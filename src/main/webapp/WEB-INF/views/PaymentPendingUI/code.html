@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11b Payment Pending</title>
+  <!-- Google Fonts: Space Grotesk & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              black: '#0B0B0B',
+              white: '#FFFFFF',
+              offwhite: '#F4F4F2',
+              gray: '#8A8A86',
+              border: '#DADAD6',
+              orange: '#FF4A1C',
+            }
+          },
+          fontFamily: {
+            heading: ['"Space Grotesk"', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #0B0B0B;
+      background-color: #FFFFFF;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+    }
+    .font-heading {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-white text-[#0B0B0B]">
+
+  <!-- Top Layout Spec Bar (Canonical 00 Public Layout Header Element) -->
+  <header class="w-full bg-[#0B0B0B] text-[#DADAD6] text-[11px] font-mono tracking-wider px-6 py-2 border-b border-[#0B0B0B] flex items-center justify-between uppercase">
+    <div class="flex items-center space-x-6">
+      <span>LAYOUT SPEC // 00 PUBLIC LAYOUT</span>
+      <span class="text-[#8A8A86]">//</span>
+      <span>ENGINE: JSP / JSTL SHARED MASTER TEMPLATE</span>
+    </div>
+    <div class="flex items-center space-x-6 text-[#8A8A86]">
+      <span>VIEWPORT: 1440PX DESKTOP</span>
+      <span>FONT: SPACE GROTESK + INTER</span>
+      <span>RADIUS: 0–4PX</span>
+      <span class="text-[#FF4A1C]">ACCENT: #FF4A1C</span>
+    </div>
+  </header>
+
+  <!-- Canonical Shared Navigation Bar from 00 Public Layout -->
+  <nav class="w-full bg-white border-b border-[#DADAD6] px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-8">
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center space-x-2.5 text-[#0B0B0B] no-underline">
+        <span class="w-2.5 h-2.5 bg-[#FF4A1C] inline-block"></span>
+        <span class="font-heading font-bold text-[19px] tracking-tight uppercase">SỬA HAY BÁN</span>
+      </a>
+
+      <!-- Nav Links -->
+      <div class="hidden md:flex items-center space-x-6 text-[14px] font-medium text-[#0B0B0B]">
+        <a href="#" class="hover:text-[#FF4A1C] transition-colors">Mua mới</a>
+        <a href="#" class="hover:text-[#FF4A1C] transition-colors">Chợ đồ cũ</a>
+        <a href="#" class="hover:text-[#FF4A1C] transition-colors">Sửa chữa</a>
+      </div>
+    </div>
+
+    <!-- Center Search Bar -->
+    <div class="flex-1 max-w-[460px] mx-6">
+      <div class="relative flex items-center">
+        <svg class="w-4 h-4 text-[#8A8A86] absolute left-3.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Tìm laptop theo tên hoặc cấu hình..." 
+          class="w-full bg-[#F4F4F2] text-[#0B0B0B] placeholder-[#8A8A86] text-[13px] pl-10 pr-4 py-2 border border-[#DADAD6] rounded-none focus:outline-none focus:border-[#0B0B0B]"
+          readonly
+        />
+      </div>
+    </div>
+
+    <!-- Right Controls: Logged In State (Canonical Reference) -->
+    <div class="flex items-center space-x-5">
+      <div class="flex items-center space-x-3 border-r border-[#DADAD6] pr-5">
+        <div class="w-8 h-8 rounded-full bg-[#0B0B0B] text-white flex items-center justify-center font-bold text-[11px] tracking-wider">
+          AN
+        </div>
+        <div class="text-left text-[12px] leading-tight">
+          <div class="font-semibold text-[#0B0B0B]">Nguyễn Văn An</div>
+          <div class="text-[#8A8A86] text-[11px]">Thành viên</div>
+        </div>
+      </div>
+
+      <!-- Cart Icon with Badge -->
+      <a href="#" class="relative p-1 text-[#0B0B0B] hover:text-[#FF4A1C] transition-colors flex items-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="absolute -top-1.5 -right-2 bg-[#FF4A1C] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full leading-tight">
+          0
+        </span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content Area: Centered Status Panel on Off-White Background -->
+  <main class="flex-1 w-full bg-[#F4F4F2] flex items-center justify-center px-4 py-12 md:py-16">
+    <div class="w-full max-w-[680px] bg-white border border-[#DADAD6] rounded-none p-8 md:p-12 text-center flex flex-col items-center">
+      
+      <!-- Large Check Icon inside a Black Square -->
+      <div class="w-16 h-16 bg-[#0B0B0B] text-white flex items-center justify-center mb-6">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <!-- Status Tag: Chờ xác nhận -->
+      <div class="inline-flex items-center px-3 py-1 bg-[#F4F4F2] border border-[#DADAD6] text-[#0B0B0B] text-[13px] font-medium tracking-wide uppercase mb-4">
+        <span class="w-2 h-2 rounded-full bg-[#FF4A1C] mr-2"></span>
+        Chờ xác nhận
+      </div>
+
+      <!-- H1: Space Grotesk 48px / 700 (scaled cleanly for layout balance) -->
+      <h1 class="font-heading font-bold text-[32px] md:text-[40px] lg:text-[44px] text-[#0B0B0B] leading-[1.2] tracking-tight mb-3">
+        Đã ghi nhận thanh toán, chờ xác nhận
+      </h1>
+
+      <!-- Message: Chúng tôi sẽ xác nhận trong thời gian sớm nhất -->
+      <p class="text-[#8A8A86] text-[15px] leading-[1.6] max-w-[500px] mb-8">
+        Chúng tôi sẽ xác nhận trong thời gian sớm nhất. Bộ phận kế toán và kỹ thuật viên phòng Lab đang tiến hành đối soát giao dịch để xử lý đơn hàng của bạn.
+      </p>
+
+      <!-- Order Details Summary Card inside the panel -->
+      <div class="w-full bg-[#F4F4F2] border border-[#DADAD6] p-5 mb-8 text-left">
+        <div class="flex items-center justify-between pb-3 border-b border-[#DADAD6]">
+          <span class="text-[#8A8A86] text-[13px]">Mã đơn hàng:</span>
+          <span class="font-mono font-bold text-[#0B0B0B] text-[15px] tracking-wide">DH-10293</span>
+        </div>
+        <div class="flex items-center justify-between pt-3">
+          <span class="text-[#8A8A86] text-[13px]">Tổng thanh toán:</span>
+          <span class="text-[#0B0B0B] font-bold text-[20px] font-body">36.490.000 ₫</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="w-full flex flex-col sm:flex-row items-center justify-center gap-3">
+        <!-- Orange Button: Xem đơn hàng -->
+        <a href="#" class="w-full sm:w-auto min-w-[180px] bg-[#FF4A1C] hover:bg-[#e03e13] text-white text-[14px] font-semibold py-3 px-6 text-center transition-colors no-underline">
+          Xem đơn hàng
+        </a>
+
+        <!-- Black Outlined Button: Tiếp tục mua sắm -->
+        <a href="#" class="w-full sm:w-auto min-w-[180px] bg-transparent hover:bg-[#0B0B0B] hover:text-white text-[#0B0B0B] text-[14px] font-semibold py-3 px-6 text-center border border-[#0B0B0B] transition-colors no-underline">
+          Tiếp tục mua sắm
+        </a>
+      </div>
+
+      <!-- Trust & Support Technical Note -->
+      <div class="mt-8 pt-6 border-t border-[#DADAD6] w-full text-center">
+        <span class="text-[13px] text-[#8A8A86]">
+          Cần hỗ trợ gấp? Liên hệ tổng đài xác thực thanh toán: <strong class="text-[#0B0B0B] font-semibold">1900 6868</strong> (8:00 - 21:00)
+        </span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Canonical Shared Footer from 00 Public Layout -->
+  <footer class="w-full bg-[#0B0B0B] text-white border-t border-[#0B0B0B]">
+    <div class="max-w-[1440px] mx-auto px-8 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-[13px] leading-relaxed">
+      <!-- Col 1: Brand & Certification -->
+      <div class="space-y-4">
+        <div class="flex items-center space-x-2 text-white">
+          <span class="w-2.5 h-2.5 bg-[#FF4A1C] inline-block"></span>
+          <span class="font-heading font-bold text-[18px] tracking-tight uppercase">SỬA HAY BÁN</span>
+        </div>
+        <p class="text-[#8A8A86] text-[13px] max-w-[260px]">
+          Nền tảng kiểm định kỹ thuật và giao dịch laptop chuẩn minh bạch hàng đầu Việt Nam. Tích hợp báo giá sửa chữa phòng sạch và sàn máy cũ tin cậy.
+        </p>
+        <div class="inline-flex items-center space-x-2 text-[11px] font-mono border border-[#8A8A86]/40 px-3 py-1.5 text-[#DADAD6]">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#FF4A1C]"></span>
+          <span>HỆ THỐNG KIỂM ĐỊNH 48 BƯỚC</span>
+        </div>
+      </div>
+
+      <!-- Col 2: Hỗ trợ khách hàng -->
+      <div>
+        <h4 class="font-semibold text-white mb-3 text-[14px]">Hỗ trợ khách hàng</h4>
+        <ul class="space-y-2 text-[#8A8A86]">
+          <li><a href="#" class="hover:text-white transition-colors">Câu hỏi thường gặp</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Hướng dẫn thanh toán</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Hướng dẫn báo giá sửa chữa</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Liên hệ kỹ thuật viên</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Chính sách -->
+      <div>
+        <h4 class="font-semibold text-white mb-3 text-[14px]">Chính sách</h4>
+        <ul class="space-y-2 text-[#8A8A86]">
+          <li><a href="#" class="hover:text-white transition-colors">Chính sách mua hàng</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Chính sách bảo hành</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Chính sách bảo mật</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Liên hệ -->
+      <div>
+        <h4 class="font-semibold text-white mb-3 text-[14px]">Liên hệ</h4>
+        <ul class="space-y-2 text-[#8A8A86]">
+          <li>Hotline: <strong class="text-white font-semibold">1900 6868</strong></li>
+          <li>Email: <span class="text-white">hotro@suahayban.vn</span></li>
+          <li>Địa chỉ: <span class="text-white">Hà Nội & TP. Hồ Chí Minh</span></li>
+          <li>Giờ làm việc: <span class="text-white">08:00 – 21:00 (Hàng ngày)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright & Master Layout Sub-Bar -->
+    <div class="border-t border-[#8A8A86]/20 px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-[#8A8A86]">
+      <div>© 2026 Sửa hay Bán. Tất cả quyền được bảo lưu.</div>
+      <div class="mt-2 sm:mt-0 space-x-4">
+        <span>MÃ NGUỒN: MASTER_LAYOUT.JSP</span>
+        <span>•</span>
+        <span>TIÊU CHUẨN ISO/IEC 17025</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
