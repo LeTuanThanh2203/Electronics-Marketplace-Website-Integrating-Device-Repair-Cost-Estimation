@@ -37,3 +37,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+### Tai lieu tham khao (khong commit - SDD noi bo + anh)
+reference/
