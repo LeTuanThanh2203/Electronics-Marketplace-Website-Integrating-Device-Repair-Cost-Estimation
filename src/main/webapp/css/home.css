@@ -1,0 +1,71 @@
+/* home.css - Architectural & Minimal System */
+html, body {
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Perspective Grid for Hero Section */
+.perspective-grid-container {
+  perspective: 1000px;
+}
+.perspective-grid {
+  transform: rotateX(75deg);
+  transform-origin: bottom;
+  background-image: linear-gradient(to right, #141414 1px, transparent 1px), linear-gradient(to bottom, #141414 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+#hero-spatial-bg,
+#hero-headline-plane,
+#hero-product-plane {
+  /* Disable Tailwind's CSS transition because rAF handles it frame-by-frame via JS */
+  transition: none !important;
+  will-change: transform;
+}
+
+#hero-product-plane {
+  transform-style: preserve-3d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #hero-spatial-bg,
+  #hero-headline-plane,
+  #hero-product-plane {
+    transform: none !important;
+  }
+}
+
+/* Smooth Transitions */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+.transition-colors {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Spec Picker Active State override to ensure exact replication of Stitch interaction */
+.spec-btn.active {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-top-color: #FF4A1C !important;
+  border-top-width: 2px !important;
+}
+
+/* Hide checkboxes default style for custom box */
+input[type="checkbox"].accent-primary {
+  accent-color: #0b0b0b;
+}

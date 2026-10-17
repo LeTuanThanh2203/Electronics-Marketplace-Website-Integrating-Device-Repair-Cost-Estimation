@@ -1,0 +1,43 @@
+/* ========================================================
+   Listing Module Stylesheet (Chợ Đồ Cũ - Task của Thành)
+   Tránh conflict: Module hóa riêng, không ghi đè style.css
+   ======================================================== */
+
+.listing-badge-good {
+    background-color: #059669;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+}
+
+.listing-badge-fair {
+    background-color: #d97706;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+}
+
+.listing-badge-damaged {
+    background-color: #FF4A1C;
+    color: #000000;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+}
+
+.thumb-btn.active {
+    border-color: #FF4A1C !important;
+}
+
+.spec-grid-item {
+    border-bottom: 1px solid #eeeeec;
+    padding: 8px 0;
+}

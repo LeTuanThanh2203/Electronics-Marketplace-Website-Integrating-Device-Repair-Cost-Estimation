@@ -5,13 +5,11 @@ target/
 .kotlin
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
 
 ### Eclipse ###
 .apt_generated
@@ -35,5 +33,12 @@ build/
 ### VS Code ###
 .vscode/
 
-### Mac OS ###
+### Mac OS & OS Files ###
 .DS_Store
+Thumbs.db
+Desktop.ini
+
+### Scratch & Preview Files ###
+ui_stitch.html
+*.log
+*.tmp
