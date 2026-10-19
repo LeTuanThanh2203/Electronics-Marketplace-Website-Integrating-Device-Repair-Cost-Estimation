@@ -23,13 +23,14 @@
    - Thành không cần phải viết lại logic kiểm tra session thủ công trong servlet của mình.
 
 3. **Chốt danh sách Enum Hợp đồng:**
-   - `ListingStatus`: `PENDING_APPROVAL` (chờ duyệt), `APPROVED` (đã duyệt), `REJECTED` (từ chối), `SOLD` (đã bán), `HIDDEN` (tự ẩn).
-   - `ListingCondition`: `LIKE_NEW` (như mới), `GOOD` (dùng tốt), `FAIR` (trầy xước/cũ), `FAULTY` (lỗi linh kiện/xác máy).
+   - `ListingStatus`: `AVAILABLE` (Đang bán), `RESERVED` (Đã giữ chỗ), `SOLD` (Đã bán), `HIDDEN` (Đã ẩn).
+   - `ListingCondition`: `DAMAGED` (Hư hỏng), `USED_FAIR` (Tạm ổn 95%), `USED_GOOD` (Như mới 99%).
 
-4. **Sẵn sàng API Admin Duyệt Tin:**
-   - Phân hệ Admin (`AdminServlet`) đã được trang bị endpoint xử lý duyệt tin tự động:
-     - `action=approveListing&listingId=...` -> Chuyển trạng thái sang `APPROVED`.
-     - `action=rejectListing&listingId=...` -> Chuyển trạng thái sang `REJECTED`.
+4. **Sẵn sàng API & Giao diện Admin Duyệt Tin:**
+   - Cơ chế duyệt tin theo BR-15 tách biệt với trạng thái giao dịch: dùng cờ `isApproved` và `isRemovedByAdmin`.
+   - Phân hệ Admin (`AdminServlet` + `dashboard.jsp`) đã hoàn thiện bảng danh sách tin chờ duyệt và endpoint xử lý duyệt/từ chối:
+     - `action=approveListing&listingId=...` -> Đặt `isApproved = true`, `isRemovedByAdmin = false`.
+     - `action=rejectListing&listingId=...&reason=...` -> Đặt `isApproved = false`, `isRemovedByAdmin = true`, kèm `rejectionReason`.
 
 ---
 
@@ -37,9 +38,8 @@
 
 Để hệ thống ghép nối mượt mà và không phát sinh lỗi 404/NullPointerException, Thành cần hoàn thiện các mục sau:
 
-### Mục 1: Sửa URL trong Giao diện Header (`src/main/webapp/WEB-INF/layout/header.jspf`)
-* **Hiện trạng lỗi:** Header đang trỏ link tới `/auth?action=login` và `/auth?action=register` (gây lỗi 404).
-* **Yêu cầu sửa:**
+### Mục 1: Giao diện Header (`src/main/webapp/WEB-INF/layout/header.jspf`)
+* **Đã cập nhật chuẩn:**
   - Link đăng nhập trỏ về: `${ctx}/login`
   - Link đăng ký trỏ về: `${ctx}/register`
   - Link hồ sơ cá nhân: `${ctx}/profile`
@@ -49,27 +49,29 @@
 
 ---
 
-### Mục 2: Hoàn thiện Entity Bài Đăng (`com.electronics.marketplace.entity.Listing`)
-File `Listing.java` hiện tại đang rỗng. Cần triển khai đầy đủ các trường:
-* `@ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "seller_id", nullable = false) private User seller;` (Bắt buộc liên kết với `User`).
-* `title` (String 200, nullable = false)
-* `description` (TEXT)
+### Mục 2: Entity Bài Đăng (`com.electronics.marketplace.entity.Listing`)
+Entity `Listing.java` đã hoàn thiện và đồng bộ đầy đủ các trường:
+* `@ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "seller_id", nullable = false) private User seller;`
+* `@ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "device_id", nullable = false) private Device device;`
 * `price` (BigDecimal, nullable = false)
 * `condition` (Enum `ListingCondition`)
-* `status` (Enum `ListingStatus`, mặc định là `PENDING_APPROVAL`)
-* `mainImage` (String 255)
-* `createdAt` (Timestamp)
+* `status` (Enum `ListingStatus`, mặc định là `AVAILABLE`)
+* `isApproved` (Boolean, mặc định là `false` khi người bán đăng tin - chờ Admin duyệt)
+* `isRemovedByAdmin` (Boolean, mặc định là `false`)
+* `rejectionReason` (String)
+* `createdAt`, `updatedAt` (Date)
+* `images` (List<ListingImage>), `problems` (List<ListingProblem>)
 
 ---
 
 ### Mục 3: Triển khai Service & DAO Chợ Đồ Cũ (`MarketplaceService.java`)
 Tuân thủ chuẩn kết nối JPA thông qua `DBUtil` (đã cấu hình sẵn trong `com.electronics.marketplace.DBConnection.DBUtil`):
-* **Hàm lấy danh sách tin công khai cho Storefront:**
-  - Điều kiện lọc: Bài đăng phải có `status = ListingStatus.APPROVED` VÀ người bán còn hoạt động `seller.status = UserStatus.ACTIVE`.
+* **Hàm lấy danh sách tin công khai cho Storefront (Theo BR-15):**
+  - Điều kiện lọc: Bài đăng phải mở bán công khai `status = ListingStatus.AVAILABLE`, Admin đã duyệt `isApproved = true`, không bị Admin gỡ `isRemovedByAdmin = false` VÀ người bán còn hoạt động `seller.status = UserStatus.ACTIVE`.
   - Không hiển thị bài của user đang bị Admin khóa (`SUSPENDED`).
 * **Hàm tạo bài đăng mới:**
   - Nhận `User seller` lấy từ `session.getAttribute("currentUser")`.
-  - Đặt trạng thái ban đầu: `listing.setStatus(ListingStatus.PENDING_APPROVAL)`.
+  - Đặt trạng thái ban đầu: `status = ListingStatus.AVAILABLE`, `isApproved = false` (chờ Admin duyệt).
 
 ---
 

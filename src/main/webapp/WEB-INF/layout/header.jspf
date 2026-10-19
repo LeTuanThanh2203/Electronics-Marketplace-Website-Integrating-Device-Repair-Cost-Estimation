@@ -30,17 +30,23 @@
         <nav class="site-nav">
             <a href="${ctx}/product?action=list">Mua mới</a>
             <a href="${ctx}/listing?action=marketplace" class="${activeNav == 'marketplace' ? 'active' : ''}">Chợ đồ cũ</a>
+            <a href="${ctx}/listing?action=create" class="${activeNav == 'createListing' ? 'active' : ''}">Đăng tin</a>
             <a href="${ctx}/repair?action=form">Sửa chữa</a>
         </nav>
 
         <div class="header-actions">
             <c:choose>
                 <c:when test="${empty currentUser}">
-                    <a href="${ctx}/auth?action=login" class="btn btn-ghost btn-sm">Đăng nhập</a>
-                    <a href="${ctx}/auth?action=register" class="btn btn-primary btn-sm">Đăng ký</a>
+                    <a href="${ctx}/login" class="btn btn-ghost btn-sm">Đăng nhập</a>
+                    <a href="${ctx}/register" class="btn btn-primary btn-sm">Đăng ký</a>
                 </c:when>
                 <c:otherwise>
+                    <c:if test="${currentUser.admin}">
+                        <a href="${ctx}/admin" class="btn btn-ghost btn-sm">Quản trị</a>
+                    </c:if>
+                    <a href="${ctx}/profile" class="btn btn-ghost btn-sm">Chào, <c:out value="${currentUser.name}"/></a>
                     <a href="${ctx}/order?action=history" class="btn btn-ghost btn-sm">Đơn hàng của tôi</a>
+                    <a href="${ctx}/logout" class="btn btn-ghost btn-sm">Đăng xuất</a>
                 </c:otherwise>
             </c:choose>
             <a class="cart-link" href="${ctx}/cart">
