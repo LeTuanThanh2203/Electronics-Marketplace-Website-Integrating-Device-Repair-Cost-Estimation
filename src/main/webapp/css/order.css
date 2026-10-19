@@ -1,0 +1,1137 @@
+/*
+ * Module Cart / Order / Payment - "Technical Precision Ledger".
+ * Nguon: DESIGN.md cua 5 man hinh stitch (cart, checkout, payment, paymentpending, orderhistory).
+ * Thay cho Tailwind CDN trong ban mockup: khong build step, khong script ngoai.
+ */
+
+:root {
+    /* Brand palette (phan prose cua DESIGN.md - ban mockup dung dung bo nay) */
+    --black: #0b0b0b;
+    --white: #ffffff;
+    --offwhite: #f4f4f2;
+    --gray: #8a8a86;
+    --hairline: #dadad6;
+    --orange: #ff4a1c;
+    --orange-hover: #e03e15;
+    --black-hover: #262626;
+    --error: #ba1a1a;
+
+    --radius: 4px;
+    --radius-sm: 2px;
+
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2.5rem;
+
+    --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'Consolas', monospace;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--black);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* So tien luon can hang doc: font tnum (DESIGN.md - Numbers and Currency) */
+.money,
+.mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Layout ---------- */
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--space-xl);
+}
+
+.page-head {
+    padding: var(--space-lg) 0 var(--space-md);
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: var(--space-lg);
+}
+
+.page-head h1 {
+    margin: var(--space-sm) 0;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+
+.page-head p {
+    margin: 0;
+    color: var(--gray);
+    font-size: 14px;
+}
+
+.eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--orange);
+}
+
+.eyebrow::before {
+    content: '';
+    width: 6px;
+    height: 12px;
+    background: var(--orange);
+}
+
+/* Breadcrumb */
+.crumbs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 12px var(--space-lg);
+    border: 1px solid var(--hairline);
+    background: var(--offwhite);
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.crumbs a:hover {
+    color: var(--orange);
+}
+
+.crumbs .current {
+    color: var(--black);
+    font-weight: 600;
+}
+
+/* Hai cot: noi dung + tom tat */
+.split {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-lg);
+    align-items: start;
+}
+
+.sticky {
+    position: sticky;
+    top: 88px;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--white);
+    border-bottom: 1px solid var(--hairline);
+}
+
+.site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    height: 72px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.brand::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: var(--orange);
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-left: var(--space-md);
+}
+
+.site-nav a {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.site-nav a:hover {
+    color: var(--orange);
+}
+
+.site-nav a.active {
+    border-bottom: 2px solid var(--orange);
+    padding-bottom: 2px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding-left: var(--space-md);
+    border-left: 1px solid var(--hairline);
+}
+
+.cart-link {
+    position: relative;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--orange);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    height: 44px;
+    padding: 0 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.33;
+    cursor: pointer;
+    background: none;
+}
+
+.btn-primary {
+    background: var(--black);
+    border-color: var(--black);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background: var(--black-hover);
+}
+
+.btn-accent {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: var(--white);
+}
+
+.btn-accent:hover {
+    background: var(--orange-hover);
+}
+
+.btn-ghost {
+    background: var(--white);
+    border-color: var(--hairline);
+    color: var(--black);
+}
+
+.btn-ghost:hover {
+    border-color: var(--black);
+    background: var(--offwhite);
+}
+
+.btn-danger {
+    background: var(--white);
+    border-color: var(--orange);
+    color: var(--orange);
+}
+
+.btn-danger:hover {
+    background: var(--offwhite);
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-sm {
+    height: 34px;
+    padding: 0 var(--space-md);
+    font-size: 13px;
+}
+
+.btn[disabled],
+.btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ---------- Panel / Card ---------- */
+
+.panel {
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+}
+
+.panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--hairline);
+    background: var(--offwhite);
+}
+
+.panel-head h2,
+.panel-head h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.panel-body {
+    padding: var(--space-lg);
+}
+
+.panel-foot {
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--hairline);
+    background: var(--offwhite);
+}
+
+/* ---------- Table ---------- */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    padding: 10px var(--space-md);
+    background: var(--offwhite);
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 12px var(--space-md);
+    border-bottom: 1px solid var(--hairline);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.table tr:last-child td {
+    border-bottom: 0;
+}
+
+.table tbody tr:hover {
+    background: var(--offwhite);
+}
+
+.table .num {
+    text-align: right;
+}
+
+.table .center {
+    text-align: center;
+}
+
+/* ---------- Badges / chips ---------- */
+
+.badge {
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-solid {
+    background: var(--black);
+    border: 1px solid var(--black);
+    color: var(--white);
+}
+
+.badge-outline {
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    color: var(--black);
+}
+
+.badge-accent {
+    background: var(--white);
+    border: 1px solid var(--orange);
+    color: var(--orange);
+}
+
+.badge-muted {
+    background: var(--offwhite);
+    border: 1px solid var(--hairline);
+    color: var(--gray);
+}
+
+.chip {
+    display: inline-block;
+    padding: 3px 8px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    background: var(--offwhite);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ---------- Forms ---------- */
+
+.field {
+    margin-bottom: var(--space-md);
+}
+
+.field > label {
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.field .hint {
+    margin-top: var(--space-xs);
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.field .error {
+    margin-top: var(--space-xs);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--orange);
+}
+
+input[type='text'],
+input[type='tel'],
+input[type='email'],
+input[type='number'],
+input[type='search'],
+select,
+textarea {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--font);
+    font-size: 16px;
+}
+
+textarea {
+    height: auto;
+    min-height: 88px;
+    padding: 10px 12px;
+    line-height: 1.65;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--gray);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--black);
+}
+
+.field.invalid input,
+.field.invalid select,
+.field.invalid textarea {
+    border-color: var(--orange);
+}
+
+/* Radio / checkbox */
+.choice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.choice:hover {
+    border-color: var(--black);
+}
+
+.choice input {
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--black);
+    flex-shrink: 0;
+}
+
+.choice strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.choice span {
+    font-size: 13px;
+    color: var(--gray);
+}
+
+/* ---------- Ledger (tom tat don hang) ---------- */
+
+.ledger {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ledger-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    font-size: 14px;
+}
+
+.ledger-row .label {
+    color: var(--black);
+}
+
+.ledger-row .value {
+    font-weight: 600;
+}
+
+.ledger-row.muted .label,
+.ledger-row.muted .value {
+    color: var(--gray);
+    font-weight: 400;
+}
+
+.ledger-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--hairline);
+}
+
+.ledger-total .label {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.ledger-total .value {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--orange);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Cart item ---------- */
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 96px 1fr 90px 140px 90px;
+    gap: var(--space-md);
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--hairline);
+}
+
+.cart-item:last-child {
+    border-bottom: 0;
+}
+
+.cart-item:hover {
+    background: var(--offwhite);
+}
+
+.cart-thumb {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hairline);
+    background: var(--offwhite);
+    overflow: hidden;
+}
+
+.cart-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-main {
+    min-width: 0;
+}
+
+.cart-title {
+    margin: 0 0 var(--space-xs);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.cart-title:hover {
+    color: var(--orange);
+}
+
+.cart-spec {
+    margin: 0;
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.cart-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.link-danger {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--gray);
+    cursor: pointer;
+}
+
+.link-danger:hover {
+    color: var(--orange);
+}
+
+.cart-price {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.cart-total {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* SL luon = 1 (BR-45) nen chi la nhan tinh, khong phai stepper. */
+.cart-qty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.cart-qty .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+/* ---------- QR / thanh toan ---------- */
+
+.qr-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border: 1px solid var(--hairline);
+    background: var(--white);
+    text-align: center;
+}
+
+.qr-box img {
+    width: 220px;
+    height: 220px;
+    border: 1px solid var(--hairline);
+    background: var(--offwhite);
+}
+
+.bank-list {
+    display: grid;
+    gap: 0;
+}
+
+.bank-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 14px;
+}
+
+.bank-row:last-child {
+    border-bottom: 0;
+}
+
+.bank-row dt {
+    color: var(--gray);
+}
+
+.bank-row dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Ma giao dich: cho phep copy nhanh */
+.copy {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 2px 8px;
+    border: 1px dashed var(--hairline);
+    border-radius: var(--radius-sm);
+    background: var(--offwhite);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.copy:hover {
+    border-color: var(--black);
+}
+
+/* ---------- Empty / thong bao ---------- */
+
+.empty {
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+    color: var(--gray);
+}
+
+.empty h2 {
+    margin: 0 0 var(--space-sm);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.notice {
+    padding: 12px var(--space-md);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--orange);
+    background: var(--offwhite);
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.notice strong {
+    color: var(--black);
+}
+
+.flash {
+    padding: 12px var(--space-md);
+    border-radius: var(--radius);
+    font-size: 14px;
+    margin-bottom: var(--space-md);
+}
+
+.flash-error {
+    border: 1px solid var(--orange);
+    background: #fff3f0;
+    color: var(--error);
+}
+
+.flash-ok {
+    border: 1px solid var(--hairline);
+    background: var(--offwhite);
+    color: var(--black);
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg) 0;
+    border-top: 1px solid var(--hairline);
+    background: var(--offwhite);
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.site-footer .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+/* ---------- Hang tieu de cua bang gio hang ---------- */
+
+.cart-head {
+    display: grid;
+    grid-template-columns: 96px 1fr 90px 140px 90px;
+    gap: var(--space-md);
+    padding: 10px var(--space-lg);
+    background: var(--offwhite);
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.cart-head span:first-child {
+    grid-column: 1 / 3;
+}
+
+.cart-thumb .mono {
+    font-size: 13px;
+    color: var(--gray);
+    letter-spacing: 0.04em;
+}
+
+/* ---------- Tab loc don hang ---------- */
+
+.tabs {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--hairline);
+    overflow-x: auto;
+}
+
+.tab {
+    padding: 10px 0;
+    border-bottom: 2px solid transparent;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--gray);
+    white-space: nowrap;
+}
+
+.tab:hover {
+    color: var(--black);
+}
+
+.tab.active {
+    border-bottom-color: var(--orange);
+    color: var(--black);
+    font-weight: 600;
+}
+
+/* ---------- Cac buoc checkout ---------- */
+
+.step {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.step:last-child {
+    border-bottom: 0;
+}
+
+.step-no {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.step-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.step-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.step-title h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.step-note {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+/* The phuong thuc dang chon. DESIGN.md cam drop shadow nen chi doi vien. */
+.choice:has(input:checked) {
+    border-color: var(--black);
+}
+
+/* ---------- The don hang (lich su) ---------- */
+
+.order-card {
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+}
+
+.order-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    padding: 12px var(--space-lg);
+    background: var(--offwhite);
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.order-card-body {
+    padding: var(--space-md) var(--space-lg);
+}
+
+.order-line {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.order-line:last-child {
+    border-bottom: 0;
+}
+
+.order-line .cart-thumb {
+    width: 72px;
+    height: 72px;
+}
+
+.order-line-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.order-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--hairline);
+    background: var(--offwhite);
+}
+
+/* Nhom nut thao tac tren the don / trong hero. */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.actions form {
+    display: inline;
+}
+
+/* ---------- Hero trang thai ---------- */
+
+.hero {
+    padding: var(--space-xl) var(--space-lg);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.hero .mark {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.hero h2 {
+    margin: 0 0 var(--space-sm);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.hero > p {
+    max-width: 560px;
+    margin: 0 auto var(--space-lg);
+    color: var(--gray);
+    font-size: 15px;
+}
+
+.hero .ledger {
+    max-width: 420px;
+    margin: 0 auto var(--space-lg);
+    text-align: left;
+}
+
+.hero .actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 var(--space-lg);
+    }
+
+    .split {
+        grid-template-columns: 1fr;
+    }
+
+    .sticky {
+        position: static;
+    }
+
+    /* Bang gio hang xuong 2 cot: bo hang tieu de vi khong con thang cot. */
+    .cart-head {
+        display: none;
+    }
+
+    .cart-item {
+        grid-template-columns: 96px 1fr;
+    }
+
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--space-md);
+    }
+
+    .page-head h1 {
+        font-size: 32px;
+    }
+
+    .site-header .container {
+        height: auto;
+        flex-wrap: wrap;
+        padding-top: var(--space-sm);
+        padding-bottom: var(--space-sm);
+    }
+
+    .site-nav {
+        order: 3;
+        width: 100%;
+        margin-left: 0;
+        gap: var(--space-md);
+    }
+
+    .cart-item {
+        grid-template-columns: 96px 1fr;
+        row-gap: var(--space-sm);
+    }
+
+    .cart-qty,
+    .cart-price,
+    .cart-item > .center {
+        grid-column: 2;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px var(--space-sm);
+    }
+}
