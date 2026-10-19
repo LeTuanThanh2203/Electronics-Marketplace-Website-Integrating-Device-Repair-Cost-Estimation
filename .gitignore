@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Project ###
+*.log
+hs_err_pid*
+**/WEB-INF/lib/*.jar
