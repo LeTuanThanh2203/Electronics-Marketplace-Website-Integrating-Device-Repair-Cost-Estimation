@@ -1,7 +1,10 @@
 package com.electronics.marketplace.controller.admin;
 
+import com.electronics.marketplace.DBConnection.DBUtil;
 import com.electronics.marketplace.DBConnection.UserDB;
+import com.electronics.marketplace.entity.Listing;
 import com.electronics.marketplace.entity.User;
+import com.electronics.marketplace.entity.enums.ListingStatus;
 import com.electronics.marketplace.entity.enums.UserStatus;
 import com.electronics.marketplace.filter.AuthenticationFilter;
 import com.electronics.marketplace.util.HttpUtil;
@@ -10,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
@@ -17,10 +21,20 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            // 1. Thống kê & Quản lý User (phần cũ của Tân)
             req.setAttribute("users", UserDB.selectAll());
             req.setAttribute("totalUsers", UserDB.countAll());
             req.setAttribute("activeUsers", UserDB.countByStatus(UserStatus.ACTIVE));
             req.setAttribute("suspendedUsers", UserDB.countByStatus(UserStatus.SUSPENDED));
+
+            // 2. TÍCH HỢP VỚI THÀNH: Lấy danh sách tin chợ đồ cũ chờ duyệt (PENDING_APPROVAL)
+            List<Listing> pendingListings = DBUtil.query(em -> em.createQuery(
+                    "SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.status = :st ORDER BY l.createdAt DESC", Listing.class)
+                    .setParameter("st", ListingStatus.PENDING_APPROVAL)
+                    .getResultList());
+            req.setAttribute("pendingListings", pendingListings);
+            req.setAttribute("pendingListingsCount", pendingListings.size());
+
         } catch (PersistenceException e) {
             log("Loi tai dashboard", e);
             req.setAttribute("error", "Không tải được dữ liệu.");
@@ -28,12 +42,31 @@ public class AdminServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(req, resp);
     }
 
-    /** Nhận action=lock|unlock|delete&userId=... từ AJAX và trả về JSON. */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         User me = (User) req.getSession().getAttribute(AuthenticationFilter.SESSION_KEY);
         String action = req.getParameter("action") == null ? "" : req.getParameter("action");
+
         try {
+            
+            if ("approveListing".equals(action) || "rejectListing".equals(action)) {
+                Long listingId = Long.valueOf(req.getParameter("listingId"));
+                ListingStatus newStatus = "approveListing".equals(action) ? ListingStatus.APPROVED : ListingStatus.REJECTED;
+                String msg = "approveListing".equals(action) ? "Đã duyệt bài đăng thành công." : "Đã từ chối bài đăng.";
+
+                DBUtil.execute(em -> {
+                    Listing l = em.find(Listing.class, listingId);
+                    if (l != null) {
+                        l.setStatus(newStatus);
+                    }
+                });
+
+                HttpUtil.writeJson(resp, HttpServletResponse.SC_OK,
+                    "{\"ok\":true,\"message\":\"" + msg + "\",\"listingId\":" + listingId + "}");
+                return;
+            }
+
+            
             Long id = Long.valueOf(req.getParameter("userId"));
             User target = UserDB.selectById(id);
             if (target == null) {
@@ -60,8 +93,9 @@ public class AdminServlet extends HttpServlet {
                 + ",\"total\":" + UserDB.countAll()
                 + ",\"active\":" + UserDB.countByStatus(UserStatus.ACTIVE)
                 + ",\"suspended\":" + UserDB.countByStatus(UserStatus.SUSPENDED) + "}");
+
         } catch (NumberFormatException e) {
-            fail(resp, "Mã người dùng không hợp lệ.");
+            fail(resp, "Mã đối tượng không hợp lệ.");
         } catch (PersistenceException e) {
             log("Loi thao tac admin", e);
             HttpUtil.writeJson(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -73,4 +107,3 @@ public class AdminServlet extends HttpServlet {
         HttpUtil.writeJson(resp, HttpServletResponse.SC_OK, "{\"ok\":false,\"message\":\"" + message + "\"}");
     }
 }
-

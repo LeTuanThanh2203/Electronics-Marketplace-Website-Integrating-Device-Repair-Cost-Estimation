@@ -7,7 +7,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 
 /** Chưa đăng nhập thì không vào được các URI cần tài khoản. */
-@WebFilter(urlPatterns = {"/profile", "/admin", "/admin/*", "/checkout", "/order", "/payment", "/cart"})
+@WebFilter(urlPatterns = {"/profile", "/admin", "/admin/*", "/checkout", "/order", "/payment", "/cart", "/listing"})
 public class AuthenticationFilter implements Filter {
 
     /** Tên attribute session chứa User đang đăng nhập (dùng thống nhất toàn dự án). */
@@ -20,23 +20,41 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         HttpSession s = req.getSession(false);
-        if (s != null && s.getAttribute(SESSION_KEY) != null) {
+        boolean isLoggedIn = (s != null && s.getAttribute(SESSION_KEY) != null);
+
+        // 1. Đã đăng nhập -> Cho qua mọi trang
+        if (isLoggedIn) {
             chain.doFilter(request, response);
             return;
         }
 
-        // GET /cart không có action = xem giỏ hàng, cho phép khách chưa đăng nhập
-        if ("/cart".equals(req.getServletPath()) && req.getParameter("action") == null) {
+        String path = req.getServletPath();
+        String action = req.getParameter("action");
+
+        // 2. GET /cart không có action = xem giỏ hàng -> Cho phép khách chưa đăng nhập
+        if ("/cart".equals(path) && action == null) {
             chain.doFilter(request, response);
             return;
         }
 
-        // AJAX phải nhận JSON 401, không nhận 302 (nếu không fetch sẽ nhận HTML trang login)
+        // 3. /listing: Khách xem chợ, xem chi tiết tin -> Cho qua; Chỉ chặn khi ĐĂNG TIN hoặc QUẢN LÝ TIN
+        if ("/listing".equals(path)) {
+            boolean isProtected = "create".equals(action) || "save".equals(action) 
+                               || "my-listings".equals(action) || "delete".equals(action);
+            if (!isProtected) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
+
+        // 4. AJAX phải nhận JSON 401, không nhận 302
         if (HttpUtil.wantsJson(req)) {
             HttpUtil.writeJson(resp, HttpServletResponse.SC_UNAUTHORIZED,
                 "{\"ok\":false,\"code\":\"UNAUTHENTICATED\",\"message\":\"Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.\"}");
             return;
         }
+
+        // 5. Chuyển hướng về trang đăng nhập
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 }
