@@ -29,7 +29,7 @@ public class RepairServiceTest {
         repairService = new RepairService(mockDeviceRepository, mockRepairRepository);
 
         // Chuẩn bị dữ liệu mẫu
-        laptop = new Device("Dell", "XPS", "15 9520", 2022, "Core i7", "16GB", "512GB SSD");
+        laptop = Device.forRepair("Dell", "XPS", "15 9520", 2022, "Core i7", "16GB", "512GB SSD");
         laptop.setId(1L);
         mockDeviceRepository.save(laptop);
 

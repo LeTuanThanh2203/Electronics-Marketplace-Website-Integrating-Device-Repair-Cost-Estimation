@@ -4,6 +4,11 @@ import com.electronics.marketplace.entity.Device;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository dùng chung cho Device.
+ * API gốc của module Repair (Quốc); các method {@code findById} / {@code findAll}
+ * giữ chữ ký tương thích với module Product (Anh) đang gọi.
+ */
 public interface DeviceRepository {
     Optional<Device> findById(Long id);
     List<Device> findAll();

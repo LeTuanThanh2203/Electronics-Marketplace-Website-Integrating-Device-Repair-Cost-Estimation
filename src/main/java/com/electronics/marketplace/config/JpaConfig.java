@@ -1,5 +1,6 @@
 package com.electronics.marketplace.config;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -39,6 +40,22 @@ public final class JpaConfig {
 
     public static EntityManagerFactory getEntityManagerFactory() {
         return Holder.EMF;
+    }
+
+    /**
+     * Tạo EntityManager mới từ EMF dùng chung.
+     * Giữ để module Product (Anh) đang gọi {@code JpaConfig.getEntityManager()} compile được.
+     * Caller chịu trách nhiệm {@code close()} EntityManager.
+     */
+    public static EntityManager getEntityManager() {
+        return Holder.EMF.createEntityManager();
+    }
+
+    /** Đóng EMF và pool khi context bị destroy (gọi từ AppShutdownListener). */
+    public static void shutdown() {
+        if (Holder.EMF.isOpen()) {
+            Holder.EMF.close();
+        }
     }
 
     private static EntityManagerFactory build() {

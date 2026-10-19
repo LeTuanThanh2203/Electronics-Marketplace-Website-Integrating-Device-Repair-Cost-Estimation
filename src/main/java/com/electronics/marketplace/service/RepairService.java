@@ -187,7 +187,7 @@ public class RepairService {
                     "Dòng máy '" + cleanBrand + " " + cleanSeries + " " + cleanModel + "' đã tồn tại.");
         }
 
-        Device device = new Device(cleanBrand, cleanSeries, cleanModel, releaseYear, trimToNull(cpu), trimToNull(ram), trimToNull(storage));
+        Device device = Device.forRepair(cleanBrand, cleanSeries, cleanModel, releaseYear, trimToNull(cpu), trimToNull(ram), trimToNull(storage));
         return deviceRepository.save(device);
     }
 

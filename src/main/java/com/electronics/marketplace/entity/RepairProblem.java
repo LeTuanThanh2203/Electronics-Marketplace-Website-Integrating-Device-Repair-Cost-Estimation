@@ -48,6 +48,16 @@ public class RepairProblem implements Serializable {
         this.estimatedMaxDays = estimatedMaxDays;
     }
 
+    /**
+     * Constructor rút gọn cho module Listing (Thành) — chỉ cần id + tên lỗi.
+     * Giữ lại để code bên Thành compile được khi merge.
+     */
+    public RepairProblem(Long id, String name) {
+        this.id = id;
+        this.name = name;
+        this.isActive = true;
+    }
+
     public Long getId() {
         return id;
     }
@@ -78,6 +88,18 @@ public class RepairProblem implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    /**
+     * Alias JavaBeans cho module Listing (Thành) — bên đó đang gọi
+     * {@code getIsActive()} / {@code setIsActive()}.
+     */
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive != null ? isActive : true;
     }
 
     public Integer getEstimatedMinDays() {

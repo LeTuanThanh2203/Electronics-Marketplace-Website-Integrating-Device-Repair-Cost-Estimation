@@ -85,6 +85,24 @@ public class User implements Serializable {
     public User() {
     }
 
+    /**
+     * Constructor tiện dụng cho dữ liệu demo/seed của module Listing (Thành).
+     * passwordHash để chuỗi rỗng vì tài khoản seed không dùng để đăng nhập.
+     */
+    public User(Long id, String name, String email, String phone, String location) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.location = location;
+        this.passwordHash = "";
+        this.role = Role.USER;
+        this.status = UserStatus.ACTIVE;
+        this.completedSalesCount = 0;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+    }
+
     public Long getId() {
         return id;
     }

@@ -38,11 +38,11 @@ public final class JpaUtil {
     }
 
     /**
-     * Không còn đóng EMF ở đây: EMF là singleton dùng chung cho toàn ứng dụng,
-     * và {@code AppShutdownListener} đã xử lý khi context bị destroy.
-     * Giữ method để code cũ gọi được mà không phải sửa.
+     * Đóng EMF dùng chung khi context bị destroy. Chỉ
+     * {@link com.electronics.marketplace.listener.AppShutdownListener} nên gọi;
+     * các nơi khác gọi sẽ làm hỏng pool của toàn app.
      */
     public static void shutdown() {
-        // No-op — xem AppShutdownListener.
+        JpaConfig.shutdown();
     }
 }

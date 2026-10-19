@@ -1,5 +1,6 @@
 package com.electronics.marketplace.listener;
 
+import com.electronics.marketplace.config.JpaConfig;
 import com.electronics.marketplace.util.MailUtilGmail;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -11,7 +12,7 @@ public class AppShutdownListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         MailUtilGmail.shutdown();
-        // Nếu JpaConfig có hàm đóng EntityManagerFactory thì gọi thêm ở đây,
-        // ví dụ JpaConfig.close(); để pool kết nối được trả lại khi redeploy.
+        // Đóng EMF + pool HikariCP khi redeploy/undeploy.
+        JpaConfig.shutdown();
     }
 }

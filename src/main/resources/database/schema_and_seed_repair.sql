@@ -13,6 +13,9 @@
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS devices (
     id BIGSERIAL PRIMARY KEY,
+    -- name dùng cho module Product/Listing (Anh, Thành); để NULL cho phép
+    -- module Repair chỉ nhập brand + series + model.
+    name VARCHAR(150),
     brand VARCHAR(100) NOT NULL,
     -- series NOT NULL: PostgreSQL coi mỗi NULL là khác nhau, nên nếu để NULL
     -- thì unique constraint bên dưới không chặn được dòng máy trùng.
@@ -22,9 +25,14 @@ CREATE TABLE IF NOT EXISTS devices (
     cpu VARCHAR(100),
     ram VARCHAR(50),
     storage VARCHAR(50),
+    device_type VARCHAR(50) DEFAULT 'LAPTOP',
     CONSTRAINT uq_devices_brand_series_model UNIQUE (brand, series, model),
     CONSTRAINT chk_devices_release_year CHECK (release_year IS NULL OR release_year BETWEEN 1990 AND 2100)
 );
+
+-- Bổ sung cột cho database đã tạo trước khi hợp nhất 3 nhánh (idempotent).
+ALTER TABLE devices ADD COLUMN IF NOT EXISTS name VARCHAR(150);
+ALTER TABLE devices ADD COLUMN IF NOT EXISTS device_type VARCHAR(50) DEFAULT 'LAPTOP';
 
 -- -----------------------------------------------------------------------------
 -- 2. BẢNG LOẠI LỖI (REPAIR_PROBLEMS)
@@ -72,7 +80,9 @@ CREATE TABLE IF NOT EXISTS repair_pricings (
 --    Nếu entity đổi tên cột, sửa cả hai nơi để hbm2ddl không tạo cột trùng.
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
-    user_id BIGSERIAL PRIMARY KEY,
+    -- Entity User map khóa chính thành cột "id" (mặc định Hibernate), nên DDL
+    -- phải dùng "id" để hbm2ddl.auto=update không sinh thêm cột user_id trùng.
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     avatar VARCHAR(255),
     location VARCHAR(150),
@@ -93,7 +103,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS repair_requests (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
     device_id BIGINT NOT NULL REFERENCES devices(id) ON DELETE RESTRICT,
     problem_id BIGINT NOT NULL REFERENCES repair_problems(problem_id) ON DELETE RESTRICT,
     customer_name VARCHAR(100),
@@ -182,7 +192,7 @@ ON CONFLICT (email) DO NOTHING;
 -- Yêu cầu sửa chữa mẫu để kiểm thử báo cáo thống kê GROUP BY.
 -- Chỉ chèn khi bảng còn trống, để chạy lại script không nhân đôi đơn.
 INSERT INTO repair_requests (user_id, device_id, problem_id, customer_name, customer_phone, customer_email, description, status)
-SELECT u.user_id, d.id, p.problem_id, v.customer_name, v.phone, v.email, v.description, 'ESTIMATED'
+SELECT u.id, d.id, p.problem_id, v.customer_name, v.phone, v.email, v.description, 'ESTIMATED'
 FROM (VALUES
     ('Apple', 'iPhone', 'iPhone 16 Pro Max', 'Vỡ màn hình / Chảy mực', 'Trần Minh Đức', '0901234567', 'duc@example.com', 'Rơi từ bàn làm việc vỡ màn hình'),
     ('Dell',  'XPS',    'Dell XPS 15 9530',    'Vỡ màn hình / Chảy mực', 'Lê Hoàng Nam',  '0902345678', 'nam@example.com', 'Màn hình bị va đập góc cấn sọc ngang'),

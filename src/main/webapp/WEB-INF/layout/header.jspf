@@ -8,7 +8,10 @@
     Neu Tan dat ten khac trong AuthenticationFilter thi sua 2 dong duoi day.
 --%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-<c:set var="cartCount" value="${fn:length(sessionScope.cart.items)}" />
+<%-- Không dùng fn:length ở đây: fragment được static include nên mỗi trang gọi
+     phải tự khai báo thư viện functions, dễ quên và làm hỏng cả trang. Dùng EL
+     null-safe với List.size() để fragment tự đứng được. --%>
+<c:set var="cartCount" value="${empty sessionScope.cart or empty sessionScope.cart.items ? 0 : sessionScope.cart.items.size()}" />
 <c:set var="currentUser" value="${sessionScope.currentUser}" />
 <!DOCTYPE html>
 <html lang="vi">
