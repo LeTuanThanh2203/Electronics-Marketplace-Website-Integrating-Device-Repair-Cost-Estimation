@@ -116,6 +116,26 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <!--
+                      jakartaee-web-api (provided) keo jakarta.json.bind-api vao
+                      classpath test, nhung khong keo provider (yasson). Hibernate
+                      chi kiem tra API class co load duoc khong, thay co -> dung
+                      JsonBJsonFormatMapper -> JsonbBuilder.create() no
+                      ClassNotFoundException. Luc chay that trong WAR, dependency
+                      provided khong duoc dong goi va Tomcat lib khong co json-bind,
+                      nen nhanh nay khong bao gio chay. Loai no khoi classpath test
+                      de test giong production.
+                    -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>jakarta.json.bind:jakarta.json.bind-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

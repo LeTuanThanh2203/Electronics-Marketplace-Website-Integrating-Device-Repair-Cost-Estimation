@@ -1,5 +1,15 @@
 package com.electronics.marketplace.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -9,15 +19,39 @@ import java.math.BigDecimal;
  * loai tru lan nhau. quantity luon = 1.
  * price la snapshot tai thoi diem tao Order, bat bien sau do (BR-41).
  */
+@Entity
+@Table(name = "order_items")
 public class OrderItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    /**
+     * Order MARKETPLACE tro toi Listing da mua. Cot van la "listing_id" nen du
+     * lieu cu khong doi; khac biet la gio doc duoc listing.device.name cho
+     * history.jsp (truoc day chi co ID tho).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "listing_id")
     private Listing listing;
+
+    /** nullable: Order NEW_DEVICE dung product, MARKETPLACE dung listing (XOR). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
+
+    /** updatable = false: BR-41 - snapshot gia, bat bien sau khi tao. */
+    @Column(nullable = false, precision = 14, scale = 2, updatable = false)
     private BigDecimal price;
+
+    @Column(nullable = false)
     private int quantity = 1;
 
     public OrderItem() {

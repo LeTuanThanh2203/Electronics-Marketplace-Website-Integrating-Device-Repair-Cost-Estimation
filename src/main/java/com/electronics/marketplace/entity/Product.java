@@ -2,6 +2,15 @@ package com.electronics.marketplace.entity;
 
 import com.electronics.marketplace.entity.enums.ProductStatus;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -16,16 +25,32 @@ import java.math.BigDecimal;
  * (device, deviceModel, admin) va avgRating thuoc pham vi Product module cua
  * Phuoc Anh - them kem annotation JPA khi ban do entity, tranh dung do o day.
  */
+@Entity
+@Table(name = "products")
 public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 200)
     private String name;
+
+    @Column(length = 100)
     private String brand;
+
+    @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal price;
+
+    /** Luu dang chuoi cho doc duoc trong DB (SDD 13.11). */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private ProductStatus status;
+
     /** Display-only (FR-BUY-03). MVP khong co entity Store rieng. */
+    @Column(name = "store_name", length = 150)
     private String storeName;
 
     public Product() {

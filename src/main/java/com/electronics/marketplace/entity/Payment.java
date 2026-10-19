@@ -3,6 +3,20 @@ package com.electronics.marketplace.entity;
 import com.electronics.marketplace.entity.enums.PaymentMethod;
 import com.electronics.marketplace.entity.enums.PaymentStatus;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -13,17 +27,44 @@ import java.util.Date;
  * MVP khong tich hop payment gateway: he thong sinh Payment o PENDING,
  * Admin xac nhan thu cong sang PAID (BR-44).
  */
+@Entity
+@Table(name = "payments")
 public class Payment implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /** unique: BR-44 - toi da mot Payment cho moi Order. */
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
+
+    /** nullable: COD de trong cho toi khi Customer chon (class diagram). */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private PaymentMethod method;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private PaymentStatus status;
+
+    @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal amount;
+
+    /** Sinh luc tao Payment (BR-44). unique de tra cuu doi soat. */
+    @Column(name = "transaction_code", nullable = false, unique = true, length = 50)
     private String transactionCode;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
+
+    /** Ghi khi status chuyen sang PAID (SDD 13.8). */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "paid_at")
     private Date paidAt;
 
     public Payment() {
