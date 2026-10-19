@@ -79,6 +79,9 @@ public class Product implements Serializable {
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity = 10;
 
+    @Column(name = "store_name", length = 150)
+    private String storeName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id")
     private Device device;
@@ -262,6 +265,14 @@ public class Product implements Serializable {
 
     public void setStockQuantity(Integer stockQuantity) {
         this.stockQuantity = stockQuantity;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 
     public Device getDevice() {

@@ -1,4 +1,4 @@
-package com.electronics.marketplace.controller.catalog;
+package com.electronics.marketplace.controller.storefront;
 
 import com.electronics.marketplace.dto.RecommendationRequest;
 import com.electronics.marketplace.dto.RecommendedProduct;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Controller handling product catalog, filtering, detail inspection, and recommendation engine.
  * URL patterns: /products, /product
- * Follows Murach Controller architecture and Rule 1 (Action routing) & Rule 4 (AJAX/JSON support).
+ * Placed in com.electronics.marketplace.controller.storefront to align with team branch architecture.
  */
 @WebServlet(name = "ProductServlet", urlPatterns = {"/products", "/product"})
 public class ProductServlet extends HttpServlet {
@@ -258,7 +258,6 @@ public class ProductServlet extends HttpServlet {
     private BigDecimal parseBigDecimal(String val) {
         if (val == null || val.trim().isEmpty()) return null;
         try {
-            // Remove dots and commas (e.g. 15.000.000 or 15,000,000)
             String clean = val.replaceAll("[^0-9.]", "").trim();
             if (clean.isEmpty()) return null;
             return new BigDecimal(clean);

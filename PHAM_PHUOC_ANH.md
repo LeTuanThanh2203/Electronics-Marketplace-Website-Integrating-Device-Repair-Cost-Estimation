@@ -84,7 +84,7 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo giáo trình Murach's
 ### 3.4. Tầng Điều khiển (Controller & Routing)
 
 - **`ProductServlet.java`:**
-  - Vị trí: `com.electronics.marketplace.controller.catalog` (URL pattern: `/products`, `/product`).
+  - Vị trí: `com.electronics.marketplace.controller.storefront` (URL pattern: `/products`, `/product`).
   - **Quy tắc điều hướng (Action Routing):**
     - `action=list` (mặc định): Trả về trang danh mục sản phẩm, hỗ trợ lọc theo hãng, khoảng giá, nhu cầu, phân trang và sắp xếp.
     - `action=detail&id=X`: Trả về trang chi tiết sản phẩm, tải toàn bộ ma trận thông số kỹ thuật `specifications`.
@@ -132,10 +132,9 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo giáo trình Murach's
    - Gọi API gợi ý: `http://localhost:8080/products?action=recommend&budget=35000000&need=GAMING`
 
 ### 4.2. Lưu ý về Cấu trúc Package
-- **Sửa lỗi cú pháp Java của đồng đội:** Trong Java, từ khóa `public` là từ khóa cấm đặt tên package (JLS §3.9). Do đó:
-  - `ProductServlet` được đặt tại: `com.electronics.marketplace.controller.catalog`.
-  - `ListingServlet` được đặt tại: `com.electronics.marketplace.controller.listing`.
-- Vui lòng **không tạo lại** thư mục package có tên là `public`.
+- **Đồng bộ với nhánh Nam:** Toàn bộ Servlet storefront công khai phục vụ khách hàng được gom vào package chuẩn:
+  - `com.electronics.marketplace.controller.storefront` (gồm `ProductServlet.java` và `ListingServlet.java`).
+- Vui lòng **không sử dụng** thư mục package có tên là `public` (vì `public` là từ khóa cấm trong Java JLS §3.9) hoặc `catalog`.
 
 ### 4.3. Kết nối Cơ sở Dữ liệu Thật (PostgreSQL)
 - Cấu hình thông tin kết nối tại: `src/main/resources/META-INF/persistence.xml`.
