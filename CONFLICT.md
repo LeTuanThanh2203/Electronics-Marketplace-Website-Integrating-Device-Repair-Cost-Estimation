@@ -300,4 +300,20 @@ cmd.exe /c "set JAVA_HOME=C:\Program Files\Java\latest\jdk-21&& .\mvnw.cmd test 
 ```
 
 ---
+
+# IV. XỬ LÝ LỖI RUNTIME & KẾT NỐI LIÊN THÔNG TOÀN DIỆN (POST-MERGE CONNECTIVITY FIXES)
+
+Sau khi hợp nhất mã nguồn, khi chạy Tomcat và click vào các tính năng trên giao diện trình duyệt, phát sinh hiện tượng **click vào đâu cũng lỗi 404 hoặc 500**. Quá trình rà soát pháp y đã xác định và xử lý triệt để 7 nguyên nhân gốc rễ sau:
+
+| STT | Nguyên Nhân Gốc Rễ | Lỗi Gây Ra | Cách Khắc Phục Triệt Để |
+|:---:|---|---|---|
+| **1** | `JpaConfig.java` gọi `requireEnv("DB_URL")` ném `IllegalStateException` khi máy local chưa set biến môi trường | **HTTP 500** trên mọi tương tác DB (Sửa chữa, Giỏ hàng, Đăng nhập, Duyệt tin) | Cung cấp fallback an toàn cho local dev: `jdbc:postgresql://localhost:5432/electronics_marketplace`, user/pass: `postgres/postgres`. Khởi tạo EMF lazy có phục hồi thay vì Holder tĩnh làm hỏng class loading. |
+| **2** | Còn sót conflict markers `<<<<<<< HEAD` trong `persistence.xml` | Hibernate không parse được XML, ứng dụng sập ngay lúc bootstrap | Dọn sạch conflict markers và persistence unit phụ không dùng, đảm bảo XML đạt chuẩn W3C. |
+| **3** | Tồn tại servlet rỗng `controller/pub/ProductServlet.java` đè mapping `{"/products", "/product/*"}` của Phước Anh | **HTTP 404 / 405** khi xem danh mục máy mới | Xóa bỏ hoàn toàn servlet rỗng; chuyển quyền điều phối cho `controller/storefront/ProductServlet.java` với `urlPatterns = {"/products", "/product", "/product/*"}` và hỗ trợ bóc tách `pathInfo`. |
+| **4** | Lệch URL Auth giữa Header (`/auth/login`) và Servlet của Tân (`/login`) | **HTTP 404** khi bấm nút "Tài khoản" hoặc "Đăng nhập" | Cập nhật `LoginServlet`, `RegisterServlet`, `ProfileServlet`, `LogoutServlet` hỗ trợ cả 2 URL pattern: `/login` và `/auth/login`, `/register` và `/auth/register`. |
+| **5** | File `cart.jsp` bị rỗng (0 bytes) do lỗi revert cũ của nhánh Tân | Bấm "Giỏ hàng" ra trang trắng tinh | Khôi phục 100% nội dung `cart.jsp` (8,158 bytes) từ commit gốc của Nam (`origin/Nam`). Đồng bộ dashboard và auth JSP vào `WEB-INF/views/`. |
+| **6** | Nút "Thêm vào giỏ" và "Mua ngay" trên `product/detail.jsp` chỉ là thẻ `<button>` rỗng | Click mua máy mới không phản hồi | Bọc form POST gửi `action=add` và `productId` tới `CartServlet` (`/cart`), hoàn thiện luồng mua sắm: Xem máy $\to$ Thêm giỏ $\to$ Checkout $\to$ MoMo Gateway/COD. |
+| **7** | Lỗi đường dẫn error-page trong `web.xml` | Lỗi lồng lỗi khi Tomcat điều hướng 404/500 | Sửa location trỏ đúng file thực tế: `/WEB-INF/views/error/404.jsp` và `/WEB-INF/views/error/500.jsp`. |
+
+---
 *Tài liệu này là bằng chứng pháp y kỹ thuật ghi nhận toàn bộ quá trình hợp nhất 5 nhánh của nhóm vào ngày 19/10/2026.*
