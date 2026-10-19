@@ -1,15 +1,16 @@
 package com.electronics.marketplace.DBConnection;
 
-import java.util.List;
-import com.electronics.marketplace.entity.enums.UserStatus;
 import com.electronics.marketplace.entity.User;
 import com.electronics.marketplace.entity.enums.Role;
+import com.electronics.marketplace.entity.enums.UserStatus;
+import java.util.List;
 
 public class UserDB {
-    public static int insert(User u) {
+
+    public static Long insert(User u) {
         return DBUtil.inTransaction(em -> {
             em.persist(u);
-            return u.getUserID();
+            return u.getId();
         });
     }
 
@@ -23,7 +24,7 @@ public class UserDB {
         });
     }
 
-    public static User selectById(int id) {
+    public static User selectById(Long id) {
         return DBUtil.query(em -> em.find(User.class, id));
     }
 
@@ -40,7 +41,7 @@ public class UserDB {
 
     public static List<User> selectAll() {
         return DBUtil.query(em -> em.createQuery(
-                "SELECT u FROM User u ORDER BY u.userID", User.class).getResultList());
+                "SELECT u FROM User u ORDER BY u.id", User.class).getResultList());
     }
 
     public static int countAll() {
@@ -57,7 +58,7 @@ public class UserDB {
 
     public static void updateProfile(User u) {
         DBUtil.execute(em -> {
-            User m = em.find(User.class, u.getUserID());
+            User m = em.find(User.class, u.getId());
             m.setName(u.getName());
             m.setPhone(u.getPhone());
             m.setLocation(u.getLocation());
@@ -65,11 +66,11 @@ public class UserDB {
         });
     }
 
-    public static void updatePassword(int userID, String passwordHash) {
-        DBUtil.execute(em -> em.find(User.class, userID).setPasswordHash(passwordHash));
+    public static void updatePassword(Long userId, String passwordHash) {
+        DBUtil.execute(em -> em.find(User.class, userId).setPasswordHash(passwordHash));
     }
 
-    public static void updateStatus(int userID, UserStatus status) {
-        DBUtil.execute(em -> em.find(User.class, userID).setStatus(status));
+    public static void updateStatus(Long userId, UserStatus status) {
+        DBUtil.execute(em -> em.find(User.class, userId).setStatus(status));
     }
 }

@@ -1,15 +1,21 @@
 package com.electronics.marketplace.DBConnection;
 
+import com.electronics.marketplace.config.JpaConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** Tiện ích mở/đóng EntityManager và transaction để các lớp DAO gọn hơn. */
+/** Tiện ích mở/đóng EntityManager và transaction cho các lớp DAO. */
 public class DBUtil {
-    /** Chạy thao tác đọc (không cần transaction), tự đóng EntityManager. */
+
+    private static EntityManager em() {
+        return JpaConfig.getEntityManagerFactory().createEntityManager();
+    }
+
+    /** Thao tác đọc (không cần transaction), tự đóng EntityManager. */
     public static <T> T query(Function<EntityManager, T> work) {
-        EntityManager em = DBConnection.createEntityManager();
+        EntityManager em = em();
         try {
             return work.apply(em);
         } finally {
@@ -17,9 +23,9 @@ public class DBUtil {
         }
     }
 
-    /** Chạy thao tác ghi trong transaction, trả về kết quả. Lỗi thì rollback. */
+    /** Thao tác ghi trong transaction, trả về kết quả. Lỗi thì rollback. */
     public static <T> T inTransaction(Function<EntityManager, T> work) {
-        EntityManager em = DBConnection.createEntityManager();
+        EntityManager em = em();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
