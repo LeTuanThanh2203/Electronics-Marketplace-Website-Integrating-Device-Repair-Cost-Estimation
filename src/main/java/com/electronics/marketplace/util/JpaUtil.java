@@ -1,53 +1,36 @@
 package com.electronics.marketplace.util;
 
-import com.electronics.marketplace.config.AppLifecycleListener;
+import com.electronics.marketplace.config.JpaConfig;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 /**
- * Điểm truy cập duy nhất tới {@link EntityManagerFactory} của ứng dụng.
+ * Điểm truy cập EntityManagerFactory cho module Repair.
  *
- * <p>EMF được tạo lười ở lần dùng đầu tiên và được đóng bởi
- * {@link AppLifecycleListener} khi Tomcat undeploy/reload. Nếu không đóng,
- * HikariCP giữ connection pool mở và mỗi lần redeploy sẽ rò một pool, dần cạn
- * connection của PostgreSQL.</p>
+ * <p>Đây là lớp vỏ mỏng chuyển tiếp sang {@link JpaConfig} của module Auth.
+ * <b>Không</b> tự gọi {@code Persistence.createEntityManagerFactory()}: cấu hình
+ * kết nối (DB_URL / DB_USER / DB_PASSWORD) nằm trong {@code JpaConfig}, và
+ * {@code persistence.xml} dùng placeholder {@code ${DB_URL}} mà Hibernate 6.4.4
+ * không tự resolve được khi tạo EMF trực tiếp.</p>
+ *
+ * <p>Nhờ vậy cả hai module dùng chung một EntityManagerFactory và một connection
+ * pool HikariCP. Việc đóng pool do
+ * {@link com.electronics.marketplace.listener.AppShutdownListener} đảm nhận.</p>
  */
 public final class JpaUtil {
-
-    private static final String PERSISTENCE_UNIT_NAME = "Electronics_MarketplacePU";
-
-    private static volatile EntityManagerFactory emf;
 
     private JpaUtil() {
     }
 
     /**
-     * Trả về EMF, tạo mới nếu chưa có hoặc đã bị đóng.
+     * Trả về EMF dùng chung.
      *
-     * @throws IllegalStateException nếu không khởi tạo được (thiếu driver, sai cấu hình DB...)
+     * @throws IllegalStateException nếu thiếu biến môi trường kết nối DB
+     *         (do {@code JpaConfig} ném ra)
      */
     public static EntityManagerFactory getEntityManagerFactory() {
-        EntityManagerFactory local = emf;
-        if (local == null || !local.isOpen()) {
-            synchronized (JpaUtil.class) {
-                local = emf;
-                if (local == null || !local.isOpen()) {
-                    try {
-                        local = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-                    } catch (Throwable ex) {
-                        // Ném lỗi rõ ràng thay vì trả null rồi NPE ở tầng repository.
-                        throw new IllegalStateException(
-                                "Không khởi tạo được EntityManagerFactory '" + PERSISTENCE_UNIT_NAME
-                                        + "'. Kiểm tra PostgreSQL đang chạy và cấu hình trong persistence.xml. "
-                                        + "Nguyên nhân: " + ex.getMessage(), ex);
-                    }
-                    emf = local;
-                }
-            }
-        }
-        return local;
+        return JpaConfig.getEntityManagerFactory();
     }
 
     public static EntityManager getEntityManager() {
@@ -55,17 +38,11 @@ public final class JpaUtil {
     }
 
     /**
-     * Đóng EMF và giải phóng connection pool. Được gọi tự động khi ứng dụng dừng.
+     * Không còn đóng EMF ở đây: EMF là singleton dùng chung cho toàn ứng dụng,
+     * và {@code AppShutdownListener} đã xử lý khi context bị destroy.
+     * Giữ method để code cũ gọi được mà không phải sửa.
      */
-    public static synchronized void shutdown() {
-        if (emf != null && emf.isOpen()) {
-            try {
-                emf.close();
-            } catch (Exception e) {
-                System.err.println("Lỗi khi đóng EntityManagerFactory: " + e.getMessage());
-            } finally {
-                emf = null;
-            }
-        }
+    public static void shutdown() {
+        // No-op — xem AppShutdownListener.
     }
 }

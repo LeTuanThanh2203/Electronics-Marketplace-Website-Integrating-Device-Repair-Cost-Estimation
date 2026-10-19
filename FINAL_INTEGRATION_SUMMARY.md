@@ -1,99 +1,48 @@
-# Tổng Hợp Tích Hợp — Module Repair (Quốc) vs. Các Nhánh Trên GitHub
+# Tổng Hợp Tích Hợp — Module Repair (Quốc)
 
 > **Người thực hiện:** Quốc
-> **Ngày rà soát:** 19/10/2026
-> **Đã fetch:** `origin/master`, `origin/Quoc`, `origin/Tan`, `origin/Thanh`, `origin/Nam`, `origin/Anh`
-> **Mục đích:** Xác định chính xác phần Quốc đã xong chưa, cần sửa gì để khớp các nhánh khác, và còn bị chặn ở đâu.
+> **Cập nhật:** 19/10/2026 — sau khi rebase lên `origin/Tan` (commit `2b9e8d9`)
+> **Nhánh:** `Quoc` (đã rebase, đã sửa P1–P3)
+> **Trạng thái:** Compile 0 lỗi (loại `controller/public`), 18/18 test pass, 9 JSP compile 0 lỗi
 
 ---
 
-## PHẦN 0 — TRẠNG THÁI CÁC NHÁNH (đã fetch ngày 19/10/2026)
+## PHẦN 0 — TRẠNG THÁI NHÁNH
 
-| Nhánh | Commit mới nhất | Nội dung |
+| Nhánh | Commit | Ghi chú |
 |---|---|---|
-| `master` | `9072b00 Set up project` | **Chưa ai merge** — vẫn là commit gốc |
-| `Quoc` | `9072b00 Set up project` | **Chưa push gì** — vẫn là commit gốc |
-| `Tan` | `2b9e8d9 Merge branch 'Nam' into Tan` | Auth/User/Filter + đã merge Nam |
-| `Thanh` | `333df71 Fix theo file PHOIHOP...` | Listing/Marketplace + tài liệu phối hợp |
-| `Nam` | `3664f24 feat: tich hop cong thanh toan MoMo that...` | Order/Payment |
-| `Anh` | `ca687c6 thêm các UI của product` | Product |
+| `master` | `9072b00` | Chưa ai merge |
+| `Quoc` | rebase trên `origin/Tan` | **Đã rebase + sửa P1–P3** |
+| `Tan` | `2b9e8d9 Merge branch 'Nam'` | Auth/User/Filter + JpaConfig |
+| `Thanh` | `333df71` | Listing/Marketplace |
+| `Nam` | `3664f24` | Order/Payment |
+| `Anh` | `ca687c6` | Product |
 
-**Kết luận quan trọng:** `origin/Quoc` **chưa có code nào**. Toàn bộ module Repair hiện chỉ nằm ở working tree máy Quốc.
+**Quan trọng:** nhánh `Quoc` giờ **dựa trên `origin/Tan`**, không còn dựa trên `master`.
+Nhờ vậy có `User`, `AuthenticationFilter`, `JpaConfig` thật.
 
 ---
 
-## PHẦN 1 — PHÁT HIỆN LỚN: TÂN ĐÃ REFACTOR CẤU HÌNH JPA
+## PHẦN 1 — NHỮNG GÌ ĐÃ SỬA TRONG LẦN NÀY
 
-Đây là thay đổi ảnh hưởng trực tiếp tới code Quốc.
+### P1. `JpaUtil` — chuyển sang dùng `JpaConfig` ✅
 
-### 1.1. `JpaConfig.java` trên nhánh Tan giờ **không còn rỗng**
-
-Trước đây (bản Quốc từng đọc) `JpaConfig` là class rỗng. Nhánh `Tan` hiện tại đã implement đầy đủ:
-
+**Trước:**
 ```java
-public final class JpaConfig {
-    public static final String PU_NAME = "Electronics_MarketplacePU";
-    private static final String ENV_URL = "DB_URL";
-    private static final String ENV_USER = "DB_USER";
-    private static final String ENV_PASSWORD = "DB_PASSWORD";
+// Tự tạo EMF, không truyền cấu hình kết nối
+local = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+```
 
-    public static EntityManagerFactory getEntityManagerFactory() { return Holder.EMF; }
-
-    private static EntityManagerFactory build() {
-        return Persistence.createEntityManagerFactory(PU_NAME, connectionOverrides());
-    }
-
-    private static Map<String, Object> connectionOverrides() {
-        // đọc DB_URL / DB_USER / DB_PASSWORD từ biến môi trường
-        // ném IllegalStateException nếu thiếu
-    }
+**Sau:**
+```java
+public static EntityManagerFactory getEntityManagerFactory() {
+    return JpaConfig.getEntityManagerFactory();   // dùng chung EMF của toàn app
 }
 ```
 
-### 1.2. `persistence.xml` trên nhánh Tan dùng placeholder `${DB_URL}`
-
-```xml
-<persistence-unit name="Electronics_MarketplacePU" transaction-type="RESOURCE_LOCAL">
-    <!-- KHÔNG khai báo <class>, KHÔNG bật exclude-unlisted-classes -->
-    <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
-    <property name="jakarta.persistence.jdbc.user" value="${DB_USER}"/>
-    <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/>
-</persistence-unit>
-
-<persistence-unit name="adminPU" ...>   <!-- vẫn còn -->
-    <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
-</persistence-unit>
-```
-
-### 1.3. `DBConnection.java` **đã bị xóa** trên nhánh Tan
-
-```
-origin/Tan/src/main/java/com/electronics/marketplace/DBConnection/
-  ├── AuthDB.java     ✅ còn
-  ├── DBUtil.java     ✅ còn
-  └── UserDB.java     ✅ còn
-  (DBConnection.java, DatabaseInitializer.java — ĐÃ XÓA)
-```
-
-Thay vào đó là 2 listener mới:
-- `listener/AdminSeedListener.java`
-- `listener/AppShutdownListener.java`
-
-`DBUtil` trên nhánh Tan gọi `JpaConfig.getEntityManagerFactory()` — **giờ hợp lệ** vì `JpaConfig` đã có method đó.
-
-### 1.4. Hệ quả với code Quốc
-
-| Code Quốc | Trạng thái trên nhánh Tan |
-|---|---|
-| `util/JpaUtil.java` | ⚠️ **Xung đột** — tạo EMF riêng, không truyền overrides |
-| `config/AppLifecycleListener.java` | ⚠️ **Trùng chức năng** với `listener/AppShutdownListener.java` |
-| `DBConnection/DBUtil.java` (Quốc sửa) | ❌ Tan đã có bản riêng gọi `JpaConfig` |
-| `DBConnection/DBConnection.java` (Quốc sửa) | ❌ File đã bị Tan xóa |
-| `DBConnection/DatabaseInitializer.java` | ❌ File đã bị Tan xóa |
-
-**Vấn đề:** `JpaUtil` gọi `Persistence.createEntityManagerFactory(PU)` **không truyền
-overrides**. Trên nhánh Tan, `persistence.xml` chứa `${DB_URL}` — Hibernate 6.4.4
-không resolve được placeholder này. Tôi đã kiểm chứng bằng cách chạy thật:
+**Vì sao bắt buộc:** `persistence.xml` trên nhánh Tan dùng placeholder `${DB_URL}`.
+Hibernate 6.4.4 **không** resolve placeholder này khi tạo EMF trực tiếp. Tôi đã kiểm chứng
+bằng cách chạy thật:
 
 ```
 RESULT: FAILED -> ServiceException: Unable to create requested service
@@ -102,154 +51,123 @@ Unable to determine Dialect without JDBC metadata
 (please set 'jakarta.persistence.jdbc.url' ...)
 ```
 
-→ **Toàn bộ module Repair sẽ không kết nối được DB** nếu giữ `JpaUtil` nguyên bản.
+`JpaConfig` truyền `DB_URL`/`DB_USER`/`DB_PASSWORD` qua override map → EMF tạo được.
 
----
+**Lợi ích phụ:** cả hai module dùng **một** EntityManagerFactory và **một** connection pool.
 
-## PHẦN 2 — XUNG ĐỘT ENTITY `Device`
+### P2. Bỏ `AppLifecycleListener` — dùng `AppShutdownListener` của Tân ✅
 
-Đây là xung đột nghiêm trọng thứ hai.
+**Đã xóa:** `src/main/java/com/electronics/marketplace/config/AppLifecycleListener.java`
 
-| Nhánh | `Device` fields | Ghi chú |
-|---|---|---|
-| **Quốc** | `brand`, **`series`**, `model`, `releaseYear`, `cpu`, `ram`, `storage` | Đúng Class Diagram |
-| **Anh** | **`name`**, `brand`, `model`, `releaseYear`, `cpu`, `ram`, `storage`, `deviceType` | Thêm `name`, `deviceType`; **không có `series`** |
-| **Thanh** | **`name`**, `brand`, `model`, `releaseYear`, `cpu`, `ram`, `storage` | Thêm `name`; **không có `series`** |
-| **Tan** | *(rỗng — stub 5 dòng)* | Không map |
+**Vì sao:** Tân đã có `listener/AppShutdownListener.java`. Giữ cả hai → hai listener
+cùng đóng EMF → double close.
 
-### Hệ quả
+`JpaUtil.shutdown()` giờ là no-op, có comment giải thích.
 
-- `Device.getDisplayName()` — method Quốc viết dựa trên `brand + series + model` — **không tồn tại** trên bản Anh/Thanh.
-- Cột `series` không có trên bản Anh/Thanh.
-- Cột `name` và `deviceType` không có trên bản Quốc.
+### P3. `DBConnection` và `DatabaseInitializer` ✅
 
-Với `hibernate.hbm2ddl.auto=update`, khi merge sẽ có **cả 4 cột** (`brand`, `series`, `name`, `deviceType`, `model`), trong đó `name` và `series` có thể NULL tùy bản ghi.
+Rebase tự động loại bỏ hai file này vì Tân đã xóa chúng. Không cần làm gì thêm.
 
-### Đề xuất
-
-Chốt một bản `Device` duy nhất, giữ **hợp** các trường cần thiết:
-```java
-id, brand, series, model, name (tùy chọn), releaseYear, cpu, ram, storage, deviceType
+`DBConnection/` hiện chỉ còn:
 ```
-Và `getDisplayName()` fallback: nếu có `name` thì dùng, ngược lại ghép `brand + series + model`.
+AuthDB.java    (Tân)
+DBUtil.java    (Tân — gọi JpaConfig.getEntityManagerFactory())
+UserDB.java    (Tân)
+```
+
+### P9 (mới phát hiện). Thiếu Gson trong `pom.xml` ✅
+
+**Vấn đề:** Tân đã bỏ dependency Gson khỏi `pom.xml`, nhưng `RepairRequestServlet`
+dùng `Gson` để trả JSON cho `/repair/api/estimate`. Compile fail:
+
+```
+error: package com.google.gson does not exist
+```
+
+**Đã sửa:** thêm lại vào `pom.xml`:
+```xml
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.10.1</version>
+</dependency>
+```
+
+**Vì sao chọn thêm Gson thay vì viết JSON thủ công:** `EstimateResultDTO` có 15 field
+(6 kiểu `BigDecimal`, 3 `Integer`, 2 `Long`, 2 `String`, 1 `boolean`). Viết tay dễ sai
+định dạng số và phải escape chuỗi. Gson chỉ dùng ở **một** file nên rủi ro thấp.
+
+### P6. `persistence.xml` — giữ danh sách `<class>` ✅
+
+**Xung đột khi rebase:** Tân bỏ toàn bộ `<class>` để Hibernate tự quét; Quốc liệt kê tường minh.
+
+**Đã giải quyết:** giữ **cả hai** cấu hình của Tân (`${DB_URL}` + `adminPU`) **và**
+danh sách `<class>` của Quốc:
+
+```xml
+<persistence-unit name="Electronics_MarketplacePU" ...>
+    <class>com.electronics.marketplace.entity.User</class>
+    <class>com.electronics.marketplace.entity.Device</class>
+    <class>com.electronics.marketplace.entity.RepairProblem</class>
+    <class>com.electronics.marketplace.entity.RepairPricing</class>
+    <class>com.electronics.marketplace.entity.RepairRequest</class>
+    <class>com.electronics.marketplace.entity.RepairEstimate</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
+    ...
+</persistence-unit>
+
+<persistence-unit name="adminPU" ...>   <!-- giữ nguyên của Tân -->
+```
+
+**Vì sao giữ `<class>`:** khi Thanh/Anh implement `Listing`, `Product`, `Order`... và thêm
+vào classpath, Hibernate tự quét sẽ map **tất cả** — kể cả entity chưa hoàn chỉnh.
+Liệt kê tường minh giữ schema ổn định.
+
+**Việc cần làm khi thêm entity:** thêm một dòng `<class>` tương ứng.
 
 ---
 
-## PHẦN 3 — XUNG ĐỘT `RepairProblem`
+## PHẦN 2 — CÒN LẠI GÌ
 
-| Nhánh | Fields | Số dòng |
-|---|---|---|
-| **Quốc** | `id`, `name`, `description`, `isActive`, `estimatedMinDays`, `estimatedMaxDays` | 116 |
-| **Thanh** | `id`, `name`, `isActive`, `estimatedMinDays`, `estimatedMaxDays` — **thiếu `description`** | 80 |
+### 🟡 P4. Xung đột entity `Device` (chưa giải quyết — cần họp nhóm)
 
-### Điểm quan trọng: `@Column` cho khóa chính
-
-- **Quốc:** `@Id @Column(name = "problem_id") private Long id;`
-- **Thanh:** `@Id private Long id;` → Hibernate map cột mặc định là **`id`**, không phải `problem_id`
-
-Nếu Thanh's `RepairProblem` thắng khi merge, cột sẽ là `id` → script SQL của Quốc
-(`problem_id BIGSERIAL PRIMARY KEY`) **lệch hoàn toàn**, và mọi khóa ngoại
-`problem_id` trong `repair_pricings` / `repair_requests` sẽ gãy.
-
-**Đề xuất:** giữ `@Column(name = "problem_id")` của Quốc, thêm `description` (Thanh không có).
-
----
-
-## PHẦN 4 — NHỮNG GÌ QUỐC ĐÃ HOÀN THÀNH
-
-### 4.1. Backend
-
-| Thành phần | File | Trạng thái |
-|---|---|---|
-| Entity | `Device`, `RepairProblem`, `RepairPricing`, `RepairRequest`, `RepairEstimate` | ✅ Khớp Class Diagram |
-| Enum | `entity/enums/RepairStatus.java` | ✅ 6 trạng thái |
-| Repository | `DeviceRepositoryImpl`, `RepairRepositoryImpl` | ✅ |
-| Service | `RepairService` (479 dòng) | ✅ |
-| Servlet | `RepairRequestServlet`, `AdminRepairServlet` | ✅ |
-| DTO | `EstimateResultDTO`, `ProblemStatisticDTO` | ✅ |
-| SQL | `database/schema_and_seed_repair.sql` | ✅ Idempotent |
-
-### 4.2. UI — 9 màn hình
-
-| # | Màn hình | File |
-|---|---|---|
-| 0 | Trang chủ | `index.jsp` |
-| 13 | Repair Request | `views/repair/request_form.jsp` |
-| 14 | Repair Estimate | `views/repair/estimate.jsp` |
-| — | Tra cứu tiến độ | `views/repair/track.jsp` |
-| — | Quản lý đơn | `views/admin/repair_requests.jsp` |
-| — | Dòng máy | `views/admin/device_list.jsp` |
-| — | Loại lỗi | `views/admin/problem_list.jsp` |
-| — | Bảng giá | `views/admin/pricing_list.jsp` |
-| — | Thống kê | `views/admin/report.jsp` |
-
-Dùng chung: `css/repair.css` (633 dòng), `views/repair/_header.jspf`, `_footer.jspf`, `views/admin/_header.jspf`.
-
-### 4.3. Kiểm chứng
-
-| Hạng mục | Kết quả |
+| Nhánh | Trường |
 |---|---|
-| Java compile (58 file, loại `controller/public`) | ✅ 0 lỗi |
-| `RepairServiceTest` | ✅ 18/18 pass |
-| Jasper compile 13 JSP | ✅ 0 lỗi |
-| JPQL (GROUP BY, JOIN FETCH, COUNT) | ✅ 11/11 parse OK |
-| EMF + map 6 entity | ✅ OK |
+| **Quốc** | `brand`, **`series`**, `model`, `releaseYear`, `cpu`, `ram`, `storage` |
+| **Anh** | **`name`**, `brand`, `model`, `releaseYear`, `cpu`, `ram`, `storage`, **`deviceType`** |
+| **Thanh** | **`name`**, `brand`, `model`, `releaseYear`, `cpu`, `ram`, `storage` |
 
----
+**Xung đột cụ thể:**
+- `series` chỉ có ở Quốc
+- `name` và `deviceType` chỉ có ở Anh/Thanh
+- `getDisplayName()` của Quốc dựa trên `brand + series + model` → không chạy trên bản Anh/Thanh
 
-## PHẦN 5 — QUỐC CẦN SỬA GÌ (theo nhánh Tan mới)
-
-### 🔴 P1. Bỏ `JpaUtil`, dùng `JpaConfig` của Tân
-
-**Vấn đề:** `JpaUtil` gọi `Persistence.createEntityManagerFactory(PU)` không truyền
-overrides → `${DB_URL}` không resolve → **EMF tạo thất bại** (đã kiểm chứng bằng lệnh chạy thật).
-
-**Sửa:** `JpaUtil.getEntityManagerFactory()` chuyển sang gọi
-`JpaConfig.getEntityManagerFactory()`. Giữ class `JpaUtil` làm vỏ mỏng để
-`RepairRepositoryImpl` / `DeviceRepositoryImpl` không phải đổi import.
-
+**Đề xuất:** giữ **hợp** các trường:
 ```java
-public static EntityManagerFactory getEntityManagerFactory() {
-    return JpaConfig.getEntityManagerFactory();
-}
+id, brand, series, model, name, releaseYear, cpu, ram, storage, deviceType
 ```
+`getDisplayName()` fallback: dùng `name` nếu có, ngược lại ghép `brand + series + model`.
 
-### 🔴 P2. Bỏ `AppLifecycleListener`, dùng `AppShutdownListener` của Tân
+**Chưa sửa** vì đây là quyết định của cả nhóm, không phải của riêng Quốc.
 
-**Vấn đề:** hai listener cùng đóng EMF → double close.
+### 🟡 P5. `RepairProblem` — Quốc đúng, Thanh thiếu `@Column` ✅ (không cần sửa)
 
-**Sửa:** xóa `config/AppLifecycleListener.java`; `JpaUtil.shutdown()` chuyển sang
-gọi `JpaConfig` (nếu Tân có `close()`), hoặc để `AppShutdownListener` xử lý.
+| Nhánh | Khai báo khóa chính |
+|---|---|
+| **Quốc** | `@Id @Column(name = "problem_id") private Long id;` ✅ |
+| **Thanh** | `@Id private Long id;` ❌ → Hibernate map cột `id` |
 
-### 🔴 P3. Xóa `DBConnection/*` và `DatabaseInitializer`
+Bản Quốc khớp script SQL (`problem_id BIGSERIAL`). Khi merge cần giữ bản Quốc.
 
-**Vấn đề:** các file này Tân đã xóa trên nhánh của họ. Giữ lại sẽ tạo 2 EMF song song
-(`DBConnection` tự tạo EMF riêng, `JpaUtil` tạo EMF riêng), và `DatabaseInitializer`
-gọi `createAdminEmf()` trỏ vào `adminPU` — unit này còn khai báo nhưng cấu hình
-khác `Electronics_MarketplacePU`.
+### 🟡 P7. `index.jsp` — vẫn là redirect ✅ (chưa sửa)
 
-**Sửa:** xóa `DBConnection.java`, `DatabaseInitializer.java`. `DBUtil.java` giữ nguyên
-bản của Tân (đã gọi `JpaConfig`).
+Nhánh Tan vẫn `<c:redirect url="/login"/>`. Bản Quốc (trang chủ thật) **đã bị mất khi rebase**
+vì file thuộc Tân và Tân chưa có thay đổi đó.
 
-### 🟡 P4. `Device` — chốt lại với Anh/Thanh
+**Đề xuất:** nếu muốn khách vào được `/repair` từ trang chủ, cần Tân đồng ý sửa `index.jsp`.
 
-Xem Phần 2. Cần thống nhất trường `series` / `name` / `deviceType`.
-
-### 🟡 P5. `RepairProblem` — giữ `@Column(name="problem_id")`
-
-Xem Phần 3. Bản Quốc đúng, bản Thanh thiếu.
-
-### 🟡 P6. `persistence.xml` — khôi phục khai báo `<class>`
-
-Bản Tan bỏ `<class>` và bật quét tự động. Nếu có entity trùng tên ở package khác
-sẽ map nhầm. Đề xuất: bật lại `exclude-unlisted-classes=true` + liệt kê đủ 6 entity.
-
-### 🟡 P7. `index.jsp` — Tân vẫn để redirect
-
-Nhánh Tan vẫn là `<c:redirect url="/login"/>`. Bản Quốc đã làm trang chủ thật.
-Khi merge cần giữ bản Quốc.
-
-### 🟡 P8. `web.xml` — Tân trỏ error-page tới file không tồn tại
+### 🟡 P8. `web.xml` — error-page trỏ file không tồn tại (thuộc Tân)
 
 ```xml
 <error-page><error-code>404</error-code>
@@ -258,16 +176,19 @@ Khi merge cần giữ bản Quốc.
     <location>/WEB-INF/views/error/500.jsp</location></error-page>
 ```
 
-Nhưng **cả 2 file đều không tồn tại** trên nhánh Tan (`fatal: path ... does not exist`).
-Khi có lỗi 404/500, Tomcat sẽ báo lỗi lồng nhau. Cần tạo 2 file này hoặc bỏ khai báo.
+Cả 2 file **không tồn tại** trên nhánh Tan. Khi có lỗi 404/500 sẽ lỗi lồng nhau.
+Cần Tân tạo 2 file hoặc bỏ khai báo.
+
+### 🟡 P10. `db.properties` — file mồ côi
+
+File vẫn tồn tại nhưng **không ai đọc** (Tân chuyển sang `JpaConfig` + biến môi trường).
+Không gây lỗi, chỉ gây nhầm lẫn. Đề xuất xóa hoặc ghi chú rõ trong file.
 
 ---
 
-## PHẦN 6 — CÒN BỊ CHẶN Ở ĐÂU
+## PHẦN 3 — BLOCKER VẪN CÒN
 
-### 🔴 BLOCKER duy nhất chặn build
-
-**Package `controller.public`** — thuộc **Phước Anh + Thành**
+### 🔴 `controller.public` — thuộc Phước Anh + Thành
 
 ```
 src/main/java/com/electronics/marketplace/controller/public/ProductServlet.java
@@ -279,67 +200,101 @@ src/main/java/com/electronics/marketplace/controller/public/ListingServlet.java
 [ERROR] ProductServlet.java:[1,48] <identifier> expected
 ```
 
-**Vẫn chưa sửa trên cả 5 nhánh** (kể cả `origin/Thanh` và `origin/Anh`).
-
-### 🟡 Không chặn build nhưng ảnh hưởng
-
-| # | Vấn đề | Nhánh | Ảnh hưởng |
-|---|---|---|---|
-| B2 | `css/style.css` rỗng **0 byte** | Tan | Dashboard/login/register/profile không có style |
-| B3 | 38 file stub rỗng | Tất cả | Chức năng chưa tồn tại |
-| B4 | `error/404.jsp`, `error/500.jsp` không tồn tại | Tan | 404/500 sẽ lỗi lồng nhau |
-| B5 | `origin/master` chưa merge gì | — | Cả nhóm chưa có bản tích hợp chung |
-| B6 | `origin/Quoc` chưa có commit | — | Module Repair chưa lên GitHub |
-
-### 🟢 Đã giải quyết (không còn là lỗi)
-
-Các lỗi L1–L4 tôi từng báo cáo **không còn đúng** với nhánh Tan mới:
-
-| Lỗi cũ | Thực tế trên nhánh Tan hiện tại |
-|---|---|
-| `DBConnection` gọi `"chodocuPU"` / `"adminPU"` | **File `DBConnection.java` đã bị xóa hẳn.** Không còn chỗ nào gọi 2 PU này. `adminPU` vẫn khai báo trong `persistence.xml` nhưng không ai dùng. |
-| `DBUtil` gọi `JpaConfig.getEntityManagerFactory()` (class rỗng) | `JpaConfig` **đã được implement đầy đủ** — method tồn tại, lỗi compile không còn |
-| `db.properties` ghi `electronics_market`, mật khẩu `____` | File **vẫn còn nguyên** nhưng **không còn được đọc** — Tân chuyển sang biến môi trường `DB_URL` / `DB_USER` / `DB_PASSWORD` qua `JpaConfig` |
-| `AdminServlet` dùng `int` + `getUserID()` | Tân đã đổi sang `Long` + `getId()` |
-| `ProfileServlet` gọi `getUserID()` | Tân đã đổi sang `getId()` |
-| `persistence.xml` khai báo `murach.business.User` | Tân đã bỏ toàn bộ khối `<class>`, chuyển sang Hibernate tự quét |
-
-**Bài học:** các lỗi tôi sửa trên bản cũ Tân đã sửa theo cách khác. Giữ bản cũ sẽ
-xung đột — cần rebase lên nhánh Tan thay vì giữ nguyên.
+**Chưa sửa trên bất kỳ nhánh nào** — kể cả `origin/Thanh` và `origin/Anh`.
 
 ---
 
-## PHẦN 7 — KẾ HOẠCH HÀNH ĐỘNG
+## PHẦN 4 — KIỂM CHỨNG SAU REBASE
 
-### Bước 1 — Chờ nhóm sửa blocker
+| Hạng mục | Kết quả |
+|---|---|
+| Java compile (loại `controller/public`) | ✅ **0 lỗi** |
+| `RepairServiceTest` | ✅ **18/18 pass** |
+| Jasper compile 9 JSP | ✅ **0 lỗi** |
+| Gson resolve | ✅ Có trong classpath |
+| `JpaUtil` → `JpaConfig` | ✅ Đã chuyển |
+| `AppLifecycleListener` | ✅ Đã xóa |
+| `DBConnection.java` / `DatabaseInitializer.java` | ✅ Không còn |
+| Conflict `persistence.xml` | ✅ Đã giải quyết |
 
-- [ ] Phước Anh + Thành: đổi package `controller.public`
+### Chưa kiểm chứng
 
-### Bước 2 — Quốc rebase lên nhánh Tan
+**Chưa chạy Tomcat thật.** PostgreSQL trên máy chỉ cài `pgAgent`, không có
+`pg_ctl.exe` / `postgres.exe`. Không có DB để kết nối.
+
+Để test thật:
+1. Cài PostgreSQL server
+2. Tạo database (hoặc để `AdminSeedListener` tự tạo)
+3. Đặt biến môi trường `DB_URL`, `DB_USER`, `DB_PASSWORD`
+4. Chạy `schema_and_seed_repair.sql`
+5. Deploy WAR lên Tomcat 11
+
+---
+
+## PHẦN 5 — NHỮNG GÌ QUỐC ĐÃ HOÀN THÀNH
+
+### Backend
+
+| Thành phần | File |
+|---|---|
+| Entity | `Device`, `RepairProblem`, `RepairPricing`, `RepairRequest`, `RepairEstimate` |
+| Enum | `entity/enums/RepairStatus.java` (6 trạng thái) |
+| Repository | `DeviceRepositoryImpl`, `RepairRepositoryImpl` |
+| Service | `RepairService` (479 dòng) |
+| Servlet | `RepairRequestServlet`, `AdminRepairServlet` |
+| DTO | `EstimateResultDTO`, `ProblemStatisticDTO` |
+| SQL | `database/schema_and_seed_repair.sql` (idempotent) |
+
+### UI — 9 màn hình
+
+| Màn hình | File |
+|---|---|
+| Repair Request | `views/repair/request_form.jsp` |
+| Repair Estimate | `views/repair/estimate.jsp` |
+| Tra cứu tiến độ | `views/repair/track.jsp` |
+| Quản lý đơn | `views/admin/repair_requests.jsp` |
+| Dòng máy | `views/admin/device_list.jsp` |
+| Loại lỗi | `views/admin/problem_list.jsp` |
+| Bảng giá | `views/admin/pricing_list.jsp` |
+| Thống kê | `views/admin/report.jsp` |
+| Fragment | `_header.jspf` ×2, `_footer.jspf` |
+
+Design system: `css/repair.css` (633 dòng).
+
+---
+
+## PHẦN 6 — VIỆC CẦN LÀM TIẾP
+
+| # | Việc | Người | Mức độ |
+|---|---|---|---|
+| 1 | Đổi package `controller.public` | Phước Anh + Thành | 🔴 Chặn build |
+| 2 | Chốt trường `Device` (`series` vs `name`) | Quốc + Anh + Thanh | 🟡 Xung đột entity |
+| 3 | Tạo `error/404.jsp`, `error/500.jsp` | Tân | 🟡 web.xml trỏ file không tồn tại |
+| 4 | Quyết định `index.jsp` có làm trang chủ không | Tân | 🟡 Khách khó vào `/repair` |
+| 5 | Xóa hoặc ghi chú `db.properties` | Tân | 🟢 File mồ côi |
+| 6 | Thêm `<class>` khi implement entity mới | Tất cả | 🟡 Tránh schema trôi |
+
+---
+
+## PHẦN 7 — LƯU Ý KỸ THUẬT
+
+### Cách chạy local
 
 ```bash
-git checkout -b Quoc-rebased origin/Tan
-# copy code Quốc vào, bỏ JpaUtil/AppLifecycleListener/DBConnection cũ
-# sửa JpaUtil gọi JpaConfig
-# chạy mvn clean test
+export DB_URL="jdbc:postgresql://localhost:5432/electronics_marketplace"
+export DB_USER="postgres"
+export DB_PASSWORD="<mat-khau-cua-ban>"
+mvn clean package
+# deploy target/*.war lên Tomcat 11
 ```
 
-### Bước 3 — Thống nhất entity với Anh/Thanh
+`JpaConfig` **fail fast**: thiếu biến môi trường sẽ báo ngay
+`IllegalStateException: Thieu bien moi truong DB_URL...` thay vì lỗi Hibernate khó hiểu.
 
-- [ ] `Device`: chốt danh sách trường
-- [ ] `RepairProblem`: giữ `@Column(name="problem_id")`
-- [ ] `persistence.xml`: khôi phục danh sách `<class>`
+### Tài liệu phối hợp
 
-### Bước 4 — Push
-
-- [ ] Push `origin/Quoc` sau khi rebase và test xanh
-
----
-
-## PHẦN 8 — TÀI LIỆU THAM KHẢO
-
-- `PHOI-HOP-THANH-QUOC.md` (nhánh `origin/Thanh`) — Thành đã ghi rõ hợp đồng:
+- `PHOI-HOP-THANH-QUOC.md` (nhánh `origin/Thanh`):
   - Quốc quản `RepairProblem`, Thành dùng `@ManyToOne` trỏ tới
   - Quốc **không được xóa cứng** `RepairProblem`, chỉ `isActive = false`
   - Quốc không tạo `Device` riêng, dùng chung với Thành
-- `Dieu_chinh_19_10_2026.md` (nhánh `origin/Tan`) — Tân ghi các điều chỉnh ngày 19/10
+- `Dieu_chinh_19_10_2026.md` (nhánh `origin/Tan`): điều chỉnh ngày 19/10 của Tân
