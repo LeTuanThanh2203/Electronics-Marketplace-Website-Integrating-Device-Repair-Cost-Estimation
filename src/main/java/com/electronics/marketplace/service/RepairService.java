@@ -44,12 +44,12 @@ public class RepairService {
         }
 
         Optional<Device> deviceOpt = deviceRepository.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
+        if (!deviceOpt.isPresent()) {
             return EstimateResultDTO.notFound("Không tìm thấy thông tin thiết bị.");
         }
 
         Optional<RepairProblem> problemOpt = repairRepository.findProblemById(problemId);
-        if (problemOpt.isEmpty()) {
+        if (!problemOpt.isPresent()) {
             return EstimateResultDTO.notFound("Không tìm thấy thông tin loại lỗi.");
         }
 
@@ -57,7 +57,7 @@ public class RepairService {
         RepairProblem problem = problemOpt.get();
 
         Optional<RepairPricing> pricingOpt = repairRepository.findActivePricing(deviceId, problemId);
-        if (pricingOpt.isEmpty()) {
+        if (!pricingOpt.isPresent()) {
             return EstimateResultDTO.notFound("Chưa có bảng giá tiêu chuẩn cho dòng máy '" + device.getDisplayName() + "' với lỗi '" + problem.getName() + "'. Kỹ thuật viên sẽ liên hệ báo giá sau khi kiểm tra.");
         }
 
@@ -355,7 +355,7 @@ public class RepairService {
         Optional<Device> deviceOpt = deviceRepository.findById(deviceId);
         Optional<RepairProblem> problemOpt = repairRepository.findProblemById(problemId);
         Optional<RepairPricing> pricingOpt = repairRepository.findActivePricing(deviceId, problemId);
-        if (deviceOpt.isEmpty() || problemOpt.isEmpty() || pricingOpt.isEmpty()) {
+        if (!deviceOpt.isPresent() || !problemOpt.isPresent() || !pricingOpt.isPresent()) {
             return 0;
         }
         return recalculatePendingEstimates(deviceOpt.get(), problemOpt.get(), pricingOpt.get());

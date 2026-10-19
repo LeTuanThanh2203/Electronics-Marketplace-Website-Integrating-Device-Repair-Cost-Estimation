@@ -316,7 +316,9 @@ public class AdminRepairServlet extends HttpServlet {
 
     private void redirectWithMessage(HttpServletRequest req, HttpServletResponse resp, String path, String message)
             throws IOException {
-        String encoded = URLEncoder.encode(message, StandardCharsets.UTF_8);
+        // URLEncoder.encode(String, Charset) là Java 10+. Dùng bản (String, String)
+        // để tương thích cả Java 8 lẫn 17.
+        String encoded = URLEncoder.encode(message, StandardCharsets.UTF_8.name());
         resp.sendRedirect(req.getContextPath() + path + "?message=" + encoded);
     }
 }

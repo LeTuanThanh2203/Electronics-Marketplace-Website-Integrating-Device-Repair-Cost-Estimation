@@ -12,8 +12,16 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>8</maven.compiler.target>
-        <maven.compiler.source>8</maven.compiler.source>
+        <!--
+            Java 17: toàn bộ code nhóm dùng API Java 11+:
+              - String.isBlank()            (Java 11) - JpaConfig, DbConfig, SQLUtil
+              - Optional.isEmpty()          (Java 11) - RepairService
+              - URLEncoder.encode(String, Charset) (Java 10) - AdminRepairServlet
+            Tomcat 11 cũng yêu cầu Java 11+. Để Java 8 sẽ không compile được.
+        -->
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.release>17</maven.compiler.release>
         <junit.version>5.13.2</junit.version>
     </properties>
 

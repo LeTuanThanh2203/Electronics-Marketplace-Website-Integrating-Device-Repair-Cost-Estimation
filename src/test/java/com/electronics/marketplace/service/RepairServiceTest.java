@@ -56,7 +56,10 @@ public class RepairServiceTest {
 
     @Test
     void testRepairPricingCostCalculation() {
-        RepairPricing pricing = mockRepairRepository.findPricingById(100L).orElseThrow();
+        // orElseThrow(Supplier) thay vì orElseThrow() — bản không tham số là Java 10+,
+        // dùng supplier để IDE không báo đỏ khi project target Java 8.
+        RepairPricing pricing = mockRepairRepository.findPricingById(100L)
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy pricing ID 100"));
 
         // Base Cost = 2.500.000 + 300.000 = 2.800.000
         BigDecimal baseCost = pricing.calculateBaseCost();
@@ -180,7 +183,8 @@ public class RepairServiceTest {
                 new BigDecimal("1500000"), new BigDecimal("200000"),
                 new BigDecimal("0.10"), true);
 
-        RepairRequest refreshed = repairService.getRepairRequestById(waiting.getId()).orElseThrow();
+        RepairRequest refreshed = repairService.getRepairRequestById(waiting.getId())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy request sau khi lưu"));
         assertEquals(RepairStatus.ESTIMATED.name(), refreshed.getStatus());
         assertNotNull(refreshed.getRepairEstimate());
         // Base = 1.700.000, margin 10% = 170.000 => 1.530.000 - 1.870.000
