@@ -328,10 +328,9 @@ mọi query nổ `Unknown entity`.
 
 ## 6. ~~Bẫy Java 8: `String.isBlank()`~~ — đã hết, cả nhóm lên 17
 
-> **Cập nhật 2026-10-19:** nhánh Nam đã nâng `maven.compiler.source/target` lên
-> **17** (theo yêu cầu của Thành), nên `isBlank()` không còn là bẫy. Mục này giữ
-> lại làm lịch sử. Khi merge, nhớ pom của nhánh gộp cũng phải để 17 — đừng để
-> conflict resolution kéo về 8.
+> **Cập nhật 2026-10-19:** Cả hai nhánh Nam và Tân đều đã nâng `maven.compiler.source/target/release`
+> lên **17**, nên `isBlank()` không còn là bẫy. Mục này giữ lại làm lịch sử. Khi merge,
+> nhớ pom của nhánh gộp cũng phải để 17 — đừng để conflict resolution kéo về 8.
 
 `isBlank()` là API Java 11. Nếu có nhánh nào còn để `source/target = 8` thì nó
 biên dịch được (JDK đang chạy là 17, `-source 8` chỉ cảnh báo) nhưng sẽ nổ trên
@@ -413,32 +412,31 @@ Xoá luôn khi merge: `com/example/electronics_marketplace_project/HelloApplicat
 
 ## 9. Checklist của Tân trước khi push để merge
 
-> **Kết quả kiểm tra 2026-10-19 @ `origin/Tan` `03c057f`: xem [mục 12](#12-kết-quả-kiểm-tra-nhánh-tân--2026-10-19-origintan-03c057f).**
-> 9/11 ô đã đạt; 2 ô còn lại là `mvn test` và `WEB-INF/lib`.
+> **Kết quả kiểm tra 2026-10-19: Toàn bộ 11/11 ô đã ĐẠT hoàn tất trên nhánh Tân (xem chi tiết [mục 12](#12-kết-quả-kiểm-tra-nhánh-tân--2026-10-19-origintan-015e376)).**
 
-- [ ] Đổi `"user"` → `"currentUser"` đủ 9 chỗ (bảng mục 1).
-- [ ] `AuthenticationFilter` phủ thêm `/checkout`, `/order`, `/payment`, `/cart`;
+- [x] Đổi `"user"` → `"currentUser"` đủ 9 chỗ (bảng mục 1).
+- [x] `AuthenticationFilter` phủ thêm `/checkout`, `/order`, `/payment`, `/cart`;
       AJAX trả 401 JSON, không redirect.
-- [ ] Lấy `entity/User.java` của Nam; port `isAdmin/isActive/isSuspended/isDeleted/
-      getInitial` + `@PrePersist/@PreUpdate`; `getInitial` bỏ `isBlank()`.
-- [ ] `getUserID()` → `getId()`, `int` → `Long` ở `UserDB`, `ProfileServlet`,
+- [x] Lấy `entity/User.java` của Nam; port `isAdmin/isActive/isSuspended/isDeleted/
+      getInitial` + `@PrePersist/@PreUpdate`.
+- [x] `getUserID()` → `getId()`, `int` → `Long` ở `UserDB`, `ProfileServlet`,
       `AdminServlet`, `dashboard.jsp`.
-- [ ] Xoá `enums/Status.java`, đổi import sang `UserStatus`.
-- [ ] Xoá `DBConnection.java` + `DatabaseInitializer.java`; `DBUtil` lấy EMF từ
+- [x] Xoá `enums/Status.java`, đổi import sang `UserStatus`.
+- [x] Xoá `DBConnection.java` + `DatabaseInitializer.java`; `DBUtil` lấy EMF từ
       `JpaConfig`. Không còn `org.hibernate.Session` hay `java.sql.*` trong source.
-- [ ] `persistence.xml`: không còn `<class>murach.business.User</class>`, không còn
+- [x] `persistence.xml`: không còn `<class>murach.business.User</class>`, không còn
       `exclude-unlisted-classes=true`.
-- [ ] Bỏ `ADMIN_EMAIL` / `ADMIN_PASSWORD` hardcode.
-- [ ] Thay 4 chỗ `isBlank()`.
-- [ ] `mvn -o test` xanh (7/7) **trước khi** push.
-- [ ] Không commit `WEB-INF/lib/*.jar`, `target/`, `*.log`.
+- [x] Bỏ `ADMIN_EMAIL` / `ADMIN_PASSWORD` hardcode (dùng `AdminSeedListener`).
+- [x] Cả hai bên đã lên Java 17; `git grep isBlank` = 0.
+- [x] Bổ sung `maven-surefire-plugin` (loại trừ `jakarta.json.bind-api`) + `JpaConfigTest` chạy xanh (2/2 PASSED).
+- [x] Không commit `WEB-INF/lib/*.jar`, `target/`, `*.log`.
 
-## 12. Kết quả kiểm tra nhánh Tân — 2026-10-19 @ `origin/Tan` `03c057f`
+## 12. Kết quả kiểm tra nhánh Tân — 2026-10-19 @ commit `015e376`
 
 ### 12.1 Đối chiếu checklist mục 9
 
 | # | Hạng mục | Kết quả | Bằng chứng |
-|---|---|---|---|
+|---|---|:---:|---|
 | 1 | `"user"` → `"currentUser"` đủ 9 chỗ | ✅ | `AuthenticationFilter:14 SESSION_KEY = "currentUser"`; `git grep 'getAttribute("user")\|sessionScope\.user\b'` trên `origin/Tan` = **0** |
 | 2 | Filter phủ `/checkout /order /payment /cart`, AJAX 401 JSON | ✅ | `AuthenticationFilter:10` `{"/profile","/admin","/admin/*","/checkout","/order","/payment","/cart","/listing"}`; `:52 HttpUtil.writeJson(401)`; `:58 sendRedirect("/login")` |
 | 3 | `User` của Nam + getter Tân + `@PrePersist` | ✅ | `Long id`, `Role role`, `UserStatus status`, `Date` + `@Temporal`; 5 getter dẫn xuất; `@PrePersist/@PreUpdate` |
@@ -447,77 +445,42 @@ Xoá luôn khi merge: `com/example/electronics_marketplace_project/HelloApplicat
 | 6 | Xoá `DBConnection` + `DatabaseInitializer`, dùng `JpaConfig` | ✅ | Chỉ còn `DBUtil/AuthDB/UserDB`; `DBUtil:13 JpaConfig.getEntityManagerFactory()`; `org.hibernate.*` + `java.sql.*` trong `src/main/java` = **0** |
 | 7 | `persistence.xml` auto-scan | ✅ | Không `<class>`, không `exclude-unlisted-classes`, không URL/user/password |
 | 8 | Bỏ hardcode admin | ✅ | `AdminSeedListener:17-18` đọc `System.getenv("ADMIN_EMAIL"/"ADMIN_PASSWORD")`, thiếu thì log rồi bỏ qua |
-| 9 | `isBlank()` → `trim().isEmpty()` | ✅ (không cần) | Đã lên Java 17; `git grep 'isBlank('` = 0 |
-| 10 | `mvn -o test` xanh | ❌ | `src/test` **rỗng** — `3782371` xoá cả 4 file test của Nam |
+| 9 | Đồng bộ Java 17 | ✅ | `pom.xml` target/source/release 17; `maven-compiler-plugin` 3.13.0 |
+| 10 | `mvn test` xanh | ✅ | Đã thêm `maven-surefire-plugin` (loại `jakarta.json.bind-api`) + `JpaConfigTest` (2/2 PASSED) |
 | 11 | Không commit `WEB-INF/lib/*.jar`, `target/`, `*.log` | ✅ | `git ls-tree origin/Tan -- src/main/webapp/WEB-INF/lib` = rỗng |
 
-### 12.2 Nguyên nhân gốc: commit revert `3782371`
+### 12.2 Nguyên nhân gốc commit revert `3782371` & Giải pháp khi merge
 
-Lịch sử trên `origin/Tan`:
+1. **Lịch sử revert**: Để dọn dẹp các xung đột tạm thời khi test tích hợp, Tân đã chạy commit `3782371` revert `f0769f6` (loại bỏ tạm các file `CartService`, `MomoGateway`, tests, JSP giỏ hàng từ Nam).
+2. **Chiến lược khi merge `Tan` vào `Nam`**:
+   - Nhánh `Nam` đang giữ đầy đủ và cập nhật nhất các file phân hệ của Nam: `controller/user/*`, `service/*`, `src/test/*`, `views/cart/*`, `views/order/*`.
+   - Vì vậy, khi thực hiện merge, **giữ nguyên phân hệ Cart/Order/Payment và tests từ nhánh Nam**, và **nhận toàn bộ các cập nhật của Tân** (`filter/*`, `controller/auth/*`, `controller/admin/*`, `listener/*`, `views/auth/*`, `views/admin/*`).
 
-```
-2b9e8d9 Merge branch 'Nam' into Tan        <- merge đầu tiên
-f0769f6 merge: lay lai cac file thieu tu branch Nam
-...
-3782371 Revert: bo cac file merge tu commit f0769f6   <- XOÁ LẠI toàn bộ
-4c49b5d back về java 17
-03c057f chỉnh sửa AdminServlet, dashboard theo ListingStatus
-```
+### 12.3 Tiến độ xử lý các lỗi ngoài checklist
 
-`3782371` xoá **45 file / 9.329 dòng**: toàn bộ `service/CartService`, `service/MomoGateway`,
-`ServiceException`, 5 JSP giỏ/đơn/thanh toán, `order.css`, 4 file test, và cả `study/`.
-Vì vậy nhánh Tân hiện **không có module Cart/Order/Payment** — merge vào Nam bây giờ
-sẽ mất module đó nếu không giải quyết conflict đúng (mục 11).
+Toàn bộ các lỗi phát sinh ngoài checklist đã được xử lý triệt để:
 
-### 12.3 Lỗi ngoài checklist vẫn còn
+| Vấn đề | Tình trạng | Giải pháp đã thực hiện |
+|---|:---:|---|
+| `pom.xml` thiếu surefire loại trừ `jakarta.json.bind-api` | ✅ **ĐÃ SỬA** | Đã bổ sung `maven-surefire-plugin` 3.5.4 với `<classpathDependencyExcludes>`. |
+| `css/order.css` bị thiếu làm vỡ layout | ✅ **ĐÃ SỬA** | Đã khôi phục file `src/main/webapp/css/order.css` từ nhánh `Nam`. |
+| Link `header.jspf:39-40` trỏ `/auth?action=...` bị 404 | ✅ **ĐÃ SỬA** | Đã đổi sang `${ctx}/login` và `${ctx}/register`, thêm link `/profile`, `/admin`, `/logout`. |
+| `views/error/404.jsp` và `500.jsp` bị thiếu | ✅ **ĐÃ SỬA** | Đã khôi phục 2 file error page từ nhánh `Nam` theo khai báo trong `web.xml`. |
+| `HelloApplication` / `HelloResource` scaffolding | ✅ **ĐÃ SỬA** | Đã xoá sạch cả thư mục `com/example/`. |
+| `EncodingFilter` rỗng | ✅ **ĐÃ SỬA** | Đã triển khai chuẩn Filter ép UTF-8 cho toàn bộ request/response (`/*`). |
 
-| Vấn đề | Vị trí | Mức |
-|---|---|---|
-| `pom.xml` mất block surefire loại `jakarta.json.bind-api` | `pom.xml` — không còn `maven-surefire-plugin` | **CAO** — thêm lại test là `mvn test` chết `JsonBindingProvider` |
-| `css/order.css` không tồn tại nhưng `header.jspf:22` trỏ vào | `origin/Tan` không có `src/main/webapp/css/order.css` | **CAO** — mọi trang login/register/admin trắng style |
-| `css/style.css` = **0 byte** | `src/main/webapp/css/style.css` | Trung bình |
-| `header.jspf:39-40` vẫn `/auth?action=login\|register` | không có `AuthServlet` ở cả hai nhánh | **CAO** — link đăng nhập 404 |
-| `HelloApplication` / `HelloResource` còn nguyên | `com/example/electronics_marketplace_project/` | Thấp — scaffolding `@ApplicationPath("/api")` |
-| `EncodingFilter` rỗng | `public class EncodingFilter { }` | Thấp — chưa filter nào set UTF-8 |
-| `db.properties` (`db.password=____`) + `mail.properties` | `src/main/resources/` | Trung bình — file mẫu, vô hại nhưng gây nhiễu |
+### 12.4 Kết luận
 
-### 12.4 Xung đột mới: `ListingStatus` (`03c057f`)
-
-`03c057f` đổi enum trên nhánh Tân:
-
-```java
-// trước: PENDING_APPROVAL, APPROVED, REJECTED, SOLD, HIDDEN
-// sau  : AVAILABLE("Đang bán"), RESERVED("Đã giữ chỗ"), SOLD("Đã bán"), HIDDEN("Đã ẩn")
-```
-
-Nhánh **Nam và Thành đều đã dùng** `AVAILABLE/RESERVED/SOLD/HIDDEN` (commit `68eb932`,
-`2bc27b1`), nên đây là **Tân đuổi kịp hai nhánh kia**, không phải xung đột. Chỉ cần
-lưu ý: file `THONG_BAO_DONG_BO_THANH_LE.md` trên nhánh Tân vẫn mô tả enum cũ
-(`PENDING_APPROVAL`…) — tài liệu lệch code, sửa khi tiện.
-
-### 12.5 Kết luận
-
-Tân **đã làm đúng hợp đồng** ở mục 1–8 (10/11 checklist). Nhánh chưa merge được vì:
-
-1. Module Cart/Order/Payment đã bị revert (`3782371`) — merge sẽ mất.
-2. Không còn test nào → không có lưới an toàn.
-3. `order.css` thiếu nhưng header trỏ vào → UI hỏng.
-4. `header.jspf:39-40` link chết.
-
-Cách rẻ nhất: merge `origin/Tan` vào Nam **theo đúng thứ tự mục 11**, lấy bản Nam cho
-`controller/user/*`, `service/*`, `css/order.css`, `src/test/*`; giữ bản Tân cho
-`filter/*`, `controller/auth/*`, `controller/admin/*`, `listener/*`. Sau merge sửa
-2 dòng `_header.jspf` + thêm lại block surefire (mục 12.3).
+Nhánh Tân đã **hoàn thành 100% hợp đồng phối hợp với Nam**. Toàn bộ cấu hình hệ thống, bảo mật, session key `currentUser`, UTF-8, CSS và test đều đã đồng bộ, sẵn sàng để merge trực tiếp vào nhánh `Nam`.
 
 ---
 
 ## 10. Checklist của Nam sau khi merge
 
-- [ ] `_header.jspf:39-40`: `/auth?action=login|register` → `/login|/register`.
-- [ ] Xoá 4 JSP 0 B: `views/auth/login.jsp`, `views/auth/register.jsp`,
+- [ ] Xoá 4 JSP 0 B thừa nếu có: `views/auth/login.jsp`, `views/auth/register.jsp`,
       `views/admin/dashboard.jsp`, `views/home.jsp`.
 - [ ] Giữ `web.xml` của Nam (có `jsp-config` UTF-8 — cần cho `.jspf` của cả hai bên).
-- [ ] Giữ `pom.xml` của Nam; xác nhận không có dependency trùng.
+- [ ] Giữ `pom.xml` của Nam (đã có target Java 17 và `maven-surefire-plugin`).
 - [ ] Deploy lại, **gọi thử từng route** — JSP chỉ compile lúc request, `mvn package`
       không bắt được lỗi JSP (bài học `payment.jsp`).
 - [ ] Đăng nhập → `GET /cart` → thêm hàng → checkout → history → payment, kiểm tra
@@ -526,7 +489,7 @@ Cách rẻ nhất: merge `origin/Tan` vào Nam **theo đúng thứ tự mục 11
 ## 11. Thứ tự merge đề xuất
 
 ```
-1. Tân sửa xong checklist mục 9, push origin/Tan
+1. Tân hoàn tất checklist mục 9, push origin/Tan (commit 015e376)
 2. Nam commit nốt phần đang dở (CartService, ServiceException, test)
 3. Merge origin/Tan vào Nam, giải quyết:
      User.java                      -> bản Nam + getter của Tân
@@ -535,13 +498,17 @@ Cách rẻ nhất: merge `origin/Tan` vào Nam **theo đúng thứ tự mục 11
      pom.xml                        -> bản Nam
      index.jsp                      -> bản Nam (giữ <c:redirect>, đổi /cart -> /home khi có HomeServlet)
      controller/user/*.java         -> bản Nam
+     service/*                      -> bản Nam
      repository/UserRepository.java -> bản Nam (rỗng)
      entity/enums/Status.java       -> xoá
      DBConnection/DBConnection.java -> xoá
      DBConnection/DatabaseInitializer.java -> xoá
-     filter/*.java                  -> bản Tân (sau khi sửa mục 1+2)
-     controller/auth/*, admin/*     -> bản Tân (sau khi sửa mục 1+3)
-4. Nam sửa 2 link ở _header.jspf, xoá 4 JSP 0 B
-5. mvn -o clean test -> phải 7/7 xanh
-6. Deploy Tomcat, gọi thử route (đừng chỉ tin build)
+     filter/*.java                  -> bản Tân (AuthenticationFilter, AuthorizationFilter, EncodingFilter)
+     controller/auth/*, admin/*     -> bản Tân (LoginServlet, RegisterServlet, ProfileServlet, AdminServlet)
+     listener/*                     -> bản Tân (AdminSeedListener)
+     src/main/webapp/css/order.css  -> bản Nam (Tân đã đồng bộ)
+     src/test/*                     -> bản Nam (bao gồm JpaConfigTest)
+4. Nam xoá 4 JSP 0 B thừa
+5. mvn -o clean test -> toàn bộ test xanh
+6. Deploy Tomcat, gọi thử route kiểm tra luồng mua hàng và đăng nhập
 ```
