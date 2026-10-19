@@ -4,15 +4,19 @@
 > Mục tiêu: Anh sửa xong `detail.jsp` thì merge vào `Nam` là chạy, không phải sửa lần hai.
 > Xem thêm [PHOI-HOP-THANH.md](PHOI-HOP-THANH.md) — mục 8 có 2 lỗi trùng với file này.
 
-## TL;DR — 5 điểm vỡ
+> **CẬP NHẬT 2026-10-19 — XONG.** Nam đã làm hết mục 6 + mục 7 trên nhánh `Nam`,
+> commit `39dbe38` (đã push `origin/Nam`). **Anh không phải sửa gì nữa** — phần
+> dưới giữ nguyên làm bản ghi lý do; xem mục 8 để biết kết quả từng mục.
 
-| Hạng mục | Chốt | Ai sửa |
+## TL;DR — 5 điểm vỡ (đã xử lý xong ở commit `39dbe38`, xem mục 8)
+
+| Hạng mục | Chốt | Ai làm |
 |---|---|---|
-| Nút "THÊM GIỎ HÀNG" ở `detail.jsp:203` | `POST ${ctx}/cart?action=add` + hidden `productId` | **Anh** |
-| Ô chọn số lượng `#qtyInput` ở `detail.jsp:185-194` | **xoá** — BR-45 quy định quantity luôn = 1 | **Anh** |
-| `entity/Device.java` | **Thành** sở hữu (xem PHOI-HOP-THANH mục TL;DR); Anh **không** đổi constructor | **Anh** trả lại |
-| `JpaConfig`, `persistence.xml`, `web.xml`, `pom.xml` | lấy bản **Nam** | **Anh** không merge bản của mình |
-| `MockProductData` + fallback in-memory trong `JpaProductRepository` | **xoá** trước khi merge | **Anh** |
+| Nút "THÊM GIỎ HÀNG" ở `detail.jsp:203` | `POST ${ctx}/cart?action=add` + hidden `productId` | Nam ✅ |
+| Ô chọn số lượng `#qtyInput` ở `detail.jsp:185-194` | **xoá** — BR-45 quy định quantity luôn = 1 | Nam ✅ |
+| `entity/Device.java` | **Thành** sở hữu (xem PHOI-HOP-THANH mục TL;DR); không đổi constructor | Nam giữ nguyên ✅ |
+| `JpaConfig`, `persistence.xml`, `web.xml`, `pom.xml` | lấy bản **Nam** | Nam ✅ |
+| `MockProductData` + fallback in-memory trong `JpaProductRepository` | **xoá** trước khi merge | Nam ✅ |
 
 ---
 
@@ -158,17 +162,17 @@ return Optional.ofNullable(inMemoryStore.get(id));
 
 ---
 
-## 6. Những chỗ Anh tự sửa trước khi merge
+## 6. Những chỗ phải sửa trước khi merge — **Nam đã làm hết**
 
-- [ ] `detail.jsp:203` → form POST `/cart?action=add` + hidden `productId` (mục 1)
-- [ ] `detail.jsp:185-194` + `changeQty()` → xoá (BR-45)
-- [ ] `detail.jsp:66`, `list.jsp:77` → icon giỏ trỏ `${ctx}/cart`
-- [ ] `Device` → trả constructor 8 tham số, bỏ `NOT NULL` ở `brand`/`model` (mục 2)
-- [ ] `JpaConfig`, `persistence.xml`, `web.xml`, `pom.xml` → không mang bản của mình; chỉ xin thêm `jackson-databind`
-- [ ] `JpaProductRepository` → xoá `inMemoryStore` + `System.err.println`
-- [ ] `index.jsp`, `home.jsp` (0 B trên `origin/Anh`) → **không ghi đè** bản của Nam
-- [ ] `getCpu/getRamGb/...` fallback số bịa → trả `null` nếu spec không có
-- [ ] EL raw trong `detail.jsp`/`list.jsp`/`compare.jsp` (`${product.name}`, `${p.brand}`, `${spec.textValue}`) → `<c:out>`. Cùng lỗi đã ghi ở [PHOI-HOP-THANH.md](PHOI-HOP-THANH.md) mục 8.
+- [x] `detail.jsp` → form POST `/cart?action=add` + hidden `productId` (mục 1)
+- [x] `detail.jsp` ô số lượng + `changeQty()` → xoá (BR-45)
+- [x] `detail.jsp`, `list.jsp` → icon giỏ trỏ `${ctx}/cart`
+- [x] `Device` → giữ constructor 8 tham số, `brand`/`model` không còn `NOT NULL` (mục 2)
+- [x] `JpaConfig`, `persistence.xml`, `web.xml`, `pom.xml` → giữ bản Nam; chỉ thêm `jackson-databind`
+- [x] `JpaProductRepository` → xoá `inMemoryStore` + `System.err.println`
+- [x] `index.jsp`, `home.jsp` → giữ bản Nam, không ghi đè
+- [x] `getCpu/getRamGb/...` → trả `null` khi thiếu spec, JSP `<c:if>` ẩn dòng
+- [x] EL raw trong `detail.jsp`/`list.jsp`/`compare.jsp` → `<c:out>`
 
 ---
 
@@ -182,3 +186,44 @@ return Optional.ofNullable(inMemoryStore.get(id));
 5. `mvn -o test` → phải xanh hết trước khi push.
 6. Deploy Tomcat: xoá `work/Catalina/localhost/shb` rồi mới copy WAR, nếu không
    JSP cũ còn cache và `detail.jsp` mới không hiện.
+
+---
+
+## 8. Kết quả phía Nam — commit `39dbe38` trên `origin/Nam`
+
+| # | Việc (mục 7) | Kết quả | Bằng chứng |
+|---|---|---|---|
+| 1 | Lấy module product của Anh | ✅ | `Product`, `ProductSpecification`, `SpecDataType`, `ProductRepository`, `JpaProductRepository`, `ProductService`, `ProductServlet`, `dto/Recommendation*`, 3 JSP |
+| 2 | Giữ file chung bản Nam | ✅ | `JpaConfig`, `persistence.xml`, `web.xml`, `index.jsp`, `pom.xml` (junit 5.13.2 + surefire exclude `jakarta.json.bind-api`) không đổi |
+| 3 | `jackson-databind` | ✅ | `pom.xml:107` — `2.17.0`; thêm `@JsonIgnore` cho `Product.getDevice()` và `ProductSpecification.getProduct()` để tránh lazy-proxy/đệ quy vô hạn khi serialize |
+| 4 | Test cập nhật | ✅ | `OrderServiceTest.persistProduct` → `setBrand("TestBrand")`; `EntityMappingTest:141` + `OrderServiceTest.persistListing` → `setModel("ThinkPad T14")` |
+| 5 | `mvn -o test` xanh | ✅ | 10/10: JpaConfig 2, EntityMapping 1, MomoGateway 3, OrderService 4 |
+| 6 | Quy trình deploy | ✅ | ghi ở mục 7.6, không đổi |
+
+### 8.1 Hai điểm khác so với dự kiến ban đầu
+
+1. **`created_at` / `stock_quantity`** — không xoá 3 dòng demo trong `products`
+   (id 27/28/29). Thay vào đó thêm `columnDefinition` để `hbm2ddl.auto=update`
+   sinh được `ADD COLUMN ... NOT NULL DEFAULT` trên bảng đang có dữ liệu:
+   `integer default 10` và `timestamp default now()`. Cách này giữ nguyên DB dev
+   và không cần bước chuẩn bị thủ công nào khi deploy.
+2. **`Device`** — giữ constructor 8 tham số (có `id`), `brand`/`model` để nullable.
+   Nhánh Thành không đỏ, không phải sửa 7 chỗ `new Device(...)` như mục 2 dự đoán.
+
+### 8.2 Ngoài phạm vi mục 7 nhưng đã làm luôn
+
+- `detail.jsp`: nút "MUA NGAY" rỗng → form add-to-cart thật (BR-45, không gửi
+  `quantity`); ô `#qtyInput` + `changeQty()` đã xoá.
+- `list.jsp`: nút "MUA NGAY" rỗng → "THÊM GIỎ" (form POST); giữ link "CHI TIẾT".
+- Cả 3 JSP: EL raw → `<c:out>`; spec thiếu → ẩn dòng (`<c:if test="${not empty ...}">`).
+- `JpaProductRepository`: bỏ fallback in-memory và `System.err.println`; exception
+  nổi lên `ProductServlet` → `ServiceException`.
+- `Product.getCpu/getRamGb/getStorageGb/getScreenSize/getScreenResolution` trả
+  `null` thay vì số bịa 16GB/512GB/14.0.
+
+### 8.3 Anh cần làm gì tiếp
+
+**Không có gì để sửa.** `origin/Anh` (`e442c14`) merge vào `Nam` sẽ sạch cho
+`product/*`. Việc còn lại chỉ là Anh `git pull` để lấy bản mới nếu muốn tiếp tục
+trên nhánh của mình — nếu `git merge origin/Nam` báo conflict ở 3 JSP thì **lấy
+bản `Nam`**, vì bản đó đã gồm cả module product lẫn các sửa ở trên.
