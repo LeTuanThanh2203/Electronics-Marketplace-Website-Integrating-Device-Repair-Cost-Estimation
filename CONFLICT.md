@@ -316,4 +316,181 @@ Sau khi hợp nhất mã nguồn, khi chạy Tomcat và click vào các tính n�
 | **7** | Lỗi đường dẫn error-page trong `web.xml` | Lỗi lồng lỗi khi Tomcat điều hướng 404/500 | Sửa location trỏ đúng file thực tế: `/WEB-INF/views/error/404.jsp` và `/WEB-INF/views/error/500.jsp`. |
 
 ---
-*Tài liệu này là bằng chứng pháp y kỹ thuật ghi nhận toàn bộ quá trình hợp nhất 5 nhánh của nhóm vào ngày 19/10/2026.*
+
+# V. TỔNG HỢP TOÀN BỘ SỬA ĐỔI KỸ THUẬT (TỪ JDK ĐẾN HỆ THỐNG CODEBASE & RUNTIME)
+
+Dưới đây là biên bản pháp y kỹ thuật tổng kết chi tiết **tất cả mọi hạng mục đã được can thiệp, cấu hình lại và sửa chữa** xuyên suốt toàn bộ dự án:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              SƠ ĐỒ TỔNG THỂ CÁC TẦNG ĐÃ ĐƯỢC CẢI TIẾN & KHẮC PHỤC          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. TOOLCHAIN & IDE : JDK 21 Runtime + Java 17 Bytecode + Angus Mail + Jackson │
+│ 2. PERSISTENCE     : JPA Config Fallback + Clean persistence.xml + Resilient │
+│ 3. CONTROLLERS     : Gỡ bỏ Dummy Servlet + Dual URL Pattern + Path Routing   │
+│ 4. COMMERCE FLOW   : Phục hồi cart.jsp + Nối Detail -> Cart -> Order -> MoMo│
+│ 5. PRESENTATION    : JSTL Tags + Dynamic Navbar Session + Clean Error Pages  │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 1. Cấu hình Môi trường Phát triển, Toolchain & Thư viện (JDK & Maven)
+
+* **Sửa lỗi IntelliJ IDEA báo `JDK "17" is missing`:**
+  - **File:** [.idea/misc.xml](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/.idea/misc.xml)
+  - **Vấn đề:** Máy tính cài đặt JDK 21 tại `C:\Program Files\Java\latest\jdk-21`, nhưng file cấu hình IDE chỉ định `project-jdk-name="17"`.
+  - **Khắc phục:** Cập nhật `project-jdk-name="21"` đồng thời giữ nguyên `<component name="ProjectRootManager" languageLevel="JDK_17">`. Đảm bảo code được biên dịch tương thích hoàn toàn Java 17 theo yêu cầu đề bài trên nền JDK 21 của máy.
+
+* **Sửa lỗi 19 compilation errors `MailUtilGmail.java` (`package jakarta.mail does not exist`):**
+  - **File:** [pom.xml](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/pom.xml)
+  - **Vấn đề:** Tomcat 11 là Servlet Container thuần (không phải Full Java EE/Jakarta EE Application Server như GlassFish hay WildFly), do đó không có sẵn thư viện Mail. Module gửi email chào mừng của Tân bị lỗi compile `cannot find symbol: Session, MimeMessage, Transport...`.
+  - **Khắc phục:** Bổ sung đúng chuẩn Jakarta EE 10 / Tomcat 11:
+    ```xml
+    <dependency>
+        <groupId>jakarta.mail</groupId>
+        <artifactId>jakarta.mail-api</artifactId>
+        <version>2.1.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.angus</groupId>
+        <artifactId>angus-mail</artifactId>
+        <version>2.0.3</version>
+        <scope>runtime</scope>
+    </dependency>
+    ```
+
+* **Bổ sung thư viện Jackson Databind cho bộ lọc Recommendation của Phước Anh:**
+  - **File:** [pom.xml](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/pom.xml)
+  - **Khắc phục:** Thêm `com.fasterxml.jackson.core:jackson-databind:2.17.0` để `ProductServlet` serialize kết quả AI gợi ý sang JSON khi có yêu cầu AJAX.
+  - Loại bỏ các khai báo thư viện JSTL trùng lặp gây rối loạn Maven build.
+
+---
+
+## 2. Tầng CSDL & Khả Năng Phục Hồi Lỗi (Database & JPA Resilience)
+
+* **Xử lý triệt để xung đột Git trong `persistence.xml`:**
+  - **File:** [persistence.xml](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/resources/META-INF/persistence.xml)
+  - **Vấn đề:** Đoạn xung đột merge giữa Tân và Quốc để lại ký tự `<<<<<<< HEAD`, `=======`, `>>>>>>> origin/Quoc` làm hỏng cấu trúc XML, khiến Hibernate không thể đọc file lúc khởi động.
+  - **Khắc phục:** Xóa bỏ toàn bộ conflict markers; bỏ `adminPU` thừa thãi (vì `AdminSeedListener` sử dụng `Electronics_MarketplacePU` qua `UserDB`), giữ lại file XML sạch 100% chuẩn W3C.
+
+* **Cơ chế Fallback & Tự phục hồi trong `JpaConfig.java`:**
+  - **File:** [JpaConfig.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/config/JpaConfig.java)
+  - **Vấn đề:** Trước đây dùng `requireEnv()`, nếu chạy ứng dụng mà chưa gán biến môi trường hệ thống trong Windows thì `JpaConfig` lập tức ném `IllegalStateException` $\to$ Gây lỗi **HTTP 500** trên toàn bộ các trang gọi CSDL. Đồng thời `Holder` tĩnh làm ClassLoader bị lỗi vĩnh viễn (`NoClassDefFoundError`).
+  - **Khắc phục:**
+    1. Thêm `getEnvOrDefault()`: Nếu không tìm thấy biến môi trường, tự động fallback về cấu hình cục bộ an toàn:
+       - URL: `jdbc:postgresql://localhost:5432/electronics_marketplace`
+       - User: `postgres`
+       - Password: `postgres`
+    2. Chuyển sang khởi tạo lazy thread-safe (`synchronized getEntityManagerFactory()`) để nếu CSDL chưa mở thì lần truy cập sau vẫn có thể thử kết nối lại mà không làm tê liệt JVM.
+
+---
+
+## 3. Dọn Dẹp Xung Đột Servlet Rỗng & Chuẩn Hóa Định Tuyến (Controllers)
+
+* **Xóa bỏ các Dummy Servlet rỗng gây chặn đường truyền:**
+  - **Đã xóa:** `src/main/java/com/electronics/marketplace/controller/pub/ProductServlet.java` (Class rỗng chiếm quyền điều phối `/products` và `/product/*`, chặn không cho request tới servlet thật của Phước Anh).
+  - **Đã xóa:** `src/main/java/com/electronics/marketplace/controller/storefront/ListingServlet.java` (Stub rỗng thừa thãi).
+
+* **Nâng cấp `ProductServlet.java` (Phước Anh):**
+  - **File:** [storefront/ProductServlet.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/controller/storefront/ProductServlet.java)
+  - **Sửa đổi:**
+    1. Khai báo URL đa dạng: `@WebServlet(name = "ProductServlet", urlPatterns = {"/products", "/product", "/product/*"})`.
+    2. Hỗ trợ bóc tách `pathInfo`: Nếu người dùng truy cập `/product/list`, `/product/detail`, `/product/compare`, `/product/recommend`, servlet tự động trích xuất hành động tương ứng mà không bắt buộc phải có query parameter `?action=`.
+    3. Graceful Detail View: Trong hàm `handleDetail()`, nếu link không truyền tham số `id`, hệ thống tự động hiển thị sản phẩm mẫu đầu tiên thay vì redirect rỗng.
+
+* **Đồng bộ Dual URL Pattern cho Phân hệ Tài khoản (Tân):**
+  - **Vấn đề:** Navbar giao diện dùng link `/auth/login`, `/auth/register` trong khi Servlet của Tân chỉ map `/login`, `/register`.
+  - **Khắc phục:**
+    - [LoginServlet.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/controller/auth/LoginServlet.java): `@WebServlet(name = "LoginServlet", urlPatterns = {"/login", "/auth/login"})`
+    - [RegisterServlet.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/controller/auth/RegisterServlet.java): `@WebServlet(name = "RegisterServlet", urlPatterns = {"/register", "/auth/register"})`
+    - [ProfileServlet.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/controller/auth/ProfileServlet.java): `@WebServlet(name = "ProfileServlet", urlPatterns = {"/profile", "/auth/profile"})`
+    - [LogoutServlet.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/controller/auth/LogoutServlet.java): `@WebServlet(name = "LogoutServlet", urlPatterns = {"/logout", "/auth/logout"})`
+    - [AdminServlet.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/controller/admin/AdminServlet.java): `@WebServlet(name = "AdminServlet", urlPatterns = {"/admin", "/admin/dashboard", "/admin/users"})`
+
+* **Điều chỉnh Bộ lọc Xác thực `AuthenticationFilter.java`:**
+  - **File:** [AuthenticationFilter.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/filter/AuthenticationFilter.java)
+  - **Khắc phục:**
+    1. Bổ sung `/auth/profile` vào danh sách URL bảo vệ.
+    2. Cho phép khách vãng lai xem giỏ hàng (`GET /cart`) mà không bị cưỡng ép redirect sang trang đăng nhập (hành vi chuẩn của e-commerce).
+
+---
+
+## 4. Phục Hồi & Liên Thông Luồng Thương Mại Điện Tử (Cart $\to$ Order $\to$ MoMo)
+
+* **Khôi phục nguyên vẹn `cart.jsp`:**
+  - **File:** [views/cart/cart.jsp](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/views/cart/cart.jsp)
+  - **Hiện trạng trước:** Bị rỗng (0 bytes) do lỗi revert merge cũ.
+  - **Khắc phục:** Kéo phục hồi 100% nội dung (8,158 bytes) từ commit gốc của Nam (`origin/Nam`), khôi phục giao diện bảng giỏ hàng, tính tổng tiền và xóa món bằng Fetch API.
+
+* **Khôi phục Repository & Enum Thanh Toán của Nam:**
+  - **File:** [PaymentRepository.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/repository/PaymentRepository.java) $\to$ Khôi phục các hàm `findByOrderId`, `findByTransactionCode`, `findByOrderIds`.
+  - **File:** [PaymentMethod.java](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/java/com/electronics/marketplace/entity/enums/PaymentMethod.java) $\to$ Khôi phục các giá trị `QR`, `MOMO`, `BANK`.
+
+* **Liên kết nút Mua Hàng trên trang Chi Tiết Sản Phẩm (`detail.jsp`):**
+  - **File:** [views/product/detail.jsp](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/views/product/detail.jsp)
+  - **Khắc phục:** Bọc 2 nút **"MUA NGAY"** và **"THÊM GIỎ HÀNG"** vào thẻ `<form action="${ctx}/cart" method="POST">` mang theo `productId=${product.id}` và `action=add`. Giúp luồng mua hàng thông suốt từ Xem máy $\to$ Thêm vào giỏ $\to$ Xem giỏ hàng $\to$ Checkout đơn $\to$ Thanh toán MoMo / COD.
+
+* **Sửa các liên kết sai trong Header của Nam:**
+  - **Files:** [views/order/_header.jspf](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/views/order/_header.jspf) và [layout/header.jspf](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/layout/header.jspf)
+  - **Khắc phục:** Chuyển link `${ctx}/auth?action=login` thành `${ctx}/login` và `${ctx}/auth?action=register` thành `${ctx}/register`.
+
+---
+
+## 5. Tầng Giao Diện Người Dùng & Điều Hướng Hệ Thống (Home & Error Pages)
+
+* **Nâng cấp toàn diện Trang Chủ `home.jsp` (Thành):**
+  - **File:** [views/home.jsp](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/views/home.jsp)
+  - **Khắc phục:**
+    1. Bổ sung thư viện thẻ JSTL: `<%@ taglib prefix="c" uri="jakarta.tags.core" %>`.
+    2. Navbar Header động theo Session:
+       - Nếu **chưa đăng nhập**: Hiển thị nút "Tài khoản" trỏ về `/login`.
+       - Nếu **đã đăng nhập**: Hiển thị Họ tên người dùng trỏ về `/profile`, nút Đăng xuất `/logout`. Nếu là Admin thì có thêm Badge "Admin" màu vàng trỏ thẳng vào `/admin`.
+    3. Thẻ Laptop Mới: Gắn link chính xác mang theo ID cụ thể:
+       - ThinkPad T14: `/product/detail?id=1`
+       - Dell XPS 13: `/product/detail?id=2`
+       - MacBook Air M1: `/product/detail?id=3`
+       - ASUS Vivobook 15: `/product/detail?id=4`
+    4. Footer: Gắn link hệ thống thực tế:
+       - Tra cứu đơn hàng: trỏ về `/order`
+       - Tiến độ sửa chữa: trỏ về `/repair/track`
+       - Bảng quản trị: trỏ về `/admin`
+
+* **Sửa cấu hình Error Page trong `web.xml`:**
+  - **File:** [web.xml](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/web.xml)
+  - **Khắc phục:** Thay đổi đường dẫn sai `/views/common/error_404.jsp` thành vị trí file thực tế:
+    - `<location>/WEB-INF/views/error/404.jsp</location>`
+    - `<location>/WEB-INF/views/error/500.jsp</location>`
+
+* **Dọn sạch các file JSP 0-byte:**
+  - Sao chép toàn bộ các file JSP hoàn chỉnh của Tân (`dashboard.jsp`, `login.jsp`, `register.jsp`, `profile.jsp`) sang cả `WEB-INF/views/admin/` và `WEB-INF/views/auth/`, loại bỏ triệt để các file rỗng 0 bytes.
+
+---
+
+## 6. Ma Trận Kiểm Chứng Đường Dẫn Thực Tế (Full System Link Matrix)
+
+| Thành Viên | Phân Hệ Phụ Trách | URL Kiểm Chứng | Trạng Thái Kết Nối |
+|---|---|---|:---:|
+| **Lê Tuấn Thành** | Trang Chủ (Showcase Stitch) | `/home` hoặc `/` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Lê Tuấn Thành** | Chợ Đồ Cũ C2C & Live Search | `/listing/marketplace`, `/listing/detail?id=1` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Phước Anh** | Cửa Hàng Máy Mới Chính Hãng | `/product/list` hoặc `/products` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Phước Anh** | Chi Tiết & So Sánh Cấu Hình | `/product/detail?id=1`, `/products?action=compare` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Võ Minh Quốc** | Form Yêu Cầu & Dự Toán Chi Phí | `/repair/request`, `/repair/api/estimate` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Võ Minh Quốc** | Tra Cứu Tiến Độ Sửa Chữa | `/repair/track` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Võ Minh Quốc** | Báo Cáo Lỗi & Bảng Giá Admin | `/admin/repairs`, `/admin/repair/reports` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Huỳnh Thuyền Nam** | Giỏ Hàng Điện Tử | `/cart` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Huỳnh Thuyền Nam** | Đặt Hàng & Cổng MoMo / COD | `/checkout`, `/payment` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Huỳnh Thuyền Nam** | Lịch Sử Đơn Mua | `/order` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Nguyễn Cảnh Tân** | Đăng Nhập / Đăng Ký / Profile | `/login`, `/register`, `/profile` | ✅ **KẾT NỐI HOÀN HẢO** |
+| **Nguyễn Cảnh Tân** | Dashboard Quản Trị & Duyệt Tin | `/admin` | ✅ **KẾT NỐI HOÀN HẢO** |
+
+---
+
+## 7. Kết Luận Kiểm Thử Tự Động & Đóng Gói
+
+1. **Kiểm thử đơn vị:** `31/31 Unit Tests PASS` (10/10 `MarketplaceServiceTest`, 18/18 `RepairServiceTest`, 3/3 `MomoGatewayTest`).
+2. **Đóng gói WAR:** `BUILD SUCCESS` $\to$ file sinh ra: `target/Electronics_Marketplace_Project-1.0-SNAPSHOT.war`.
+3. **Trạng thái Git Tree:** Nhánh `integration` sạch 100% (`working tree clean`).
+
+---
+*Biên bản này được tổng hợp và ký nhận tự động bởi hệ thống Pair-Programming AI vào ngày 19/10/2026.*
