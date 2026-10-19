@@ -604,5 +604,31 @@ Khi chạy ứng dụng trên máy thật qua IntelliJ IDEA và Tomcat 11, phát
 * Gỡ bỏ `enctype="multipart/form-data"` để đảm bảo `ProfileServlet` (chuẩn HTTP Servlet) đọc dữ liệu form `name`, `phone`, `location`, `avatar` luôn chính xác 100% không bị null.
 
 ---
+
+## BƯỚC 9: Tinh Giản Giao Diện Đăng Nhập / Đăng Ký & Xây Dựng Hệ Thống CSS Quản Trị Admin (`admin.css`)
+
+### 1. Tinh Giản Giao Diện Auth theo Phản Hồi:
+* **Vấn đề xử lý:** Các icon bên trong input đè lên chữ placeholder; các chú thích/khẩu hiệu và tem bảo mật rườm rà làm phân tán sự tập trung.
+* **Các thay đổi cụ thể:**
+  - Gỡ bỏ hoàn toàn icon phong cách Material Design lồng bên trong input (`mail`, `lock`, `person`, `verified_user`). Input trở về dạng chuẩn đơn giản, chữ placeholder hiển thị rõ ràng với padding 1rem rộng rãi, 100% không bị che khuất.
+  - Loại bỏ các dòng chú thích thừa thãi: `MEMBERSHIP // ĐĂNG KÝ THÀNH VIÊN MỚI`, `SECURE ACCESS // CỔNG XÁC THỰC TIÊU CHUẨN`, phụ đề giới thiệu.
+  - Loại bỏ các tem bảo mật dưới chân form: `shield Bảo mật dữ liệu • verified Tiêu chuẩn ISO • lock Zero-Spam`, `256-Bit SSL • ISO 9001:2015 • Zero-Leak`.
+  - Giữ lại tính năng thiết thực: Nút con mắt ẩn/hiện mật khẩu và nút nạp nhanh tài khoản mẫu Admin/Khách hàng.
+
+### 2. Xây Dựng Module CSS Dành Riêng Cho Quản Trị Viên (`admin.css`):
+* Tạo mới file [src/main/webapp/css/admin.css](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/css/admin.css) phục vụ giao diện quản trị sau khi đăng nhập:
+  - Khung chính `.admin-container` rộng 1400px với header quản trị chuyên nghiệp `.admin-header`, badge `ADMINISTRATOR CONTROL`.
+  - Hệ thống Tab phụ `.admin-tabs` liên thông thông suốt giữa:
+    + Người dùng & Duyệt tin (`/admin`)
+    + Đơn sửa chữa (`/admin/repairs`)
+    + Dòng máy (`/admin/repair/devices`)
+    + Loại lỗi (`/admin/repair/problems`)
+    + Bảng giá sửa (`/admin/repair/pricing`)
+    + Thống kê Lab (`/admin/repair/reports`)
+  - Lưới thống kê chỉ số `.stats` / `.stat` hiển thị số to 2.25rem, hiệu ứng hover viền cam.
+  - Bảng dữ liệu `.table-wrap` / `table` với header `#F4F4F2`, zebra hover, badge trạng thái (`badge-admin`, `badge-user`, `badge-ok`, `badge-bad`) và các nút thao tác (`btn-sm`, `btn-warn`, `btn-danger`).
+* Liên kết `admin.css` vào [header.jspf](file:///c:/Users/LENOVO/Desktop/Study/WEB%20PROGRAMING/Electronics_Marketplace_Project/src/main/webapp/WEB-INF/layout/header.jspf) và đồng bộ trong cả hai thư mục `WEB-INF/admin/` và `WEB-INF/views/admin/`.
+
+---
 *Biên bản này được cập nhật tự động bởi hệ thống Pair-Programming AI vào ngày 19/10/2026.*
 

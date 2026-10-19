@@ -1,20 +1,56 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-<c:set var="pageTitle" value="Bảng điều khiển" scope="request"/>
+<c:set var="pageTitle" value="Bảng điều khiển quản trị — ELECTRONICSMARKETPLACE" scope="request"/>
+<c:set var="activeNav" value="admin" scope="request"/>
 <%@ include file="/WEB-INF/layout/header.jspf" %>
 
-<h1>Bảng điều khiển quản trị</h1>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="admin-title">
+            <span class="material-symbols-outlined text-[24px] text-[#FF4A1C]">shield_person</span>
+            <span>BẢNG ĐIỀU KHIỂN QUẢN TRỊ</span>
+        </h1>
+        <span class="admin-badge-role">ADMINISTRATOR CONTROL</span>
+    </div>
 
-<div id="ajaxAlert" class="alert" style="display:none"></div>
-<c:if test="${not empty error}"><div class="alert error"><c:out value="${error}"/></div></c:if>
+    <!-- Admin Sub-Navigation Tabs -->
+    <div class="admin-tabs">
+        <a class="admin-tab is-active" href="${pageContext.request.contextPath}/admin">
+            <span class="material-symbols-outlined text-[16px]">group</span>
+            <span>Người dùng & Duyệt tin</span>
+        </a>
+        <a class="admin-tab" href="${pageContext.request.contextPath}/admin/repairs">
+            <span class="material-symbols-outlined text-[16px]">build</span>
+            <span>Đơn sửa chữa</span>
+        </a>
+        <a class="admin-tab" href="${pageContext.request.contextPath}/admin/repair/devices">
+            <span class="material-symbols-outlined text-[16px]">devices</span>
+            <span>Dòng máy</span>
+        </a>
+        <a class="admin-tab" href="${pageContext.request.contextPath}/admin/repair/problems">
+            <span class="material-symbols-outlined text-[16px]">report_problem</span>
+            <span>Loại lỗi</span>
+        </a>
+        <a class="admin-tab" href="${pageContext.request.contextPath}/admin/repair/pricing">
+            <span class="material-symbols-outlined text-[16px]">payments</span>
+            <span>Bảng giá sửa</span>
+        </a>
+        <a class="admin-tab" href="${pageContext.request.contextPath}/admin/repair/reports">
+            <span class="material-symbols-outlined text-[16px]">analytics</span>
+            <span>Thống kê Lab</span>
+        </a>
+    </div>
 
-<div class="stats">
-    <div class="stat"><span id="stat-total">${totalUsers}</span>Tổng người dùng</div>
-    <div class="stat"><span id="stat-active">${activeUsers}</span>Đang hoạt động</div>
-    <div class="stat"><span id="stat-suspended">${suspendedUsers}</span>Đang bị khóa</div>
-    <div class="stat"><span id="stat-pending-listings">${pendingListingsCount}</span>Tin chờ duyệt</div>
-</div>
+    <div id="ajaxAlert" class="alert" style="display:none"></div>
+    <c:if test="${not empty error}"><div class="alert error"><c:out value="${error}"/></div></c:if>
+
+    <div class="stats">
+        <div class="stat"><span id="stat-total">${totalUsers}</span>Tổng người dùng</div>
+        <div class="stat"><span id="stat-active">${activeUsers}</span>Đang hoạt động</div>
+        <div class="stat"><span id="stat-suspended">${suspendedUsers}</span>Đang bị khóa</div>
+        <div class="stat"><span id="stat-pending-listings">${pendingListingsCount}</span>Tin chờ duyệt</div>
+    </div>
 
 <div class="card">
     <h2>Quản lý người dùng</h2>
@@ -221,4 +257,5 @@
     }
 })();
 </script>
+</div>
 <%@ include file="/WEB-INF/layout/footer.jspf" %>

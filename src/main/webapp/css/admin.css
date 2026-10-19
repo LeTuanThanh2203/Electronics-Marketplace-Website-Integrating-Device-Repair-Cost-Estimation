@@ -1,0 +1,329 @@
+/* =============================================================================
+   ELECTRONICSMARKETPLACE — ADMIN MANAGEMENT STYLESHEET (admin.css)
+   Dành riêng cho bảng điều khiển quản trị, quản lý người dùng, duyệt tin, và lab sửa chữa.
+   ============================================================================= */
+
+:root {
+    --adm-orange: #FF4A1C;
+    --adm-black: #0B0B0B;
+    --adm-bg: #F9F9F7;
+    --adm-card-bg: #FFFFFF;
+    --adm-border: #E5E5E5;
+    --adm-border-subtle: #ECECE8;
+    --adm-text: #1A1C1B;
+    --adm-muted: #666666;
+    --adm-font-heading: 'Space Grotesk', -apple-system, sans-serif;
+    --adm-font-body: 'Be Vietnam Pro', -apple-system, sans-serif;
+    --adm-font-mono: 'JetBrains Mono', monospace;
+}
+
+/* 1. KHUNG CHÍNH (CONTAINER) */
+.admin-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* 2. TIÊU ĐỀ & TAB ĐIỀU HƯỚNG QUẢN TRỊ */
+.admin-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--adm-border);
+    gap: 1rem;
+}
+
+.admin-title {
+    font-family: var(--adm-font-heading);
+    font-size: 1.625rem;
+    font-weight: 800;
+    color: var(--adm-black);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.admin-badge-role {
+    font-family: var(--adm-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+    padding: 2px 8px;
+    letter-spacing: 0.08em;
+}
+
+/* Navigation Tabs */
+.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-bottom: 1.75rem;
+    background: #EEEEEC;
+    padding: 0.375rem;
+    border: 1px solid var(--adm-border);
+}
+
+.admin-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-family: var(--adm-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--adm-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    background: transparent;
+}
+
+.admin-tab:hover {
+    color: var(--adm-black);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.admin-tab.is-active {
+    background: #FFFFFF;
+    color: var(--adm-black);
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* 3. THỐNG KÊ (STATS GRID) */
+.admin-container .stats,
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.admin-container .stat,
+.stat {
+    background: #FFFFFF;
+    border: 1px solid var(--adm-border);
+    border-top: 3px solid var(--adm-black);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+    font-family: var(--adm-font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--adm-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: transform 0.15s ease, border-top-color 0.15s ease;
+}
+
+.admin-container .stat:hover,
+.stat:hover {
+    border-top-color: var(--adm-orange);
+    transform: translateY(-2px);
+}
+
+.admin-container .stat span,
+.stat span {
+    font-family: var(--adm-font-heading);
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--adm-black);
+    line-height: 1.1;
+    margin-bottom: 0.375rem;
+    letter-spacing: -0.02em;
+}
+
+/* 4. THẺ CARD QUẢN TRỊ */
+.admin-container .card,
+.card {
+    background: #FFFFFF;
+    border: 1px solid var(--adm-border);
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+}
+
+.admin-container .card h2,
+.card h2 {
+    font-family: var(--adm-font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--adm-black);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 5. BẢNG DỮ LIỆU (TABLES) */
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--adm-border);
+    background: #FFFFFF;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--adm-font-body);
+    font-size: 0.8125rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+thead th {
+    background: #F4F4F2;
+    padding: 0.875rem 1rem;
+    font-family: var(--adm-font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--adm-black);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--adm-border);
+}
+
+tbody td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--adm-border-subtle);
+    color: var(--adm-text);
+    vertical-align: middle;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background-color: #FAFAF8;
+}
+
+/* 6. BADGES */
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    font-family: var(--adm-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 0;
+}
+
+.badge-admin {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+}
+
+.badge-user {
+    background: #F4F4F2;
+    color: #555555;
+    border: 1px solid #DADAD8;
+}
+
+.badge-ok {
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #6EE7B7;
+}
+
+.badge-bad {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FCA5A5;
+}
+
+/* 7. NÚT THAO TÁC */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    font-family: var(--adm-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.4rem 0.875rem;
+    border: 1px solid var(--adm-black);
+    background: var(--adm-black);
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.btn:hover {
+    background: var(--adm-orange);
+    border-color: var(--adm-orange);
+    color: #000000;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 10px;
+}
+
+.btn-warn {
+    background: #D97706;
+    border-color: #D97706;
+    color: #FFFFFF;
+}
+
+.btn-warn:hover {
+    background: #B45309;
+    border-color: #B45309;
+    color: #FFFFFF;
+}
+
+.btn-danger {
+    background: #DC2626;
+    border-color: #DC2626;
+    color: #FFFFFF;
+}
+
+.btn-danger:hover {
+    background: #B91C1C;
+    border-color: #B91C1C;
+    color: #FFFFFF;
+}
+
+/* 8. THÔNG BÁO ALERT */
+.alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.8125rem;
+    border-left: 3px solid;
+    font-family: var(--adm-font-body);
+}
+
+.alert.success {
+    background: #ECFDF5;
+    border-color: #059669;
+    color: #065F46;
+}
+
+.alert.error {
+    background: #FEF2F2;
+    border-color: #DC2626;
+    color: #991B1B;
+}
