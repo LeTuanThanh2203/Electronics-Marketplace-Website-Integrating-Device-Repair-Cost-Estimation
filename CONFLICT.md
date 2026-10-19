@@ -565,5 +565,44 @@ Khi chạy ứng dụng trên máy thật qua IntelliJ IDEA và Tomcat 11, phát
   - Cập nhật đồng thời trong cả 2 thư mục `WEB-INF/auth/` và `WEB-INF/views/auth/`.
 
 ---
+
+## BƯỚC 8: Tách Biệt Tên File CSS Chuẩn Hóa (`style.css` vs `auth.css`) & Tái Thiết Kế Toàn Diện UI Login, Register, Profile
+
+### 1. Phân Định Rõ Ràng Phạm Vi `style.css` vs `auth.css`:
+* **Vấn đề đặt ra:** *"style.css đó dùng chung project hay dùng cho login register phải đặt tên phù hợp, layout login đang rất lộn xộn"*.
+* **Nguyên nhân gốc rễ gây lộn xộn layout:**
+  - Các module `order.css`, `repair.css` và CSS trước đó sử dụng các class tên chung chung như `.card`, `.btn`, `body`, `form label`.
+  - Khi nhúng chung vào `header.jspf`, các class này đè chéo lên nhau (CSS specificity clashing), làm hỏng padding của input, mất căn giữa card, vỡ nút bấm và làm layout trang login bị xộc xệch.
+* **Giải pháp quy chuẩn kiến trúc CSS:**
+  1. **`src/main/webapp/css/style.css` (DÙNG CHUNG TOÀN DỰ ÁN):**
+     - Đóng vai trò là file CSS gốc (Global Stylesheet), chứa các design tokens toàn hệ thống (`:root` colors, font families), reset box-sizing, typography chuẩn và thanh cuộn đẹp.
+     - Tuyệt đối KHÔNG chứa các class form/card đặc thù của riêng màn hình đăng nhập.
+  2. **`src/main/webapp/css/auth.css` (DÀNH RIÊNG CHO MODULE XÁC THỰC & HỒ SƠ):**
+     - Tạo riêng file `auth.css` đặt tên rõ ràng, tường minh.
+     - Sử dụng cơ chế namespacing 100%: mọi class đều mang tiền tố `.auth-*` (cho Login, Register) hoặc `.profile-*` (cho Hồ sơ cá nhân).
+     - Đảm bảo tính độc lập tuyệt đối, không làm ảnh hưởng hay bị ảnh hưởng bởi bất kỳ CSS nào khác trong dự án.
+
+### 2. Tái Thiết Kế Màn Hình Đăng Nhập (`login.jsp`):
+* Căn giữa hoàn hảo bằng Flexbox (`.auth-screen`) với nền chấm lưới kỹ thuật và vệt màu cam mềm mại.
+* Card đăng nhập cao cấp `.auth-card` với viền trên màu cam điểm nhấn `#FF4A1C`.
+* Input có icon đại diện (`mail`, `lock`), viền đổi màu và viền phát sáng nhẹ khi focus.
+* Nút bấm mắt ẩn/hiện mật khẩu trực quan bằng Javascript (`togglePassVisibility()`).
+* Hộp **Nạp nhanh tài khoản mẫu** (Quick-fill Demo Credentials) với 2 nút:
+  - **Admin:** nạp tự động `admin@marketplace.com` / `admin123`.
+  - **Khách hàng:** nạp tự động `user@marketplace.com` / `user123`.
+* Bộ 3 tem chứng thực bảo mật: `256-Bit SSL`, `ISO 9001:2015`, `Zero-Leak`.
+
+### 3. Tái Thiết Kế Màn Hình Đăng Ký (`register.jsp`):
+* Sử dụng `.auth-card-wide` (520px) với bố cục chia cột grid khoa học cho Email / SĐT và Mật khẩu / Xác nhận mật khẩu.
+* Hai nút ẩn/hiện mật khẩu độc lập cho cả mật khẩu và xác nhận mật khẩu.
+* Tích hợp đầy đủ thông báo lỗi `${error}` và lưu lại giá trị đã nhập khi xảy ra lỗi.
+
+### 4. Nâng Cấp Giao Diện Hồ Sơ Cá Nhân (`profile.jsp`):
+* Sử dụng bộ class `.profile-*` thống nhất trong `auth.css`.
+* Cột trái: Avatar tròn 104px viền cam, tên, badge quyền hạn (Admin/Khách hàng), trạng thái (Active/Suspended), số đơn hàng đã hoàn tất, ngày gia nhập, nút tra cứu đơn hàng và nút vào Admin dashboard.
+* Cột phải: 2 thẻ cập nhật thông tin và đổi mật khẩu an toàn.
+* Gỡ bỏ `enctype="multipart/form-data"` để đảm bảo `ProfileServlet` (chuẩn HTTP Servlet) đọc dữ liệu form `name`, `phone`, `location`, `avatar` luôn chính xác 100% không bị null.
+
+---
 *Biên bản này được cập nhật tự động bởi hệ thống Pair-Programming AI vào ngày 19/10/2026.*
 

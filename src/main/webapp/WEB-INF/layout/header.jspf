@@ -53,6 +53,7 @@
     <link rel="stylesheet" href="${ctx}/css/listing.css">
     <link rel="stylesheet" href="${ctx}/css/repair.css">
     <link rel="stylesheet" href="${ctx}/css/order.css">
+    <link rel="stylesheet" href="${ctx}/css/auth.css">
 </head>
 <body class="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen">
 

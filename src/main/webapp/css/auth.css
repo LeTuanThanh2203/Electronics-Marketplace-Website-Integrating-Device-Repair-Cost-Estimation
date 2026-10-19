@@ -1,0 +1,547 @@
+/* =============================================================================
+   ELECTRONICSMARKETPLACE — AUTHENTICATION & PROFILE MODULE (auth.css)
+   Dành riêng cho: Đăng nhập (login.jsp), Đăng ký (register.jsp), Hồ sơ cá nhân (profile.jsp)
+   Namespaced hoàn toàn với tiền tố "auth-" và "profile-" để tuyệt đối không xung đột CSS toàn cục.
+   ============================================================================= */
+
+:root {
+    --auth-orange: #FF4A1C;
+    --auth-black: #0B0B0B;
+    --auth-gray: #666666;
+    --auth-light-gray: #8A8A86;
+    --auth-bg: #F9F9F7;
+    --auth-input-bg: #F4F4F2;
+    --auth-border: #E5E5E5;
+    --auth-border-input: #DADAD8;
+    --auth-font-heading: 'Space Grotesk', -apple-system, sans-serif;
+    --auth-font-body: 'Be Vietnam Pro', -apple-system, sans-serif;
+    --auth-font-mono: 'JetBrains Mono', monospace;
+}
+
+/* =============================================================================
+   1. KHUNG TRANG ĐĂNG NHẬP / ĐĂNG KÝ (AUTH SCREEN & CARDS)
+   ============================================================================= */
+.auth-screen {
+    width: 100%;
+    min-height: calc(100vh - 4rem - 240px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 1.25rem;
+    box-sizing: border-box;
+    background-color: var(--auth-bg);
+    background-image: 
+        radial-gradient(ellipse at 50% 10%, rgba(255, 74, 28, 0.06) 0%, transparent 60%),
+        linear-gradient(to right, rgba(218, 218, 214, 0.3) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(218, 218, 214, 0.3) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    background: #FFFFFF;
+    border: 1px solid var(--auth-border);
+    border-top: 3px solid var(--auth-orange);
+    padding: 2.5rem 2.25rem;
+    box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+    position: relative;
+}
+
+.auth-card-wide {
+    max-width: 520px;
+}
+
+/* Header & Tiêu đề */
+.auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--auth-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--auth-orange);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+}
+
+.auth-title {
+    font-family: var(--auth-font-heading);
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: var(--auth-black);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+}
+
+.auth-subtitle {
+    font-family: var(--auth-font-body);
+    font-size: 0.8125rem;
+    color: var(--auth-gray);
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Thông báo Lỗi / Thành công */
+.auth-alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.auth-alert-error {
+    background: #FEF2F2;
+    border-left: 3px solid #DC2626;
+    color: #991B1B;
+}
+
+.auth-alert-success {
+    background: #ECFDF5;
+    border-left: 3px solid #059669;
+    color: #065F46;
+}
+
+/* Form Groups & Controls */
+.auth-field {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.auth-field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 560px) {
+    .auth-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.auth-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--auth-font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--auth-black);
+    margin-bottom: 0.375rem;
+}
+
+.auth-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-input-icon {
+    position: absolute;
+    left: 0.875rem;
+    color: var(--auth-light-gray);
+    font-size: 18px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.auth-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 2.5rem 0 2.625rem;
+    background: var(--auth-input-bg);
+    border: 1px solid var(--auth-border-input);
+    font-family: var(--auth-font-body);
+    font-size: 0.875rem;
+    color: var(--auth-black);
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    border-radius: 0;
+}
+
+.auth-input:focus {
+    background: #FFFFFF;
+    border-color: var(--auth-black);
+    box-shadow: 0 0 0 2px rgba(11, 11, 11, 0.08);
+}
+
+.auth-toggle-pass {
+    position: absolute;
+    right: 0.625rem;
+    background: none;
+    border: none;
+    color: var(--auth-light-gray);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    transition: color 0.15s;
+}
+
+.auth-toggle-pass:hover {
+    color: var(--auth-black);
+}
+
+/* Hộp tài khoản mẫu (Demo Credentials Quick-fill) */
+.auth-demo-box {
+    background: #FAFAFA;
+    border: 1px dashed var(--auth-border-input);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    box-sizing: border-box;
+}
+
+.auth-demo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--auth-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--auth-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+}
+
+.auth-demo-pills {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.auth-demo-pill {
+    flex: 1;
+    padding: 0.375rem 0.5rem;
+    background: #FFFFFF;
+    border: 1px solid var(--auth-border-input);
+    font-family: var(--auth-font-mono);
+    font-size: 11px;
+    color: var(--auth-black);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.auth-demo-pill:hover {
+    border-color: var(--auth-orange);
+    color: var(--auth-orange);
+    background: #FFF9F7;
+}
+
+/* Nút Submit chính */
+.auth-btn-submit {
+    width: 100%;
+    height: 48px;
+    background: var(--auth-black);
+    color: #FFFFFF;
+    font-family: var(--auth-font-mono);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--auth-black);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+}
+
+.auth-btn-submit:hover {
+    background: var(--auth-orange);
+    border-color: var(--auth-orange);
+    color: #000000;
+    box-shadow: 0 4px 14px rgba(255, 74, 28, 0.25);
+}
+
+.auth-btn-submit:active {
+    transform: scale(0.99);
+}
+
+/* Link chuyển đổi (Login <-> Register) */
+.auth-switch-link {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-family: var(--auth-font-body);
+    font-size: 0.8125rem;
+    color: var(--auth-gray);
+}
+
+.auth-switch-link a {
+    color: var(--auth-black);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+}
+
+.auth-switch-link a:hover {
+    color: var(--auth-orange);
+}
+
+/* Security Trust Stamp */
+.auth-trust-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--auth-border);
+    font-family: var(--auth-font-mono);
+    font-size: 10px;
+    color: var(--auth-light-gray);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.auth-trust-footer span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* =============================================================================
+   2. TRANG HỒ SƠ CÁ NHÂN (PROFILE SCREEN & LAYOUT)
+   ============================================================================= */
+.profile-screen {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-card {
+    background: #FFFFFF;
+    border: 1px solid var(--auth-border);
+    padding: 2rem;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.profile-sidebar {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    border-top: 3px solid var(--auth-orange);
+}
+
+.profile-avatar,
+.profile-avatar-initial {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    margin: 0 auto 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--auth-font-heading);
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--auth-black);
+    color: #FFFFFF;
+    border: 3px solid var(--auth-orange);
+    object-fit: cover;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.profile-username {
+    font-family: var(--auth-font-heading);
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--auth-black);
+    margin: 0 0 0.5rem 0;
+}
+
+.profile-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    font-family: var(--auth-font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0.25rem 0.75rem;
+}
+
+.profile-badge-admin {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+}
+
+.profile-badge-user {
+    background: var(--auth-input-bg);
+    color: #444748;
+    border: 1px solid var(--auth-border-input);
+}
+
+.profile-badge-active {
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #6EE7B7;
+}
+
+.profile-badge-suspended {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FCA5A5;
+}
+
+.profile-info-list {
+    list-style: none;
+    padding: 1.5rem 0 0 0;
+    margin: 1.5rem 0 0 0;
+    border-top: 1px solid var(--auth-border);
+    text-align: left;
+    font-size: 0.8125rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    color: #444748;
+}
+
+.profile-info-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    word-break: break-all;
+}
+
+.profile-card-title {
+    font-family: var(--auth-font-heading);
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--auth-black);
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--auth-border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-field {
+    margin-bottom: 1.25rem;
+}
+
+.profile-label {
+    display: block;
+    font-family: var(--auth-font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--auth-black);
+    margin-bottom: 0.375rem;
+}
+
+.profile-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 1rem;
+    background: var(--auth-input-bg);
+    border: 1px solid var(--auth-border-input);
+    font-family: var(--auth-font-body);
+    font-size: 0.875rem;
+    color: var(--auth-black);
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    border-radius: 0;
+}
+
+.profile-input:focus {
+    background: #FFFFFF;
+    border-color: var(--auth-black);
+    box-shadow: 0 0 0 2px rgba(11, 11, 11, 0.08);
+}
+
+.profile-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 42px;
+    padding: 0 1.5rem;
+    font-family: var(--auth-font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+}
+
+.profile-btn-primary {
+    background: var(--auth-black);
+    color: #FFFFFF;
+    border-color: var(--auth-black);
+}
+
+.profile-btn-primary:hover {
+    background: var(--auth-orange);
+    border-color: var(--auth-orange);
+    color: #000000;
+}
+
+.profile-btn-outline {
+    background: transparent;
+    color: var(--auth-black);
+    border-color: var(--auth-border-input);
+}
+
+.profile-btn-outline:hover {
+    background: #F4F4F2;
+    border-color: var(--auth-black);
+}
+
+.profile-btn-admin {
+    background: #92400E;
+    color: #FFFFFF;
+    border-color: #92400E;
+}
+
+.profile-btn-admin:hover {
+    background: #78350F;
+}
