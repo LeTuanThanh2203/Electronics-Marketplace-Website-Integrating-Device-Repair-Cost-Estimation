@@ -7,6 +7,6 @@ public class SQLUtil {
      * @param s
      * @return  */
     public static String blankToNull(String s) {
-        return (s == null || s.isBlank()) ? null : s.trim();
+        return (s == null || s.trim().isEmpty()) ? null : s.trim();
     }
 }

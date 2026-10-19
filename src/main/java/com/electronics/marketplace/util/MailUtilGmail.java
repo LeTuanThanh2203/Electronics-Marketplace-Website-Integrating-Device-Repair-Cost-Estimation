@@ -32,7 +32,7 @@ public class MailUtilGmail {
     // Ưu tiên biến môi trường, sau đó đến mail.properties
     private static String get(String env, String key) {
         String v = System.getenv(env);
-        if (v != null && !v.isBlank()) return v.trim();
+        if (v != null && !v.trim().isEmpty()) return v.trim();
         String p = CONFIG.getProperty(key);
         return p == null ? "" : p.trim();
     }
