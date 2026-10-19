@@ -27,10 +27,9 @@ public class AdminServlet extends HttpServlet {
             req.setAttribute("activeUsers", UserDB.countByStatus(UserStatus.ACTIVE));
             req.setAttribute("suspendedUsers", UserDB.countByStatus(UserStatus.SUSPENDED));
 
-            // 2. TÍCH HỢP VỚI THÀNH: Lấy danh sách tin chợ đồ cũ chờ duyệt (PENDING_APPROVAL)
+            // 2. TÍCH HỢP VỚI THÀNH: Lấy danh sách tin chợ đồ cũ chờ duyệt (isApproved = false, isRemovedByAdmin = false)
             List<Listing> pendingListings = DBUtil.query(em -> em.createQuery(
-                    "SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.status = :st ORDER BY l.createdAt DESC", Listing.class)
-                    .setParameter("st", ListingStatus.PENDING_APPROVAL)
+                    "SELECT l FROM Listing l JOIN FETCH l.seller LEFT JOIN FETCH l.device WHERE (l.isApproved = false OR l.isApproved IS NULL) AND (l.isRemovedByAdmin = false OR l.isRemovedByAdmin IS NULL) ORDER BY l.createdAt DESC", Listing.class)
                     .getResultList());
             req.setAttribute("pendingListings", pendingListings);
             req.setAttribute("pendingListingsCount", pendingListings.size());
@@ -48,21 +47,34 @@ public class AdminServlet extends HttpServlet {
         String action = req.getParameter("action") == null ? "" : req.getParameter("action");
 
         try {
-            
             if ("approveListing".equals(action) || "rejectListing".equals(action)) {
                 Long listingId = Long.valueOf(req.getParameter("listingId"));
-                ListingStatus newStatus = "approveListing".equals(action) ? ListingStatus.APPROVED : ListingStatus.REJECTED;
-                String msg = "approveListing".equals(action) ? "Đã duyệt bài đăng thành công." : "Đã từ chối bài đăng.";
+                boolean isApprove = "approveListing".equals(action);
+                String reason = req.getParameter("reason");
+                String msg = isApprove ? "Đã duyệt bài đăng thành công." : "Đã từ chối bài đăng.";
 
                 DBUtil.execute(em -> {
                     Listing l = em.find(Listing.class, listingId);
                     if (l != null) {
-                        l.setStatus(newStatus);
+                        if (isApprove) {
+                            l.setIsApproved(true);
+                            l.setIsRemovedByAdmin(false);
+                            l.setRejectionReason(null);
+                        } else {
+                            l.setIsApproved(false);
+                            l.setIsRemovedByAdmin(true);
+                            l.setRejectionReason(reason != null && !reason.trim().isEmpty() ? reason.trim() : "Không đạt tiêu chuẩn kiểm duyệt");
+                        }
+                        l.setUpdatedAt(new java.util.Date());
                     }
                 });
 
+                Long remainingCount = DBUtil.query(em -> em.createQuery(
+                        "SELECT COUNT(l) FROM Listing l WHERE (l.isApproved = false OR l.isApproved IS NULL) AND (l.isRemovedByAdmin = false OR l.isRemovedByAdmin IS NULL)", Long.class)
+                        .getSingleResult());
+
                 HttpUtil.writeJson(resp, HttpServletResponse.SC_OK,
-                    "{\"ok\":true,\"message\":\"" + msg + "\",\"listingId\":" + listingId + "}");
+                    "{\"ok\":true,\"message\":\"" + msg + "\",\"listingId\":" + listingId + ",\"pendingCount\":" + remainingCount + "}");
                 return;
             }
 

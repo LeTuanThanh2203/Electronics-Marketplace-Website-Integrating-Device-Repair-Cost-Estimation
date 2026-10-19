@@ -13,6 +13,7 @@
     <div class="stat"><span id="stat-total">${totalUsers}</span>Tổng người dùng</div>
     <div class="stat"><span id="stat-active">${activeUsers}</span>Đang hoạt động</div>
     <div class="stat"><span id="stat-suspended">${suspendedUsers}</span>Đang bị khóa</div>
+    <div class="stat"><span id="stat-pending-listings">${pendingListingsCount}</span>Tin chờ duyệt</div>
 </div>
 
 <div class="card">
@@ -54,8 +55,56 @@
 </div>
 
 <div class="card">
-    <h2>Duyệt tin đăng &amp; quản lý thiết bị (Product)</h2>
-    <p class="muted">Phần này sẽ nối vào khi module Product của nhóm hoàn thành.</p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="margin:0;">Tin đăng Chợ đồ cũ chờ duyệt (<span id="pending-count">${pendingListingsCount}</span>)</h2>
+    </div>
+    <div class="table-wrap">
+    <table id="listingTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Thiết bị</th>
+                <th>Người bán</th>
+                <th>Tình trạng</th>
+                <th>Giá bán</th>
+                <th>Thời điểm đăng</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+        <c:choose>
+            <c:when test="${empty pendingListings}">
+                <tr id="empty-listings-row"><td colspan="7" style="text-align:center; color:#888;">Hiện không có tin đăng nào cần duyệt.</td></tr>
+            </c:when>
+            <c:otherwise>
+                <c:forEach var="item" items="${pendingListings}">
+                    <tr id="listing-row-${item.id}">
+                        <td>#${item.id}</td>
+                        <td>
+                            <strong><c:out value="${item.device != null ? item.device.name : 'Thiết bị'}"/></strong>
+                            <c:if test="${not empty item.description}">
+                                <br><small style="color:#666;"><c:out value="${item.description}"/></small>
+                            </c:if>
+                        </td>
+                        <td>
+                            <c:out value="${item.seller.name}"/><br>
+                            <small style="color:#666;"><c:out value="${item.seller.email}"/></small>
+                        </td>
+                        <td><span class="badge badge-admin"><c:out value="${item.condition != null ? item.condition.displayName : ''}"/></span></td>
+                        <td><strong style="color:#e65100;"><fmt:formatNumber value="${item.price}" pattern="#,###"/> ₫</strong></td>
+                        <td><fmt:formatDate value="${item.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                        <td id="listing-actions-${item.id}">
+                            <button class="btn btn-sm" style="background:#2e7d32; color:#fff;" data-listing-action="approveListing" data-id="${item.id}">Duyệt</button>
+                            <button class="btn btn-sm btn-danger" data-listing-action="rejectListing" data-id="${item.id}">Từ chối</button>
+                            <a href="${pageContext.request.contextPath}/listing?action=detail&id=${item.id}" target="_blank" class="btn btn-sm" style="background:#eee; color:#333; text-decoration:none;">Xem</a>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
+        </tbody>
+    </table>
+    </div>
 </div>
 
 <script>
@@ -115,6 +164,61 @@
             btn.disabled = false;
         });
     });
+
+    var listingTable = document.getElementById('listingTable');
+    if (listingTable) {
+        listingTable.addEventListener('click', function (e) {
+            var btn = e.target.closest('button[data-listing-action]');
+            if (!btn) return;
+            var action = btn.dataset.listingAction;
+            var id = btn.dataset.id;
+            var isApprove = (action === 'approveListing');
+
+            var reason = '';
+            if (!isApprove) {
+                reason = prompt('Nhập lý do từ chối duyệt bài đăng này:', 'Không đạt tiêu chuẩn kiểm duyệt');
+                if (reason === null) return;
+            } else {
+                if (!confirm('Bạn có chắc chắn muốn duyệt tin đăng #' + id + '?')) return;
+            }
+
+            btn.disabled = true;
+            fetch(ctx + '/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                },
+                body: 'action=' + encodeURIComponent(action) + '&listingId=' + encodeURIComponent(id) + '&reason=' + encodeURIComponent(reason)
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                showAlert(d.ok, d.message);
+                if (d.ok) {
+                    var row = document.getElementById('listing-row-' + id);
+                    if (row) row.remove();
+                    if (typeof d.pendingCount !== 'undefined') {
+                        var pendingCountEl = document.getElementById('pending-count');
+                        var statPendingEl = document.getElementById('stat-pending-listings');
+                        if (pendingCountEl) pendingCountEl.textContent = d.pendingCount;
+                        if (statPendingEl) statPendingEl.textContent = d.pendingCount;
+                        if (d.pendingCount === 0) {
+                            var tbody = listingTable.querySelector('tbody');
+                            if (tbody) {
+                                tbody.innerHTML = '<tr id="empty-listings-row"><td colspan="7" style="text-align:center; color:#888;">Hiện không có tin đăng nào cần duyệt.</td></tr>';
+                            }
+                        }
+                    }
+                } else {
+                    btn.disabled = false;
+                }
+            })
+            .catch(function () {
+                showAlert(false, 'Lỗi kết nối hoặc phiên đăng nhập đã hết hạn. Hãy tải lại trang.');
+                btn.disabled = false;
+            });
+        });
+    }
 })();
 </script>
 <%@ include file="/WEB-INF/layout/footer.jspf" %>
