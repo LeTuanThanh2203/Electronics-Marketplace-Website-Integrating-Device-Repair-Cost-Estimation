@@ -55,9 +55,9 @@ class MarketplaceServiceTest {
     @Test
     @DisplayName("BR-08: Bắt buộc chọn tình trạng khi đăng tin")
     void testCreateListingRequiresCondition() {
-        User seller = new User(1, "Test Seller", "seller@test.com", "0900000000", "TP.HCM");
+        User seller = new User(1L, "Test Seller", "seller@test.com", "0900000000", "TP.HCM");
         assertThrows(IllegalArgumentException.class, () -> {
-            service.createListing(seller, 1, null, "Mô tả test", new BigDecimal("10000000"),
+            service.createListing(seller, 1L, null, "Mô tả test", new BigDecimal("10000000"),
                     "http://image.jpg", "Lenovo", "T14", "i5", "16GB", "512GB", Collections.emptyList());
         });
     }
@@ -65,9 +65,9 @@ class MarketplaceServiceTest {
     @Test
     @DisplayName("BR-12: Tạo tin đăng thành công đính kèm hình ảnh và thông số")
     void testCreateListingSuccess() {
-        User seller = new User(1, "Test Seller", "seller@test.com", "0900000000", "TP.HCM");
+        User seller = new User(1L, "Test Seller", "seller@test.com", "0900000000", "TP.HCM");
         Listing created = service.createListing(
-                seller, 1, "USED_GOOD", "Máy văn phòng cực đẹp", new BigDecimal("12500000"),
+                seller, 1L, "USED_GOOD", "Máy văn phòng cực đẹp", new BigDecimal("12500000"),
                 "https://example.com/laptop.jpg", "Lenovo", "ThinkPad T14", "Core i5", "16GB", "512GB",
                 Collections.singletonList("Trầy xước nhẹ")
         );
@@ -84,7 +84,7 @@ class MarketplaceServiceTest {
     void testUpdateListingPermissionCheck() {
         assertThrows(SecurityException.class, () -> {
             // Tin số 1 thuộc về seller ID 1, người dùng ID 999 cố ý sửa
-            service.updateListing(1, 999, "USED_FAIR", "Cố ý sửa", new BigDecimal("5000000"), null);
+            service.updateListing(1L, 999L, "USED_FAIR", "Cố ý sửa", new BigDecimal("5000000"), null);
         });
     }
 
@@ -92,11 +92,11 @@ class MarketplaceServiceTest {
     @DisplayName("BR-33: Xem số điện thoại người bán yêu cầu đăng nhập")
     void testGetSellerPhoneRequiresLogin() {
         assertThrows(SecurityException.class, () -> {
-            service.getSellerPhone(1, null);
+            service.getSellerPhone(1L, null);
         });
 
-        User buyer = new User(10, "Buyer", "buyer@gmail.com", "0911111111", "Hà Nội");
-        String phone = service.getSellerPhone(1, buyer);
+        User buyer = new User(10L, "Buyer", "buyer@gmail.com", "0911111111", "Hà Nội");
+        String phone = service.getSellerPhone(1L, buyer);
         assertNotNull(phone);
         assertFalse(phone.isEmpty());
     }
