@@ -12,11 +12,13 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="vi_VN" />
 
-<c:set var="pageTitle" value="Giỏ hàng — Sửa hay bán" />
+<c:set var="pageTitle" value="Giỏ hàng — ELECTRONICSMARKETPLACE" />
+<c:set var="activeNav" value="cart" />
 <c:set var="cart" value="${empty cart ? sessionScope.cart : cart}" />
 
 <%@ include file="../order/_header.jspf" %>
 
+<div class="container" style="padding-top: var(--space-lg); padding-bottom: var(--space-xl); width: 100%;">
 <div class="page-head">
     <p class="eyebrow">Giỏ hàng</p>
     <h1>Thiết bị bạn chọn</h1>
@@ -175,5 +177,6 @@
     });
 })();
 </script>
+</div>
 
 <%@ include file="../order/_footer.jsp" %>
