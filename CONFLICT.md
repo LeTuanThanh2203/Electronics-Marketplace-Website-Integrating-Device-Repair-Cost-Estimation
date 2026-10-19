@@ -534,4 +534,36 @@ Khi chạy ứng dụng trên máy thật qua IntelliJ IDEA và Tomcat 11, phát
 * **Build WAR:** `BUILD SUCCESS` (100% hợp lệ bytecode Java 17 / 21).
 
 ---
-*Biên bản này được tổng hợp và ký nhận tự động bởi hệ thống Pair-Programming AI vào ngày 19/10/2026.*
+
+## BƯỚC 7: Đồng Bộ Header/Footer Include & Sửa Lỗi Giỏ Hàng, Bổ Sung CSS Auth/Profile
+
+### 1. Đồng Bộ Layout Toàn Hệ Thống (Master Header/Footer Include):
+* Tạo `WEB-INF/layout/header.jspf` và `WEB-INF/layout/footer.jspf` chuẩn hệ thiết kế Stitch (phong cách Index/Home).
+* Thay thế toàn bộ header và footer hardcoded trên tất cả các trang: `home.jsp`, `product/list.jsp`, `product/detail.jsp`, `product/compare.jsp`, `listing/marketplace.jsp`, `listing/detail.jsp`, `listing/form.jsp`, `repair/`, `cart.jsp`, `order/`.
+* Xử lý trường hợp đặc thù:
+  - **Sửa chữa:** Giữ thanh breadcrumb `rp-breadcrumb` và 2 nút "Tra cứu tiến độ sửa", "Dự toán chi phí".
+  - **Laptop mới:** Giữ ô tìm kiếm `q` và nút "AI GỢI Ý MÁY" gọi popup modal `#recModal` với thuật toán matching engine không bị ảnh hưởng.
+  - **Chợ đồ cũ:** Giữ ô tìm kiếm `keyword` và nút "ĐĂNG BÁN MÁY".
+  - **Giỏ hàng & Đơn hàng:** Badge đếm số món động từ session cart.
+
+### 2. Sửa Lỗi 500 Khi Nhấn Vào Giỏ Hàng (`/cart`):
+* **Triệu chứng:** Người dùng click vào icon Giỏ hàng thì bị văng màn hình `500 Lỗi hệ thống`.
+* **Nguyên nhân cốt lõi:**
+  - File `src/main/webapp/WEB-INF/layout/header.jspf` khai báo: `<%@ page contentType="text/html;charset=UTF-8" ... %>` (không có khoảng trắng sau dấu chấm phẩy).
+  - File `cart.jsp` khai báo: `<%@ page contentType="text/html; charset=UTF-8" ... %>` (có khoảng trắng sau dấu chấm phẩy).
+  - Jasper Compiler của Tomcat coi 2 chuỗi directive này là khác nhau, ném ngoại lệ: `org.apache.jasper.JasperException: Page directive: illegal to have multiple occurrences of 'contentType' with different values`.
+* **Khắc phục:**
+  - Xóa bỏ thẻ `<%@ page contentType ... %>` trong fragment `header.jspf` vì file `.jspf` được nhúng tĩnh (`<%@ include %>`), trang cha `.jsp` đã định nghĩa `contentType`.
+  - Bổ sung wrapper `.container` và `activeNav="cart"` vào `cart.jsp` để căn giữa bố cục và hiển thị thanh lịch.
+
+### 3. Khởi Tạo Toàn Diện `style.css` và Nâng Cấp Giao Diện Login, Register, Profile:
+* **Triệu chứng:** File `src/main/webapp/css/style.css` trước đó là file rỗng (0 bytes), khiến các trang Đăng nhập (`login.jsp`), Đăng ký (`register.jsp`), và Hồ sơ cá nhân (`profile.jsp`) không có CSS, bố cục vỡ nát.
+* **Khắc phục:**
+  - Xây dựng hoàn chỉnh `css/style.css` với bảng màu chuẩn (`#0B0B0B`, `#FF4A1C`, `#F9F9F7`), font chữ `Space Grotesk`, `Be Vietnam Pro`, `JetBrains Mono`.
+  - Thiết kế card xác thực `.auth-card` căn giữa màn hình với nền hoa văn grid tinh tế, input có hiệu ứng focus viền đen/cam, nút bấm `.btn-block` hover mượt mà.
+  - Thiết kế trang hồ sơ cá nhân `.profile-page-wrapper` với layout 2 cột: cột trái là thẻ Avatar tròn 104px viền cam, badge Admin/User, danh sách thông tin; cột phải là 2 thẻ "Cập nhật thông tin tài khoản" và "Đổi mật khẩu bảo mật".
+  - Cập nhật đồng thời trong cả 2 thư mục `WEB-INF/auth/` và `WEB-INF/views/auth/`.
+
+---
+*Biên bản này được cập nhật tự động bởi hệ thống Pair-Programming AI vào ngày 19/10/2026.*
+
