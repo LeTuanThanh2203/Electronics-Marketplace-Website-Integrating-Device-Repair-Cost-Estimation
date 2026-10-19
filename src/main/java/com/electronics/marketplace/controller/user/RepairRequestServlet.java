@@ -9,16 +9,22 @@ import com.electronics.marketplace.filter.AuthenticationFilter;
 import com.electronics.marketplace.service.RepairService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @WebServlet(name = "RepairRequestServlet", urlPatterns = {
         "/repair",
@@ -27,6 +33,11 @@ import java.util.Optional;
         "/repair/api/estimate",
         "/repair/track"
 })
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 1, // 1MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 15    // 15MB
+)
 public class RepairRequestServlet extends HttpServlet {
 
     private final RepairService repairService = new RepairService();
@@ -126,6 +137,48 @@ public class RepairRequestServlet extends HttpServlet {
             String customerEmail = req.getParameter("customerEmail");
             String description = req.getParameter("description");
             String imageUrl = req.getParameter("imageUrl");
+
+            // Xử lý tệp ảnh tải lên từ máy tính (nếu có)
+            try {
+                Part filePart = req.getPart("imageFile");
+                if (filePart != null && filePart.getSize() > 0) {
+                    String submittedName = filePart.getSubmittedFileName();
+                    if (submittedName != null && !submittedName.trim().isEmpty()) {
+                        String cleanName = Paths.get(submittedName).getFileName().toString();
+                        String ext = "";
+                        int dot = cleanName.lastIndexOf('.');
+                        if (dot >= 0) {
+                            ext = cleanName.substring(dot).toLowerCase();
+                        }
+                        if (!Arrays.asList(".jpg", ".jpeg", ".png", ".webp", ".gif").contains(ext)) {
+                            req.setAttribute("errorMessage", "Định dạng ảnh không được hỗ trợ. Vui lòng chọn tệp PNG, JPG, JPEG hoặc WEBP.");
+                            handleShowRequestForm(req, resp);
+                            return;
+                        }
+
+                        String uploadDirPath = req.getServletContext().getRealPath("/uploads/repairs");
+                        File uploadDir;
+                        if (uploadDirPath != null) {
+                            uploadDir = new File(uploadDirPath);
+                        } else {
+                            String catalinaBase = System.getProperty("catalina.base", System.getProperty("user.dir"));
+                            uploadDir = new File(catalinaBase, "webapps" + req.getContextPath() + "/uploads/repairs");
+                        }
+                        if (!uploadDir.exists()) {
+                            uploadDir.mkdirs();
+                        }
+
+                        String savedFileName = "repair_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
+                        File targetFile = new File(uploadDir, savedFileName);
+                        filePart.write(targetFile.getAbsolutePath());
+
+                        String ctx = req.getContextPath();
+                        imageUrl = (ctx != null ? ctx : "") + "/uploads/repairs/" + savedFileName;
+                    }
+                }
+            } catch (Exception fileEx) {
+                req.getServletContext().log("Lỗi khi lưu ảnh mô tả lỗi: " + fileEx.getMessage(), fileEx);
+            }
 
             if (deviceIdStr == null || problemIdStr == null || deviceIdStr.trim().isEmpty() || problemIdStr.trim().isEmpty()) {
                 req.setAttribute("errorMessage", "Vui lòng chọn thiết bị và loại lỗi.");

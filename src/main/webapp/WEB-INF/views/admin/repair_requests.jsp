@@ -51,7 +51,22 @@
                             <td><c:out value="${req.customerName}" /></td>
                             <td class="rp-table__mono rp-table__muted"><c:out value="${req.customerPhone}" /></td>
                             <td><c:out value="${req.device.displayName}" /></td>
-                            <td><c:out value="${req.problem.name}" /></td>
+                            <td>
+                                <div><c:out value="${req.problem.name}" /></div>
+                                <c:if test="${not empty req.imageUrl}">
+                                    <div style="margin-top:4px;">
+                                        <a href="${req.imageUrl}" target="_blank" rel="noopener noreferrer"
+                                           style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-family:var(--rp-font-mono); color:var(--rp-orange); text-decoration:underline;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                                <polyline points="21 15 16 10 5 21"/>
+                                            </svg>
+                                            Xem ảnh lỗi
+                                        </a>
+                                    </div>
+                                </c:if>
+                            </td>
                             <td class="rp-table__num">
                                 <c:choose>
                                     <c:when test="${not empty req.repairEstimate}">

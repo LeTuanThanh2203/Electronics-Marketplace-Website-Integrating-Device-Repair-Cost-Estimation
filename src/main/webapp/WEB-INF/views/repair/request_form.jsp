@@ -54,7 +54,8 @@
 
                 <!-- ---------- FORM ---------- -->
                 <form class="rp-form" id="repairForm"
-                      action="${pageContext.request.contextPath}/repair/request" method="POST">
+                      action="${pageContext.request.contextPath}/repair/request" method="POST"
+                      enctype="multipart/form-data">
 
                     <c:if test="${not empty errorMessage}">
                         <div class="rp-section" style="padding-bottom:0; border-bottom:none;">
@@ -136,15 +137,46 @@
                         </div>
 
                         <div class="rp-field" style="margin-top:24px;">
-                            <span class="rp-label">
-                                <span>Ảnh mô tả lỗi</span>
-                                <span class="rp-label__meta">URL ẢNH (TÙY CHỌN)</span>
-                            </span>
-                            <input class="rp-input" type="url" id="imageUrl" name="imageUrl"
-                                   placeholder="https://example.com/images/hinh_anh_loi.jpg">
-                            <div class="rp-label__meta" style="margin-top:6px;">
-                                Hệ thống hiện lưu đường dẫn ảnh, chưa hỗ trợ tải tệp trực tiếp.
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <span class="rp-label" style="margin:0;">
+                                    <span>Ảnh mô tả lỗi</span>
+                                </span>
+                                <span class="rp-label__meta">CHỌN TỪ THƯ MỤC MÁY TÍNH (TÙY CHỌN)</span>
                             </div>
+
+                            <label class="rp-upload" for="imageFile" id="uploadDropzone">
+                                <input type="file" id="imageFile" name="imageFile"
+                                       accept="image/png, image/jpeg, image/jpg, image/webp"
+                                       onchange="handleImageSelect(this)">
+                                <div class="rp-upload__icon">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                                        <polyline points="21 15 16 10 5 21"/>
+                                    </svg>
+                                </div>
+                                <div class="rp-upload__title">Bấm vào đây để chọn ảnh từ máy tính</div>
+                                <div class="rp-upload__meta">Hoặc kéo thả file ảnh vào đây (Hỗ trợ PNG, JPG, JPEG, WEBP - Tối đa 10MB)</div>
+                                <div class="rp-upload__file" id="fileChosenLabel" style="display:none;"></div>
+                            </label>
+
+                            <%-- Xem trước ảnh đã chọn --%>
+                            <div id="imagePreviewContainer" style="display:none; margin-top:12px; position:relative; max-width:320px; border:1px solid var(--rp-hairline); padding:8px; background:var(--rp-white);">
+                                <img id="imagePreview" src="" alt="Xem trước ảnh lỗi" style="width:100%; height:auto; max-height:220px; object-fit:contain; display:block;">
+                                <button type="button" onclick="clearSelectedImage()"
+                                        style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.7); color:#fff; border:none; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; line-height:1;"
+                                        title="Bỏ chọn ảnh">&times;</button>
+                            </div>
+
+                            <%-- Tùy chọn nhập URL nếu muốn --%>
+                            <details style="margin-top:12px; font-size:12px; color:var(--rp-gray);">
+                                <summary style="cursor:pointer; user-select:none; font-family:var(--rp-font-mono);">Hoặc nhập đường dẫn URL ảnh trực tuyến</summary>
+                                <div style="margin-top:6px;">
+                                    <input class="rp-input rp-input--sm" type="url" id="imageUrl" name="imageUrl"
+                                           placeholder="https://example.com/images/hinh_anh_loi.jpg"
+                                           oninput="handleUrlInput(this)">
+                                </div>
+                            </details>
                         </div>
                     </div>
 
@@ -424,6 +456,93 @@
                 placeholder.style.display = 'block';
             });
     }
+
+    function handleImageSelect(input) {
+        var file = input.files && input.files[0];
+        var label = document.getElementById('fileChosenLabel');
+        var container = document.getElementById('imagePreviewContainer');
+        var preview = document.getElementById('imagePreview');
+        var urlInput = document.getElementById('imageUrl');
+
+        if (file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Kích thước ảnh vượt quá 10MB. Vui lòng chọn ảnh nhỏ hơn.');
+                input.value = '';
+                return;
+            }
+
+            label.style.display = 'block';
+            label.textContent = 'Đã chọn: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                container.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            if (urlInput) urlInput.value = '';
+        } else {
+            clearSelectedImage();
+        }
+    }
+
+    function clearSelectedImage() {
+        var input = document.getElementById('imageFile');
+        if (input) input.value = '';
+        var label = document.getElementById('fileChosenLabel');
+        if (label) {
+            label.textContent = '';
+            label.style.display = 'none';
+        }
+        var container = document.getElementById('imagePreviewContainer');
+        if (container) container.style.display = 'none';
+        var preview = document.getElementById('imagePreview');
+        if (preview) preview.src = '';
+    }
+
+    function handleUrlInput(input) {
+        if (input.value && input.value.trim() !== '') {
+            var fileInput = document.getElementById('imageFile');
+            if (fileInput && fileInput.files.length > 0) {
+                clearSelectedImage();
+            }
+        }
+    }
+
+    // Hỗ trợ kéo thả ảnh (Drag & Drop)
+    (function initDropzone() {
+        var dropzone = document.getElementById('uploadDropzone');
+        if (!dropzone) return;
+
+        ['dragenter', 'dragover'].forEach(function(eventName) {
+            dropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.style.borderColor = 'var(--rp-black)';
+                dropzone.style.background = 'var(--rp-white)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(function(eventName) {
+            dropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.style.borderColor = '';
+                dropzone.style.background = '';
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', function(e) {
+            var dt = e.dataTransfer;
+            var files = dt.files;
+            if (files && files.length > 0) {
+                var fileInput = document.getElementById('imageFile');
+                fileInput.files = files;
+                handleImageSelect(fileInput);
+            }
+        }, false);
+    })();
 </script>
 
 </body>

@@ -129,6 +129,18 @@
                                 <p><c:out value="${repairRequest.description}" /></p>
                             </div>
                         </c:if>
+
+                        <c:if test="${not empty repairRequest.imageUrl}">
+                            <div class="rp-quote" style="margin-top:16px;">
+                                <div class="rp-quote__label">Ảnh mô tả lỗi đính kèm</div>
+                                <div style="margin-top:8px;">
+                                    <a href="${repairRequest.imageUrl}" target="_blank" rel="noopener noreferrer">
+                                        <img src="${repairRequest.imageUrl}" alt="Ảnh mô tả lỗi"
+                                             style="max-width:100%; max-height:220px; object-fit:contain; border:1px solid var(--rp-hairline); display:block; background:#fff; padding:4px;">
+                                    </a>
+                                </div>
+                            </div>
+                        </c:if>
                     </div>
 
                     <div class="rp-section rp-section--commit">
