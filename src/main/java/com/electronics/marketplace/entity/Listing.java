@@ -143,6 +143,13 @@ public class Listing implements Serializable {
         return "https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx";
     }
 
+    public String getTitle() {
+        if (device != null) {
+            return device.getName();
+        }
+        return "Laptop Cũ #" + (id != null ? id : "");
+    }
+
     public Long getReservedByOrderId() {
         return reservedByOrderId;
     }
