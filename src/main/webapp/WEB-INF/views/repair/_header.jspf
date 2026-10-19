@@ -5,6 +5,7 @@
       <c:set var="rpCrumb" value="Tên trang" scope="request"/>
       <c:set var="rpCrumbs" value="..." scope="request"/>  (tùy chọn, HTML breadcrumb đã dựng sẵn)
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <header class="rp-header">
     <div class="rp-header__inner">
         <a class="rp-brand" href="${pageContext.request.contextPath}/repair">

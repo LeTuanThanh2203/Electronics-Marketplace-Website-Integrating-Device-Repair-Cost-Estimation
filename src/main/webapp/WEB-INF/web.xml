@@ -20,6 +20,10 @@
             <taglib-uri>jakarta.tags.fmt</taglib-uri>
             <taglib-location>/WEB-INF/tld/fmt.tld</taglib-location>
         </taglib>
+        <taglib>
+            <taglib-uri>jakarta.tags.functions</taglib-uri>
+            <taglib-location>/WEB-INF/tld/fn.tld</taglib-location>
+        </taglib>
     </jsp-config>
 
     <welcome-file-list>

@@ -6,9 +6,11 @@
     LUU Y tich hop: ${sessionScope.currentUser} va ${sessionScope.cart} la ten
     attribute gia dinh theo Rule 3 (Session chi chua current User + Cart).
     Neu Tan dat ten khac trong AuthenticationFilter thi sua 2 dong duoi day.
---%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-<c:set var="cartCount" value="${fn:length(sessionScope.cart.items)}" />
+<c:set var="cartCount" value="${not empty sessionScope.cart and not empty sessionScope.cart.items ? fn:length(sessionScope.cart.items) : 0}" />
 <c:set var="currentUser" value="${sessionScope.currentUser}" />
 <!DOCTYPE html>
 <html lang="vi">

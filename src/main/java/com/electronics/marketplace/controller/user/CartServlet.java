@@ -60,7 +60,7 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
         User user = currentUser(req);
         if (user == null) {
-            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
         Long productId = parseId(req.getParameter("productId"));

@@ -486,11 +486,52 @@ Dưới đây là biên bản pháp y kỹ thuật tổng kết chi tiết **t�
 
 ---
 
-## 7. Kết Luận Kiểm Thử Tự Động & Đóng Gói
+---
 
-1. **Kiểm thử đơn vị:** `31/31 Unit Tests PASS` (10/10 `MarketplaceServiceTest`, 18/18 `RepairServiceTest`, 3/3 `MomoGatewayTest`).
-2. **Đóng gói WAR:** `BUILD SUCCESS` $\to$ file sinh ra: `target/Electronics_Marketplace_Project-1.0-SNAPSHOT.war`.
-3. **Trạng thái Git Tree:** Nhánh `integration` sạch 100% (`working tree clean`).
+# VI. XỬ LÝ TRIỆT ĐỂ LỖI RUNTIME KHI CHẠY TRÊN TOMCAT (DATABASE & JSP COMPILATION)
+
+Khi chạy ứng dụng trên máy thật qua IntelliJ IDEA và Tomcat 11, phát hiện 3 nguyên nhân cốt lõi khiến các chức năng "báo lỗi chứ chưa connect được":
+
+### 1. Sửa Lỗi Biên Dịch JSP JasperException (Thiếu Function Taglib `fn`):
+* **Triệu chứng:** Khi truy cập `/login`, `/register`, `/cart`, `/checkout` hoặc bất kỳ trang nào include `header.jspf`, Tomcat báo lỗi 500:
+  `org.apache.jasper.JasperException: /WEB-INF/layout/header.jspf (line: [11], column: [0]) The attribute prefix [fn] does not correspond to any imported tag library`.
+* **Nguyên nhân:** File `header.jspf` và `order/_header.jspf` sử dụng hàm `${fn:length(...)}` để đếm số sản phẩm trong giỏ hàng, nhưng không import thư viện `fn`, đồng thời file `fn.tld` chưa được trích xuất vào `WEB-INF/tld` và chưa khai báo trong `web.xml`.
+* **Khắc phục:**
+  1. Trích xuất file chuẩn `fn.tld` từ JSTL 3.0 vào `src/main/webapp/WEB-INF/tld/fn.tld`.
+  2. Khai báo thẻ `<taglib>` cho `jakarta.tags.functions` trỏ tới `/WEB-INF/tld/fn.tld` trong `web.xml`.
+  3. Bổ sung trực tiếp directive `<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>` và kiểm tra null an toàn trong cả 2 file `header.jspf` và `order/_header.jspf`.
+
+### 2. Sửa Lỗi Kết Nối PostgreSQL (Password Authentication & Missing Database):
+* **Triệu chứng:** Khi truy cập `/repair/request` hoặc các trang gọi JPA / DBUtil, Tomcat báo lỗi:
+  `HikariPool$PoolInitializationException: Failed to initialize pool: FATAL: password authentication failed for user "postgres"`.
+* **Nguyên nhân:** 
+  1. PostgreSQL trên máy tính chưa được cấu hình mật khẩu khớp với mã nguồn (`postgres`).
+  2. Cơ sở dữ liệu `electronics_marketplace` chưa được tạo trong PostgreSQL.
+* **Khắc phục:**
+  1. Đồng bộ quyền và đặt mật khẩu user `postgres` thành `postgres` trong PostgreSQL.
+  2. Tạo cơ sở dữ liệu `electronics_marketplace`.
+  3. Chạy script SQL nạp dữ liệu mẫu ban đầu: `src/main/resources/database/schema_and_seed_repair.sql`.
+  4. Khởi chạy Hibernate DDL tự động sinh và cập nhật đầy đủ **16 bảng** dữ liệu: `users`, `products`, `product_specifications`, `listings`, `listing_images`, `listing_problems`, `devices`, `repair_problems`, `repair_pricings`, `repair_requests`, `repair_estimates`, `carts`, `cart_items`, `orders`, `order_items`, `payments`.
+  5. Nạp sẵn 2 tài khoản mẫu phục vụ kiểm thử ngay lập tức:
+     - **Admin:** `admin@marketplace.com` / `admin123` (Role ADMIN)
+     - **User:** `user@marketplace.com` / `user123` (Role USER)
+
+### 3. Xử Lý Xung Đột Deployment Kép trong IntelliJ IDEA (`.idea/workspace.xml`):
+* **Triệu chứng:** IntelliJ IDEA tự động add đồng thời cả 2 artifact khi chạy Tomcat:
+  - `Electronics_Marketplace_Project:war` tại `/Electronics_Marketplace_Project_war`
+  - `Electronics_Marketplace_Project:war exploded` tại `/Electronics_Marketplace_Project_war_exploded`
+  Dẫn tới việc gõ `http://localhost:8080/` bị 404, đồng thời 2 pool kết nối Hikari chạy song song tranh chấp tài nguyên.
+* **Khắc phục:**
+  - Chuẩn hóa lại `.idea/workspace.xml`: Xóa bỏ việc deploy file `.war`, chỉ deploy duy nhất `Electronics_Marketplace_Project:war exploded`.
+  - Cấu hình Context Path về root `/` và đặt URL mở trình duyệt mặc định: `http://localhost:8080/home`.
+
+### 4. Tối Ưu Hóa Trải Nghiệm Khách Vãng Lai & Routing:
+* **CartServlet:** Khi khách chưa đăng nhập bấm "Thêm vào giỏ hàng" hoặc "Mua ngay", Servlet sẽ tự động điều hướng sang `/login` thay vì văng màn hình lỗi trắng `401 Unauthorized`.
+* **ListingServlet:** Bổ sung URL pattern `/listing` vào danh sách `@WebServlet` bên cạnh `{"/listing/*", "/marketplace"}` để ngăn chặn lỗi 404 khi truy cập không có trailing slash.
+
+### 5. Kết Quả Kiểm Thử Toàn Diện:
+* **Unit Tests:** `36/36 Unit Tests PASS` (0 failures, 0 errors).
+* **Build WAR:** `BUILD SUCCESS` (100% hợp lệ bytecode Java 17 / 21).
 
 ---
 *Biên bản này được tổng hợp và ký nhận tự động bởi hệ thống Pair-Programming AI vào ngày 19/10/2026.*

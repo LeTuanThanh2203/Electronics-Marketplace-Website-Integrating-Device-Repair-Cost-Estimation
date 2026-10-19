@@ -3,6 +3,7 @@
     Yêu cầu trước khi include:
       <c:set var="rpAdminPage" value="requests|devices|problems|pricing|reports" scope="request"/>
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <header class="rp-header">
     <div class="rp-header__inner">
         <a class="rp-brand" href="${pageContext.request.contextPath}/admin">

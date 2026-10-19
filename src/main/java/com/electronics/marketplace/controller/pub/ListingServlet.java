@@ -24,7 +24,7 @@ import java.util.List;
  * - BR-11, BR-15, BR-33, BR-34, BR-40: Xử lý đúng phân quyền và quy trình chợ.
  * - Handoff Nam - Thành: Nhánh action=marketplace, hỗ trợ Long id.
  */
-@WebServlet(name = "ListingServlet", urlPatterns = {"/listing/*", "/marketplace"})
+@WebServlet(name = "ListingServlet", urlPatterns = {"/listing", "/listing/*", "/marketplace"})
 public class ListingServlet extends HttpServlet {
 
     private final MarketplaceService marketplaceService = new MarketplaceService();
