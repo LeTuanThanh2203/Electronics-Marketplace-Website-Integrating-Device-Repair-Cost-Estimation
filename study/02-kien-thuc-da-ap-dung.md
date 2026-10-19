@@ -12,7 +12,7 @@ Mỗi mục: **kiến thức → đã dùng ở đâu trong code → nói gì kh
 **Đã thực hành:** Mỗi màn hình là một cặp servlet + JSP. Servlet nhận `action`, chuẩn bị model, `forward` sang JSP trong `WEB-INF/views/`.
 
 **Nói khi demo:**
-> "Em không viết một dòng Java nào trong JSP. Toàn bộ logic đẩy sang Servlet và Service; JSP chỉ đọc model bằng EL/JSTL. Ví dụ dòng 111 của `history.jsp` chỉ là `<c:forEach var="item" items="${order.items}">`."
+> "Em không viết một dòng Java nào trong JSP. Toàn bộ logic đẩy sang Servlet và Service; JSP chỉ đọc model bằng EL/JSTL. Ví dụ dòng 112 của `history.jsp` chỉ là `<c:forEach var="item" items="${order.items}">`."
 
 ---
 
@@ -24,15 +24,15 @@ Mỗi mục: **kiến thức → đã dùng ở đâu trong code → nói gì kh
 
 | Kỹ thuật | Vị trí |
 |----------|--------|
-| `<c:choose>/<c:when>/<c:otherwise>` rẽ 3 nhánh trạng thái | [payment.jsp:104-156](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L104-L156) |
-| `<c:forEach>` duyệt danh sách | [history.jsp:111](../../src/main/webapp/WEB-INF/views/order/history.jsp#L111) |
+| `<c:choose>/<c:when>/<c:otherwise>` rẽ 3 nhánh trạng thái | [payment.jsp:93-141](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L93-L141) |
+| `<c:forEach>` duyệt danh sách | [history.jsp:75](../../src/main/webapp/WEB-INF/views/order/history.jsp#L75) |
 | `<fmt:formatNumber>` + `currencySymbol="₫"` | [cart.jsp:83](../../src/main/webapp/WEB-INF/views/cart/cart.jsp#L83) |
-| `<fmt:formatDate>` định dạng ngày VN | [history.jsp:105](../../src/main/webapp/WEB-INF/views/order/history.jsp#L105) |
+| `<fmt:formatDate>` định dạng ngày VN | [history.jsp:106](../../src/main/webapp/WEB-INF/views/order/history.jsp#L106) |
 | `<fmt:setLocale value="vi_VN">` | [cart.jsp:13](../../src/main/webapp/WEB-INF/views/cart/cart.jsp#L13) |
-| `<c:set>` tính nhãn/badge từ enum | [history.jsp:76-92](../../src/main/webapp/WEB-INF/views/order/history.jsp#L76-L92) |
+| `<c:set>` tính nhãn/badge từ enum | [history.jsp:76-93](../../src/main/webapp/WEB-INF/views/order/history.jsp#L76-L93) |
 | `<c:if test="${empty cart.items}">` trạng thái rỗng | [cart.jsp:32](../../src/main/webapp/WEB-INF/views/cart/cart.jsp#L32) |
 
-**Điểm hay để khoe** — `history.jsp:76-92`, đổi enum thành nhãn tiếng Việt mà không cần `if/else` Java:
+**Điểm hay để khoe** — `history.jsp:76-93`, đổi enum thành nhãn tiếng Việt mà không cần `if/else` Java:
 
 ```jsp
 <c:set var="statusLabel">
@@ -86,9 +86,20 @@ Và **fail fast** — thiếu biến môi trường thì báo lỗi rõ ràng ng
 
 **Kiến thức:** `FetchType.LAZY` cho quan hệ collection — chỉ load khi gọi getter. `EAGER` gây N+1 query và tốn RAM. Bắt buộc theo Rule 2 của project.
 
-**Đã thực hành:** quan hệ `Cart → CartItem`, `Order → OrderItem` đều là collection sẽ khai báo LAZY. Khi màn lịch sử cần `OrderItem`, phải dùng `JOIN FETCH` trong JPQL — đây là chỗ dễ mắc lỗi `LazyInitializationException` nhất.
+**Đã thực hành:** quan hệ `Cart → CartItem`, `Order → OrderItem` đều khai báo `LAZY` thật. Khi màn lịch sử cần `OrderItem`, repository dùng `JOIN FETCH` trong JPQL — đây là chỗ dễ mắc `LazyInitializationException` nhất.
 
-> ⚠️ Chưa map annotation vì `Order`/`Cart` đang là POJO thuần. Xem [05-checklist](05-checklist-truoc-buoi-cham.md).
+```java
+// PaymentRepository.java — fetch đúng thứ view cần, không hơn
+"SELECT DISTINCT p FROM Payment p " +
+    "JOIN FETCH p.order o " +
+    "JOIN FETCH o.buyer " +
+    "LEFT JOIN FETCH o.items " +      // LEFT: đơn chưa có item vẫn phải trả về
+    "WHERE o.id = :orderId"
+```
+
+`LEFT JOIN FETCH o.items` chứ không `JOIN FETCH` — dùng `JOIN` thì đơn rỗng item sẽ **biến mất** khỏi kết quả thay vì trả về với collection rỗng.
+
+`findByOrderIds` cố ý **không** fetch items: `history.jsp` chỉ cần trạng thái Payment, fetch thêm sẽ nhân bản dòng. Mỗi truy vấn chỉ fetch đúng thứ màn hình đó đọc.
 
 ---
 
@@ -96,7 +107,7 @@ Và **fail fast** — thiếu biến môi trường thì báo lỗi rõ ràng ng
 
 **Kiến thức:** Model phải có constructor rỗng, getter/setter đúng chuẩn, `implements Serializable` — để JSP/EL đọc được và để lưu vào Session.
 
-**Đã thực hành:** cả 5 entity đều đúng chuẩn — ví dụ [Cart.java:14](../../src/main/java/com/electronics/marketplace/entity/Cart.java#L14) `public class Cart implements Serializable` với `serialVersionUID`.
+**Đã thực hành:** cả 5 entity đều đúng chuẩn — ví dụ [Cart.java:30](../../src/main/java/com/electronics/marketplace/entity/Cart.java#L30) `public class Cart implements Serializable` với `serialVersionUID`.
 
 ---
 
@@ -104,10 +115,12 @@ Và **fail fast** — thiếu biến môi trường thì báo lỗi rõ ràng ng
 
 **Kiến thức:** Trạng thái nên là enum, không phải chuỗi tự do. Sai chính tả bị compiler chặn ngay.
 
-**Đã thực hành:** 4 enum tách riêng file — [OrderStatus](../../src/main/java/com/electronics/marketplace/entity/enums/OrderStatus.java), [OrderType](../../src/main/java/com/electronics/marketplace/entity/enums/OrderType.java), [PaymentMethod](../../src/main/java/com/electronics/marketplace/entity/enums/PaymentMethod.java), [PaymentStatus](../../src/main/java/com/electronics/marketplace/entity/enums/PaymentStatus.java).
+**Đã thực hành:** 4 enum của module tách riêng file — [OrderStatus](../../src/main/java/com/electronics/marketplace/entity/enums/OrderStatus.java), [OrderType](../../src/main/java/com/electronics/marketplace/entity/enums/OrderType.java), [PaymentMethod](../../src/main/java/com/electronics/marketplace/entity/enums/PaymentMethod.java), [PaymentStatus](../../src/main/java/com/electronics/marketplace/entity/enums/PaymentStatus.java). (Các enum `Listing*`, `ProductStatus`, `Role`, `UserStatus`, `SpecDataType` là của phần bạn khác.)
 
 **Nói khi demo:**
 > "PaymentStatus chỉ có 3 giá trị `PENDING, PAID, FAILED` — cố tình **không có** `REFUNDED`, vì MVP không hoàn tiền. Đây là quyết định trong buổi review SDD v1.17."
+
+> **Vì sao `PaymentMethod` vẫn còn `QR` và `BANK` dù UI đã bỏ:** enum mô tả *dữ liệu có thể có*, không phải *lựa chọn đang bán*. Hai giá trị này có thể còn trong DB của đơn cũ, và xoá khỏi enum sẽ làm Hibernate ném `IllegalArgumentException` khi đọc chúng. Cổng vào đã bị chặn ở tầng view (chỉ 2 radio) — đây là cách "thu hẹp phạm vi" mà không phá dữ liệu cũ.
 
 ---
 
@@ -118,7 +131,7 @@ Và **fail fast** — thiếu biến môi trường thì báo lỗi rõ ràng ng
 **Đã thực hành:** mọi trường tiền là `BigDecimal` — `Product.price`, `CartItem` → `Cart.getSubtotal()`, `OrderItem.price`, `Order.getTotalAmount()`, `Payment.amount`.
 
 ```java
-// Cart.java:31
+// Cart.java:62
 public BigDecimal getSubtotal() {
     BigDecimal total = BigDecimal.ZERO;
     for (CartItem item : items) {
@@ -193,7 +206,7 @@ Dùng ở [cart.jsp:151](../../src/main/webapp/WEB-INF/views/cart/cart.jsp#L151)
 
 **Kiến thức:** Hành động không hoàn tác được phải hỏi lại.
 
-**Đã thực hành:** huỷ đơn — [history.jsp:242-246](../../src/main/webapp/WEB-INF/views/order/history.jsp#L242-L246)
+**Đã thực hành:** huỷ đơn — [history.jsp:241-248](../../src/main/webapp/WEB-INF/views/order/history.jsp#L241-L248)
 
 ```js
 document.querySelectorAll('form.js-confirm').forEach(function (form) {
@@ -211,9 +224,34 @@ Dùng `data-confirm` để mỗi form mang thông điệp riêng, không hardcod
 
 **Kiến thức:** Mọi thứ từ client đều có thể bị sửa. `orderId` gửi lên từ form huỷ đơn phải được server kiểm tra **có thuộc về user đang đăng nhập không**.
 
-**Đã thực hành (thiết kế):** form huỷ đơn gửi `orderId` qua hidden input; servlet **phải** xác minh `order.buyer.id == currentUser.id` trước khi huỷ. Tương tự `payment?action=view&orderId=`.
+**Đã thực hành:** form huỷ đơn gửi `orderId` qua hidden input; servlet xác minh quyền sở hữu **trước** khi gọi service.
 
-> ⚠️ Đây là lỗ hổng IDOR kinh điển nếu quên. Phải có trong `OrderService`/`PaymentService` trước khi chấm.
+```java
+// PaymentServlet.java:96 — IDOR check cho màn xem thanh toán
+if (!canView(user, payment)) {
+    resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+    return;
+}
+
+private boolean canView(User user, Payment payment) {
+    return user.getId().equals(payment.getOrder().getBuyer().getId())
+            || user.getRole() == Role.ADMIN;
+}
+```
+
+`create` (mở cổng MoMo) kiểm tra chặt hơn — **chỉ Buyer**, không cho Admin thay mặt tạo giao dịch:
+
+```java
+// PaymentServlet.java:131
+if (!user.getId().equals(payment.getOrder().getBuyer().getId())) {
+    resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+    return;
+}
+```
+
+**Đã verify thật:** dùng user khác xem `/payment?orderId=` → **403**; user khác huỷ đơn → **403** (xem bảng bước 9 trong [00](00-tien-do-cong-viec.md)).
+
+> **Vì sao không tin tham số callback:** `action=return` nhận `orderId`/`resultCode` từ URL — người dùng sửa được. Nên servlet **không** đọc `resultCode` trên URL, mà gọi `momoGateway.query()` lấy kết quả thật từ MoMo rồi mới đổi trạng thái. Xem mục 21.
 
 ---
 
@@ -235,7 +273,23 @@ Danh sách đơn hàng thì **không** để ở session — nạp theo từng r
 
 **Kiến thức:** Không bao giờ load toàn bộ bảng. `LIMIT`/`OFFSET` + đếm tổng.
 
-**Đã thực hành (view):** [history.jsp:191-200](../../src/main/webapp/WEB-INF/views/order/history.jsp#L191-L200) render dãy số trang từ `${page}` / `${totalPages}` do servlet truyền vào, và giữ nguyên bộ lọc `status` khi đổi trang.
+**Đã thực hành:** [history.jsp:191-201](../../src/main/webapp/WEB-INF/views/order/history.jsp#L191-L201) render dãy số trang từ `${page}` / `${totalPages}` do servlet truyền vào, và giữ nguyên bộ lọc `status` khi đổi trang.
+
+`OrderServlet` đặt `PAGE_SIZE = 10`, gọi `findHistory(...)` + `countHistory(...)`, rồi tính `totalPages` bằng phép chia làm tròn lên.
+
+**Cái bẫy thật đã gặp — phân trang + fetch join collection.** `OrderRepository` cố ý dùng **hai query**:
+
+```java
+// 1) phân trang trên bảng orders
+SELECT o.id FROM Order o WHERE ... ORDER BY o.createdAt DESC, o.id DESC
+    .setFirstResult((page - 1) * pageSize).setMaxResults(pageSize)
+// 2) fetch join items theo danh sách id vừa lấy
+SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items WHERE o.id IN :ids
+```
+
+> "Nếu em `setMaxResults(10)` trên câu có `JOIN FETCH o.items` thì SQL trả về 10 **dòng**, không phải 10 **đơn** — một đơn 3 món ăn hết 3 dòng. Hibernate cảnh báo `HHH000104: firstResult/maxResults specified with collection fetch`. Đơn NEW_DEVICE nhiều món là trường hợp thật, nên em tách đôi."
+
+`CartRepository.findByUserId` cũng không đặt `setMaxResults` vì cùng lý do, nhưng ở đó an toàn: `carts.customer_id` là `UNIQUE` nên tối đa một kết quả.
 
 ---
 
@@ -245,7 +299,28 @@ Danh sách đơn hàng thì **không** để ở session — nạp theo từng r
 
 **Quy định:** [BR-43](../../reference/_sdd.txt) + [BR-45](../../reference/_sdd.txt) — `Cart` **không** giữ chỗ `Product`; checkout một Cart hợp lệ tạo Order `NEW_DEVICE` với một OrderItem cho mỗi CartItem, tất cả trong **cùng một transaction**.
 
-**Đã thực hành (thiết kế):** `OrderService.checkout()` mở `EntityManager` transaction, validate `Product.status == AVAILABLE` **bên trong** transaction, tạo Order + OrderItem + Payment, rollback toàn bộ nếu bất kỳ bước nào fail.
+**Đã thực hành:** `OrderService.checkoutCart()` mở `EntityManager` transaction, validate `Product.status == AVAILABLE` **bên trong** transaction, tạo Order + OrderItem + Payment, rollback toàn bộ nếu bất kỳ bước nào fail. Mã lỗi trả về `409 PRODUCT_NOT_AVAILABLE` qua `ServiceException`.
+
+```java
+// OrderService.java:130 — checkoutCart, một transaction cho cả cụm
+EntityManager em = JpaConfig.getEntityManagerFactory().createEntityManager();
+EntityTransaction tx = em.getTransaction();
+try {
+    tx.begin();
+    // ... validate + tạo Order + OrderItem + Payment ...
+    tx.commit();
+    return order.getId();
+} catch (RuntimeException e) {
+    if (tx.isActive()) {
+        tx.rollback();
+    }
+    throw e;
+} finally {
+    em.close();
+}
+```
+
+Cùng khuôn đó lặp lại ở **7 method** của `OrderService` — checkout, huỷ, hoàn tất, Admin xác nhận, `markPaidByGateway`… Mỗi thao tác nghiệp vụ là một transaction trọn vẹn, không có transaction lồng nhau.
 
 **Nói khi demo:**
 > "Kênh của em không giữ chỗ sản phẩm nên rủi ro tranh mua thấp — nhưng em vẫn validate lại `Product.status` **bên trong** transaction, chứ không kiểm tra trước rồi mới tạo đơn. Kiểm tra trước là khe hở: giữa hai bước đó người khác mua mất."
@@ -258,7 +333,9 @@ Danh sách đơn hàng thì **không** để ở session — nạp theo từng r
 
 **Kiến thức:** Một hành động nghiệp vụ chạm nhiều bảng phải là một transaction.
 
-**Đã thực hành (thiết kế):** [BR-46](../../reference/_sdd.txt) — khi Order NEW_DEVICE chuyển `CANCELLED`, **trong cùng transaction** phải chuyển `Payment` từ `PENDING → FAILED`. Nhưng nếu Payment đã `PAID` thì **giữ nguyên** (không hoàn tiền trong MVP).
+**Đã thực hành:** [BR-46](../../reference/_sdd.txt) — khi Order NEW_DEVICE chuyển `CANCELLED`, **trong cùng transaction** chuyển `Payment` từ `PENDING → FAILED`. Nếu Payment đã `PAID` thì **giữ nguyên** (không hoàn tiền trong MVP).
+
+Đường ngược lại cũng là transaction 2 bảng — `OrderService.markPaidByGateway` ghi `Payment.PAID + paidAt` và `Order.PENDING → CONFIRMED` cùng lúc, gọi từ cả IPN lẫn return URL của MoMo.
 
 **Nói khi demo:**
 > "Đây là ví dụ rõ nhất cho việc vì sao cần transaction: nếu em update Order thành CANCELLED mà crash trước khi update Payment, dữ liệu sẽ mâu thuẫn — đơn đã huỷ nhưng vẫn báo chờ thanh toán."
@@ -267,7 +344,18 @@ Danh sách đơn hàng thì **không** để ở session — nạp theo từng r
 
 ## 18. `c:choose` rẽ nhánh theo enum trong view
 
-**Đã thực hành:** [payment.jsp:36-41](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L36-L41) — tiêu đề trang đổi theo `PaymentStatus`, và [payment.jsp:104-156](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L104-L156) — khối nội dung đổi theo trạng thái (PENDING hiện thông tin chuyển khoản, PAID hiện xác nhận, còn lại hiện thất bại).
+**Đã thực hành:** [payment.jsp:27-31](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L27-L31) — tiêu đề trang đổi theo `PaymentStatus`; [payment.jsp:93-141](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L93-L141) — khối nội dung rẽ **hai tầng**:
+
+```
+<c:choose>  payment.status
+  ├─ PENDING → <c:choose> payment.method
+  │              ├─ MOMO  → notice + nút "Thanh toán qua MoMo"
+  │              └─ khác  → notice COD "Đã ghi nhận đơn hàng"
+  ├─ PAID    → "Thanh toán đã được xác nhận"
+  └─ còn lại → "Giao dịch không hoàn tất"
+```
+
+Tầng ngoài là trạng thái thanh toán, tầng trong là phương thức — đúng thứ tự vì cùng PENDING thì COD và MoMo cần lời nhắn khác nhau.
 
 ---
 
@@ -300,3 +388,118 @@ Danh sách đơn hàng thì **không** để ở session — nạp theo từng r
 
 **Nói khi demo:**
 > "Bản mockup có stepper số lượng 1..5, nhưng em bỏ vì `CartItem.quantity` luôn bằng 1 — mỗi máy mới là một đơn vị duy nhất ([BR-45](../../reference/_sdd.txt)). Em ghi lại lý do ngay trong comment để người đọc sau không tưởng là em quên."
+
+---
+
+## 21. Tích hợp cổng thanh toán — HMAC-SHA256 & callback
+
+**Kiến thức:** Cổng thanh toán không bao giờ nhận một POST trần trụi rồi tin ngay. Mọi request/response đều có **chữ ký** để hai bên xác nhận đúng đối tác và nội dung không bị sửa.
+
+### 21.1 Ký request — `MomoGateway.hmacSha256`
+
+MoMo yêu cầu chuỗi ký là các field **xếp theo alphabet**, nối bằng `&`, ký HMAC-SHA256 bằng `secretKey`:
+
+```java
+// MomoGateway.java:80 — thứ tự alphabet là bắt buộc, không phải sở thích
+String raw = "accessKey=" + cfg.getAccessKey()
+        + "&amount=" + amount
+        + "&extraData=" + extraData
+        + "&ipnUrl=" + ipnUrl
+        + "&orderId=" + orderId
+        + "&orderInfo=" + orderInfo
+        + "&partnerCode=" + cfg.getPartnerCode()
+        + "&redirectUrl=" + redirectUrl
+        + "&requestId=" + requestId
+        + "&requestType=" + REQUEST_TYPE;
+String signature = hmacSha256(raw, cfg.getSecretKey());
+```
+
+`hmacSha256` dùng `javax.crypto.Mac` của JDK — không thêm thư viện nào. Có test đối chiếu vector độc lập (xem 21.5).
+
+### 21.2 Xác thực callback — `verifyIpn`
+
+IPN là form-encoded, 13 field, cũng xếp alphabet. Điểm dễ sai: **phải ký trên giá trị đã URL-decode**. Tomcat tự decode form param, nên `req.getParameter("message")` đã đúng — nếu tự decode thêm lần nữa thì chữ ký lệch với chuỗi MoMo ký.
+
+```java
+// MomoGateway.java:145
+public static boolean verifyIpn(Map<String, String> params) {
+    String raw = "accessKey=" + cfg.getAccessKey()
+            + "&amount=" + nz(params.get("amount"))
+            + "&extraData=" + nz(params.get("extraData"))
+            + "&message=" + nz(params.get("message"))
+            ...
+    String signature = params.get("signature");
+    return signature != null
+            && hmacSha256(raw, cfg.getSecretKey()).equalsIgnoreCase(signature.trim());
+}
+```
+
+`nz()` trả `""` cho field thiếu — MoMo gửi field rỗng chứ không bỏ hẳn, nên `null` trong chuỗi ký sẽ làm sai hash.
+
+Chữ ký sai → `400 {"resultCode":400,"message":"Invalid signature"}`, **không** đụng vào DB.
+
+### 21.3 Không tin URL redirect
+
+`action=return` nhận `orderId`, `resultCode` từ query string — người dùng sửa được. Nên servlet bỏ qua `resultCode` trên URL và gọi `query` API lấy kết quả thật:
+
+```java
+// PaymentServlet.java:182
+MomoGateway.QueryResult result = momoGateway.query(req.getParameter("orderId").trim());
+if (result.resultCode == 0) {
+    orderService.markPaidByGateway(payment.getId(), result.amount);
+}
+```
+
+`markPaidByGateway` còn đối chiếu `result.amount` với `payment.amount` → lệch thì `409 PAYMENT_AMOUNT_MISMATCH`.
+
+### 21.4 Idempotency — callback đến hai lần không được sai
+
+MoMo gửi IPN tới khi nhận HTTP 200, nên **trùng lặp là bình thường**. `markPaidByGateway` coi "đã PAID" là thành công im lặng; `ipn()` vẫn trả 200 kể cả khi service ném `ServiceException` mà Payment đã PAID:
+
+```java
+// PaymentServlet.java:215
+try {
+    orderService.markPaidByGateway(payment.getId(), parseLong(params.get("amount")));
+} catch (ServiceException e) {
+    // Da PAID la truong hop binh thuong (IPN trung lap): van tra 200.
+    if (payment.getStatus() != PaymentStatus.PAID) {
+        json(resp, HttpServletResponse.SC_OK, 1, e.getMessage());
+        return;
+    }
+}
+json(resp, HttpServletResponse.SC_OK, 0, "ok");
+```
+
+Trả 4xx/5xx cho một IPN trùng sẽ khiến MoMo retry vô hạn.
+
+### 21.5 Bí mật nằm ở đâu — `MomoConfig`
+
+Không một dòng credential nào trong source. `MomoConfig` là Holder đọc biến môi trường, **fail fast** khi thiếu:
+
+```java
+private static String requireEnv(String name) {
+    String value = System.getenv(name);
+    if (value == null || value.trim().isEmpty()) {
+        throw new IllegalStateException("Thieu bien moi truong " + name + "...");
+    }
+    return value.trim();
+}
+```
+
+`PaymentServlet.create` bắt `IllegalStateException` đó và trả flash thân thiện ("Cổng thanh toán chưa được cấu hình") — không lộ tên biến hay stack trace ra UI.
+
+> Holder đọc **lazy** ở lần đầu thanh toán MoMo, nên app vẫn boot bình thường khi chỉ dùng COD.
+
+### 21.6 Test
+
+`MomoGatewayTest` có 3 test, trong đó một vector HMAC đối chiếu độc lập bằng `openssl dgst -sha256 -hmac`:
+
+```
+d5a3787abba93930dcacedb8dea899b7b03a810f5232f11a294f08b15cb0bbdd
+```
+
+> "Nếu em tự viết cả hai phía — ký và verify — thì test sẽ pass dù cả hai cùng sai. Nên em đối chiếu bằng công cụ ngoài (openssl) một lần, rồi khoá giá trị đó vào test."
+
+### 21.7 Nói khi demo
+
+> "Em không dùng SDK vì repo chính thức `momo-wallet/payment` không có bản Java, còn SDK Java cộng đồng kéo theo log4j 1.2.17 đã hết hỗ trợ. Project target Java 17, nên `java.net.http.HttpClient` có sẵn — nhưng em vẫn dùng `HttpURLConnection` + `javax.crypto` vì đủ dùng và không phải thêm code, không thêm dependency. Và secret key chỉ đọc từ biến môi trường, `git grep MOMO_SECRET_KEY` chỉ ra tên biến, không ra giá trị."

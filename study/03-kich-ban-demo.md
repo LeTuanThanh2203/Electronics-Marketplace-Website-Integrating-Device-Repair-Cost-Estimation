@@ -10,7 +10,13 @@
 
 - [ ] `mvn clean package` chạy sạch, không warning đỏ
 - [ ] Tomcat đã start, DB đã có dữ liệu mẫu: **3 Product `AVAILABLE`** với giá khác nhau
-- [ ] Đã đăng nhập sẵn một tài khoản Customer, **giỏ hàng đang có 2 máy**
+- [ ] **Session đã dựng sẵn** — `LoginServlet` còn rỗng nên không đăng nhập bằng
+      form được; phải nạp `currentUser` + `cart` vào session từ nhà (JSP tạm hoặc
+      Tomcat manager), và **giỏ hàng đang có 2 máy**
+- [ ] **Biến môi trường MoMo đã set** (`MOMO_PARTNER_CODE`, `MOMO_ACCESS_KEY`,
+      `MOMO_SECRET_KEY`) và **đã restart Tomcat** — thiếu thì nút MoMo chỉ ra
+      flash "Cổng thanh toán chưa được cấu hình", demo sẽ mất mạch
+- [ ] Đã bấm thử MoMo một lần ở nhà, thấy trang `test-payment.momo.vn` hiện ra
 - [ ] Mở sẵn 6 tab theo đúng thứ tự sẽ dùng:
   1. `/cart`
   2. `/checkout`
@@ -28,7 +34,7 @@ Nói **đúng 4 câu**, không dài hơn:
 
 > "Em phụ trách module **Giỏ hàng – Đặt hàng – Thanh toán**, tức là kênh bán **máy mới**: khách chọn máy, bỏ vào giỏ, đặt hàng, thanh toán, rồi theo dõi đơn.
 >
-> Module này có hai điểm em muốn cô chú ý: **thứ nhất**, hệ thống có hai kênh bán hàng — khách mua lại máy cũ từ người bán, và khách mua máy mới từ cửa hàng. Hai kênh dùng **chung một bảng `Order`**, phân biệt bằng cột `orderType`. **Thứ hai**, kênh của em có ràng buộc về **chống tranh mua** và **tính toàn vẹn khi huỷ đơn**.
+> Module này có hai điểm em muốn cô chú ý: **thứ nhất**, hệ thống có hai kênh bán hàng — khách mua lại máy cũ từ người bán, và khách mua máy mới từ cửa hàng. Hai kênh dùng **chung một bảng `Order`**, phân biệt bằng cột `orderType`. **Thứ hai**, kênh của em có tích hợp **cổng thanh toán MoMo thật** và ràng buộc **tính toàn vẹn khi huỷ đơn**.
 >
 > Em xin demo giao diện trước, rồi mở source code giải thích."
 
@@ -53,22 +59,30 @@ Lời:
 
 ### 1:40 · Đặt hàng — tab `/checkout`
 
-1. Cuộn xuống phần **Phương thức thanh toán**, chỉ 4 lựa chọn.
-2. Chọn **Chuyển khoản QR**.
-3. Bấm **Đặt hàng**.
+1. Cuộn xuống phần **Phương thức thanh toán**, chỉ **2 lựa chọn**: COD và Ví MoMo
+   ([checkout.jsp:115](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L115) và
+   [:125](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L125)).
+2. Chọn **Ví MoMo**.
+3. Bấm **Đặt hàng** → tự chuyển sang trang `/payment`.
 
 Lời:
-> "Ba phương thức QR, MOMO, BANK map thẳng vào enum `PaymentMethod` đúng như SDD. Còn COD là lựa chọn em lấy thêm từ bản mockup — em **không** thêm nó vào enum mà để `method = null`, vì COD nghĩa là chưa có giao dịch trực tuyến nào cả."
+> "Form chỉ còn hai lựa chọn: COD và Ví MoMo. Enum `PaymentMethod` vẫn giữ giá trị `QR` và `BANK` vì đó là dữ liệu có thể có trong CSDL — xoá đi thì Hibernate sẽ nổ khi đọc dòng cũ. Nhưng giao diện đã đóng, chỉ còn hai đường đi. Còn COD em để `method = null` chứ không thêm vào enum, vì COD nghĩa là chưa có giao dịch trực tuyến nào cả."
 
-> ⚠️ **Nói câu này trước khi cô hỏi.** SDD chỉ có 3 giá trị mà form có 4 — nếu để cô tự phát hiện, bạn ở thế bị động. Chủ động nói là bạn đang kiểm soát thiết kế.
+> ⚠️ **Chủ động nói câu này.** Enum có 3 giá trị mà form có 2 — nếu để cô tự phát hiện, bạn ở thế bị động.
 
-### 2:30 · Thanh toán — tab `/payment`
+### 2:10 · Thanh toán — tab `/payment`
 
-1. Chỉ badge `PENDING`.
-2. Bấm nút **COPY** ở dòng "Nội dung chuyển khoản".
+1. Chỉ badge `PENDING`, dòng **Mã giao dịch** có nút **COPY**
+   ([payment.jsp:76](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L76)).
+2. Bấm **Thanh toán qua MoMo** ([payment.jsp:106](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L106)).
+3. Trình duyệt nhảy sang `https://test-payment.momo.vn/v2/gateway/pay?…` — **dừng ở đây**, không nhập gì.
 
 Lời:
-> "Đây là điểm em muốn cô để ý: **hệ thống không tích hợp cổng thanh toán**. Không có QR động, không có callback. Hệ thống tự sinh một `Payment` ở trạng thái `PENDING` kèm mã giao dịch, khách chuyển khoản thủ công, rồi **Admin xác nhận tay**. Đây là quyết định trong SDD chứ không phải em làm thiếu."
+> "Đây là điểm em muốn cô để ý nhất: **cổng thanh toán là thật**, không phải giả lập. Em gọi REST v2 của MoMo sandbox bằng `HttpURLConnection` của JDK, ký HMAC-SHA256 bằng `javax.crypto`. URL cô đang thấy có chữ ký thật trong query string.
+>
+> Khi MoMo xác nhận, nó gọi ngược về server em qua IPN; em verify chữ ký rồi đổi `Payment` sang `PAID` **và** `Order` sang `CONFIRMED` trong cùng một transaction. Đường dự phòng khi IPN không tới được máy local là URL `return` — nhưng ở đó em **không tin tham số trên URL**, em gọi lại API `query` lấy kết quả thật."
+
+> Nếu cô hỏi "sao không bấm trả tiền luôn": sandbox cần app **"ứng dụng MoMo Test"** riêng, và phải gỡ app MoMo thật trước. Nói thẳng điều đó — nó chứng tỏ bạn đã đọc tài liệu, không phải làm hỏng.
 
 ### 3:00 · Lịch sử đơn — tab `/order?action=history`
 
@@ -95,7 +109,7 @@ Mở **`OrderItem.java`**, chỉ vào chỗ `listing` **hoặc** `product`.
 
 > "Một dòng hàng chỉ có thể trỏ tới **hoặc** một tin đăng máy cũ **hoặc** một máy mới, không bao giờ cả hai. Và trường `price` ở đây là **ảnh chụp giá tại thời điểm đặt**. Nếu mai Admin đổi giá niêm yết, đơn cũ vẫn giữ giá cũ — đây là yêu cầu nghiệp vụ, không phải em quên cập nhật."
 
-Mở **`Cart.java:31`** — hàm `getSubtotal()`.
+Mở **`Cart.java:62`** — hàm `getSubtotal()`.
 
 > "Tổng tiền **không lưu trong CSDL**, mà tính từ các dòng chi tiết. Lý do: nếu lưu một cột `totalAmount` rồi ai đó sửa một dòng hàng mà quên cập nhật cột đó, dữ liệu sẽ mâu thuẫn. Tính lại thì không bao giờ lệch.
 >
@@ -103,11 +117,11 @@ Mở **`Cart.java:31`** — hàm `getSubtotal()`.
 
 ### 5:00 · Rẽ nhánh giao diện — `history.jsp`
 
-Mở **`history.jsp`**, cuộn tới khoảng dòng 74–107.
+Mở **`history.jsp`**, cuộn tới khoảng dòng 76–96.
 
 > "Toàn bộ file này **không có một dòng Java nào** — không có scriptlet. Em dùng JSTL và EL. Ví dụ ở đây em đổi enum `OrderStatus` thành nhãn tiếng Việt bằng `c:choose`, và tính luôn class CSS cho badge."
 
-Cuộn xuống **`history.jsp:178`** — điều kiện nút "Đã nhận hàng".
+Cuộn xuống **`history.jsp:179`** — điều kiện nút "Đã nhận hàng".
 
 > "Đây là dòng em muốn cô xem nhất:
 > ```
@@ -115,13 +129,13 @@ Cuộn xuống **`history.jsp:178`** — điều kiện nút "Đã nhận hàng"
 > ```
 > Nút 'Đã nhận hàng' chỉ hiện khi **đồng thời** đơn đã xác nhận **và** tiền đã vào. Thiếu một trong hai thì không hiện. Đây là ràng buộc BR-46 trong SDD."
 
-Chỉ vào **`history.jsp:155`**.
+Chỉ vào **`history.jsp:156`**.
 
 > "Cô có thể thắc mắc vì sao em viết `${payments[order.id]}` mà không phải `${order.payment}`. Vì `Order` **không có** trường `payment` — quan hệ một-một nằm ở phía `Payment`, và `Payment.orderId` là duy nhất. Nên servlet phải tra một map rồi truyền vào. Đây là chủ ý thiết kế để tránh quan hệ vòng."
 
 ### 6:20 · AJAX — `cart.jsp`
 
-Mở **`cart.jsp`**, cuộn tới khoảng dòng 145–177.
+Mở **`cart.jsp`**, cuộn tới khoảng dòng 140–177.
 
 > "Đây là phần AJAX. Chú ý comment ngay trên: em ghi rõ **hợp đồng JSON** giữa client và server — server trả về `ok`, `subtotal`, `count`. Ghi ngay trong file để người viết servlet sau này biết phải trả gì."
 
@@ -129,13 +143,17 @@ Chỉ vào dòng `var vnd = new Intl.NumberFormat(...)`.
 
 > "Số tiền do JavaScript render ra phải giống hệt số tiền do JSTL render ra ở lần load đầu, nên em dùng cùng locale `vi-VN`."
 
-### 7:00 · Điểm nhấn: race-condition & transaction
+### 7:00 · Điểm nhấn: transaction & cổng thanh toán
 
-> "Hai thứ khó nhất trong module này em chưa demo được vì tầng service đang làm dở, nhưng em xin nói thiết kế.
+> "Hai thứ khó nhất trong module này em xin nói ở tầng code.
 >
-> **Thứ nhất — chống bán trùng.** Kênh của em, giỏ hàng **không giữ chỗ** sản phẩm — bỏ vào giỏ không làm máy đó thành đã bán. Nên chỗ duy nhất có thể xảy ra tranh mua là lúc checkout. Cách chặn là kiểm tra `Product.status == AVAILABLE` **bên trong** transaction tạo đơn, chứ không kiểm tra trước rồi mới tạo. Nếu kiểm tra trước, giữa hai bước đó người khác mua mất. Không `AVAILABLE` thì em ném exception để rollback — không tạo Order dở dang.
+> **Thứ nhất — huỷ đơn là thao tác hai bảng.** Khi huỷ một đơn máy mới, trong **cùng một transaction** em phải chuyển `Payment` từ `PENDING` sang `FAILED`. Nếu không gói chung, hệ thống có thể crash giữa hai bước và để lại đơn đã huỷ nhưng vẫn báo chờ thanh toán. Còn nếu khách đã trả tiền rồi thì `Payment` **giữ nguyên** — bản MVP không có hoàn tiền, nên `PaymentStatus` cố tình chỉ có ba giá trị và không có `REFUNDED`.
 >
-> **Thứ hai — huỷ đơn là thao tác hai bảng.** Khi huỷ một đơn máy mới, trong **cùng một transaction** em phải chuyển `Payment` từ `PENDING` sang `FAILED`. Nếu không gói chung, hệ thống có thể crash giữa hai bước và để lại đơn đã huỷ nhưng vẫn báo chờ thanh toán. Còn nếu khách đã trả tiền rồi thì `Payment` **giữ nguyên** — bản MVP không có hoàn tiền, nên `PaymentStatus` cố tình chỉ có ba giá trị và không có `REFUNDED`."
+> **Thứ hai — thanh toán MoMo cũng là transaction hai bảng, chiều ngược lại.** Khi MoMo báo đã trả tiền, `Payment` sang `PAID` kèm `paidAt` **và** `Order` từ `PENDING` sang `CONFIRMED` trong cùng một transaction. Cả IPN lẫn URL `return` đều gọi chung một hàm `markPaidByGateway`, nên hai đường về không bao giờ cho ra hai trạng thái khác nhau.
+>
+> **Chống bán trùng** thì kênh của em nhẹ hơn kênh marketplace: giỏ hàng **không giữ chỗ** sản phẩm, nên chỗ duy nhất có thể tranh mua là lúc checkout. Em kiểm tra `Product.status == AVAILABLE` **bên trong** transaction tạo đơn, không kiểm tra trước rồi mới tạo — nếu kiểm tra trước, giữa hai bước đó người khác mua mất. Không `AVAILABLE` thì ném exception để rollback, không tạo Order dở dang."
+
+> Nói thêm một câu nếu còn giờ: *"Em cố tình không nói mình làm lock dòng Buyer — đó là rule chống tranh mua của kênh marketplace, thuộc phần bạn khác."*
 
 ---
 
@@ -144,11 +162,16 @@ Chỉ vào dòng `var vnd = new Intl.NumberFormat(...)`.
 > "Tóm lại module của em có ba điểm:
 > 1. **Một bảng `Order` cho hai kênh bán**, phân biệt bằng `orderType` — không nhân đôi schema.
 > 2. **Tiền dùng `BigDecimal` và tổng được tính chứ không lưu** — tránh sai số và tránh dữ liệu mâu thuẫn.
-> 3. **Ràng buộc nghiệp vụ đặt ở tầng view và tầng service**, ví dụ nút 'Đã nhận hàng' chỉ hiện khi đủ hai điều kiện, và huỷ đơn phải là một transaction hai bảng.
+> 3. **Cổng thanh toán thật** — MoMo REST v2, ký và verify HMAC-SHA256, IPN idempotent; cộng với ràng buộc nghiệp vụ ở tầng service: huỷ đơn và xác nhận thanh toán đều là transaction hai bảng.
 >
-> Phần giao diện và model em đã xong. Tầng repository và service em đang hoàn thiện."
+> Bốn tầng servlet, service, repository, view của module em đã xong và đã chạy end-to-end trên Tomcat; **10/10 test xanh**."
 
 **Nói thẳng phần chưa xong** — đừng để cô tự phát hiện. Nói trước sẽ được tính là trung thực, bị phát hiện sẽ bị tính là giấu.
+
+Phần còn hở, nói đúng một câu:
+> "Còn một điểm chưa xong: `AuthenticationFilter` đang rỗng — hiện các servlet tự kiểm tra `currentUser` và trả 401. Filter thuộc phần bạn em phụ trách session, em đã viết sẵn hợp đồng bàn giao."
+
+Đừng nói "em đang hoàn thiện tầng repository/service" — không còn đúng nữa, và nói sai về chính bài của mình còn tệ hơn nói thiếu.
 
 ---
 

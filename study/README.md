@@ -21,22 +21,26 @@ Mục đích: hiểu tường tận module **Giỏ hàng – Đặt hàng – Th
 | File | Tầng | Trạng thái tài liệu |
 |------|------|---------------------|
 | [06-doc-code-entity.md](06-doc-code-entity.md) | Entity + Enum (6 file, 5 enum) | ✅ đã viết — tầng này đã xong thật |
-| `07-doc-code-repository.md` | Repository | ⏳ chờ bạn viết code |
-| `08-doc-code-service.md` | Service (checkout / cancel / complete) | ⏳ chờ bạn viết code |
-| `09-doc-code-servlet.md` | Servlet + filter | ⏳ chờ bạn viết code |
-| `10-doc-code-view.md` | JSP + CSS + AJAX | ⏳ chờ bạn viết code |
+| `07-doc-code-repository.md` | Repository | ⏳ **code đã xong**, tài liệu chưa viết |
+| `08-doc-code-service.md` | Service (checkout / cancel / complete / MoMo) | ⏳ **code đã xong**, tài liệu chưa viết |
+| `09-doc-code-servlet.md` | Servlet + filter | ⏳ **code đã xong** (trừ `AuthenticationFilter`), tài liệu chưa viết |
+| `10-doc-code-view.md` | JSP + CSS + AJAX | ⏳ **code đã xong**, tài liệu chưa viết |
 
+> Ba tầng repository / service / servlet giờ đã có code thật. Chưa viết doc riêng cho
+> từng tầng, nhưng [02](02-kien-thuc-da-ap-dung.md) đã gắn link tới code thật của cả ba.
 
-## Tình trạng module (cập nhật 2026-10-16)
+## Tình trạng module (cập nhật 2026-10-19)
 
 | Tầng | Trạng thái |
 |------|-----------|
 | Entity + Enum | ✅ Xong (`Cart`, `CartItem`, `Order`, `OrderItem`, `Payment`, `Product`, 5 enum) — **đã map annotation JPA và đã verify bằng test** |
-| Config + Test | ✅ Xong (`JpaConfig` + `JpaConfigTest` + `EntityMappingTest`, 3/3 xanh) |
-| View JSP + CSS | ✅ Xong (5 màn: cart, checkout, payment, history + 2 fragment) |
-| Repository | ❌ Còn rỗng (3 file; `ProductRepository` đã xong) |
-| Service | ❌ Còn rỗng (và **chưa có `CartService`**) |
-| Servlet | ❌ Chưa có logic — `@WebServlet` đã đăng ký nhưng mọi action trả `NOT_IMPLEMENTED` |
-| `web.xml` | ✅ Xong — nhưng **chưa có `AuthenticationFilter`** nên URI bảo vệ vẫn hở |
+| Config + Test | ✅ Xong (`JpaConfig` + `MomoConfig`; **10/10 test xanh**) |
+| View JSP + CSS | ✅ Xong (4 màn của module: cart, checkout, payment, history + 2 fragment) |
+| Repository | ✅ Xong (`CartRepository`, `OrderRepository`, `PaymentRepository`, `ProductRepository`) |
+| Service | ✅ Xong (`CartService`, `OrderService`, `MomoGateway`, `ServiceException`) |
+| Servlet | ✅ Xong (`CartServlet`, `CheckoutServlet`, `OrderServlet`, `PaymentServlet`) |
+| Thanh toán | ✅ COD + **MoMo thật** (REST v2, sandbox) — đã chạy end-to-end |
+| `web.xml` | ✅ Xong (encoding, HttpOnly cookie, `tracking-mode COOKIE`, error-page) |
+| `AuthenticationFilter` | ❌ Vẫn rỗng — **là điểm hở duy nhất còn lại**, thuộc phần Tân |
 
 > Chi tiết đầy đủ + hợp đồng JSP: xem [00-tien-do-cong-viec.md](00-tien-do-cong-viec.md).

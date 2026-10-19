@@ -18,13 +18,11 @@ Cả sáu entity đều có. **Vì sao:** object đặt vào `HttpSession` phả
 > **Nếu cô hỏi "sao không dùng `java.time.LocalDateTime` mà dùng `java.util.Date`?"**
 > Trả lời thẳng: `java.util.Date` là kiểu **cũ**, `LocalDateTime` là kiểu hiện đại nên dùng. Em giữ `Date` vì JPA map `Date` mặc định sang `TIMESTAMP` không cần cấu hình gì thêm, còn `LocalDateTime` cần `@Temporal`/converter tuỳ version. **Đây là chỗ em chọn theo sự tiện lợi của JPA, không phải vì `Date` tốt hơn.** Nếu làm lại em sẽ dùng `LocalDateTime`.
 
-### 0.2 Không có annotation JPA — và đây là việc còn lại
+### 0.2 Annotation JPA — đã map xong và đã verify
 
-Cả sáu file hiện là **POJO thuần**: có field, có getter/setter, `implements Serializable`, nhưng **không có `@Entity`, `@Id`, `@Column`, `@ManyToOne`**. Nghĩa là Hibernate chưa biết chúng là gì.
+Cả sáu file **đều có** `@Entity`, `@Id`, `@Column`, `@ManyToOne`/`@OneToMany`, `@Enumerated(EnumType.STRING)`, `@Temporal`. Không còn file nào là POJO thuần.
 
-> **Nói thẳng khi demo:** *"Model em viết xong về mặt field và quan hệ; phần annotation JPA em đang map nốt."* Đừng để cô tự phát hiện.
-
-Chi tiết cần map ở [05](05-checklist-truoc-buoi-cham.md) mục B, dòng 2.
+Bằng chứng đáng nói khi demo: `EntityMappingTest` boot `EntityManagerFactory` thật, ghi/đọc lại cả 5 entity rồi assert trên **metamodel của Hibernate** — tức là nó kiểm mapping thật, không phải chỉ đọc code. Xem [00 — Bước 2](00-tien-do-cong-viec.md#bước-2-đã-verify-bằng-gì).
 
 ### 0.3 Constructor rỗng `public Order() {}`
 
@@ -32,7 +30,7 @@ Chi tiết cần map ở [05](05-checklist-truoc-buoi-cham.md) mục B, dòng 2.
 
 ---
 
-## 1. `Order.java` — 101 dòng, entity trung tâm
+## 1. `Order.java` — 138 dòng, entity trung tâm
 
 ### Field
 
@@ -47,7 +45,7 @@ Chi tiết cần map ở [05](05-checklist-truoc-buoi-cham.md) mục B, dòng 2.
 
 **Không có** `totalAmount`. **Không có** `payment`. Cả hai đều là chủ ý — xem mục 1.2 và 1.3.
 
-### 1.1 `getTotalAmount()` — dòng 37–44
+### 1.1 `getTotalAmount()` — dòng 75–82
 
 ```java
 public BigDecimal getTotalAmount() {
@@ -67,7 +65,7 @@ Bốn điểm đáng nói:
 3. **`BigDecimal.valueOf(quantity)`** — `quantity` là `int`, phải chuyển sang `BigDecimal` mới `multiply` được. Dùng `valueOf` (nhận `long`) chứ không `new BigDecimal(int)`.
 4. **`total = total.add(...)`** — `BigDecimal` **bất biến**, `add()` trả về object mới chứ không sửa `total`. Viết `total.add(x);` mà không gán lại là bug im lặng. Đây là câu hỏi kinh điển về immutability.
 
-> **Cô có thể hỏi: "hàm này gọi ở đâu?"** → `history.jsp:151` — `${order.totalAmount}`. EL gọi getter này tự động, không cần viết gì thêm trong JSP.
+> **Cô có thể hỏi: "hàm này gọi ở đâu?"** → `history.jsp:152` — `${order.totalAmount}`. EL gọi getter này tự động, không cần viết gì thêm trong JSP.
 
 > ⚠️ **Điểm yếu thật của hàm này:** nó duyệt `items`. Nếu `items` là `LAZY` và hàm được gọi **ngoài transaction** (ví dụ servlet đã đóng `EntityManager` rồi mới forward sang JSP), Hibernate ném `LazyInitializationException`. Cách chặn: `JOIN FETCH items` trong query lịch sử đơn. Xem [04](04-cau-hoi-phan-bien.md) mục C3. **Chủ động nói điểm này trước — nó cho thấy bạn hiểu tầng, không chỉ viết được getter.**
 
@@ -75,7 +73,7 @@ Bốn điểm đáng nói:
 
 Quan hệ một-đơn-tối-đa-một-thanh-toán được biểu diễn bằng **unique index trên `Payment.orderId`**, tức khoá ngoại nằm ở phía `Payment`. Nếu để `Order.paymentId` thì không có gì chặn hai `Payment` cùng trỏ vào một `Order`.
 
-**Hệ quả ở tầng view:** JSP không viết được `${order.payment}` → servlet phải tra `Map<orderId, Payment>` rồi truyền vào. Đó là lý do có dòng `history.jsp:155`:
+**Hệ quả ở tầng view:** JSP không viết được `${order.payment}` → servlet phải tra `Map<orderId, Payment>` rồi truyền vào. Đó là lý do có dòng `history.jsp:156`:
 
 ```jsp
 <c:set var="payment" value="${payments[order.id]}" />
@@ -89,7 +87,7 @@ Quan hệ một-đơn-tối-đa-một-thanh-toán được biểu diễn bằng 
 
 ---
 
-## 2. `OrderItem.java` — 73 dòng
+## 2. `OrderItem.java` — 106 dòng
 
 ### Field
 
@@ -127,7 +125,7 @@ Có **setter** `setQuantity(int)`. Nghĩa là giá trị 1 chỉ là **mặc đ�
 
 ---
 
-## 3. `Payment.java` — 95 dòng
+## 3. `Payment.java` — 137 dòng
 
 | Field | Ghi chú |
 |---|---|
@@ -140,13 +138,13 @@ Có **setter** `setQuantity(int)`. Nghĩa là giá trị 1 chỉ là **mặc đ�
 
 ### 3.1 `method` nullable — chỗ bạn phải tự quyết
 
-SDD §12.4 ghi `method ∈ {QR, MOMO, BANK}` — **ba** giá trị. Form của bạn có **bốn** lựa chọn vì có COD. Cách xử lý: **không** thêm `COD` vào enum, mà để `method = null`.
+SDD §12.4 ghi `method ∈ {QR, MOMO, BANK}` — **ba** giá trị. Form của bạn chỉ còn **hai** lựa chọn (COD + MoMo), và COD không có trong enum. Cách xử lý: **không** thêm `COD` vào enum, mà để `method = null`.
 
 **Vì sao không thêm `COD` vào enum:** nếu thêm thì mọi chỗ xử lý thanh toán đều phải rẽ nhánh "nếu là COD thì bỏ qua" — làm hỏng ý nghĩa của enum. Để `null` rồi rẽ nhánh **một lần** ở tầng view thì sạch hơn.
 
-→ [checkout.jsp:116](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L116) (radio `value=""`) và [payment.jsp:76](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L76) (`empty payment.method` → "Nhận hàng trả tiền (COD)").
+→ [checkout.jsp:115](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L115) (radio `value=""`) và [payment.jsp:67](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L67) (`empty payment.method` → "Nhận hàng trả tiền (COD)").
 
-> ⚠️ **Nói câu này TRƯỚC khi cô hỏi.** SDD 3 giá trị mà form 4 lựa chọn — để cô tự phát hiện là bạn ở thế bị động. Chi tiết ở [04](04-cau-hoi-phan-bien.md) mục B4.
+> ⚠️ **Nói câu này TRƯỚC khi cô hỏi.** SDD 3 giá trị mà form chỉ còn 2 lựa chọn — để cô tự phát hiện là bạn ở thế bị động. Chi tiết ở [04](04-cau-hoi-phan-bien.md) mục B4.
 
 ### 3.2 `amount` là bản sao, không phải nguồn sự thật
 
@@ -162,7 +160,7 @@ Vì MVP **không có hoàn tiền**. Hoàn tiền là quy trình kế toán ngo�
 
 ---
 
-## 4. `Cart.java` — 80 dòng
+## 4. `Cart.java` — 110 dòng
 
 | Field | Ghi chú |
 |---|---|
@@ -170,7 +168,7 @@ Vì MVP **không có hoàn tiền**. Hoàn tiền là quy trình kế toán ngo�
 | `createdAt` / `updatedAt` | |
 | `items` | `List<CartItem>`, khởi tạo sẵn |
 
-### 4.1 `getSubtotal()` — dòng 31–39
+### 4.1 `getSubtotal()` — dòng 62–70
 
 Cùng khuôn với `Order.getTotalAmount()`, **nhưng khác một chỗ quan trọng**:
 
@@ -185,7 +183,7 @@ Giỏ hàng đọc **giá hiện tại** từ `Product` — đúng, vì giỏ ch
 >
 > Trả lời: *"Vì hai thời điểm khác nhau về nghiệp vụ. Trong giỏ, khách chưa cam kết gì — Admin đổi giá thì khách phải thấy giá mới. Lúc bấm đặt hàng mới là lúc chốt: `OrderItem.price` sao chép giá tại đúng thời điểm đó và bất biến từ đó về sau. Nếu giỏ cũng snapshot thì khách sẽ thấy giá cũ và bị tính giá sai."*
 
-**Comment ở dòng 29** giải thích vì sao cần hàm này thay vì tính trong JSP: *"EL không duyệt tính được tổng nên JSP cần hàm này."* Chính xác — EL không có vòng lặp kiểu `sum`, nên tổng phải là một getter.
+**Comment ở dòng 58–61** giải thích vì sao cần hàm này thay vì tính trong JSP: *"EL không duyệt tính được tổng nên JSP cần hàm này."* Chính xác — EL không có vòng lặp kiểu `sum`, nên tổng phải là một getter.
 
 ### 4.2 Cart **không** giữ chỗ Product — BR-45
 
@@ -193,7 +191,7 @@ Bỏ máy vào giỏ **không** làm `Product.status` đổi. Không có cột `
 
 ---
 
-## 5. `CartItem.java` — 63 dòng
+## 5. `CartItem.java` — 91 dòng
 
 | Field | Ghi chú |
 |---|---|
@@ -202,7 +200,7 @@ Bỏ máy vào giỏ **không** làm `Product.status` đổi. Không có cột `
 | `quantity` | `int = 1` — cùng vấn đề như `OrderItem` |
 | `addedAt` | để sắp xếp giỏ theo thứ tự thêm |
 
-**Ràng buộc `(cartId, productId)` unique:** chặn thêm cùng một máy hai lần vào giỏ. Đây là ràng buộc ở tầng DB, chưa map annotation.
+**Ràng buộc `(cart_id, product_id)` unique:** chặn thêm cùng một máy hai lần vào giỏ. Đã map ngay trên class — [`CartItem.java:25-26`](../../src/main/java/com/electronics/marketplace/entity/CartItem.java#L25-L26) có `@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"cart_id", "product_id"}))`, nên `hbm2ddl` sinh đúng unique index ở DB.
 
 > **Nếu cô hỏi "thêm trùng thì sao?"** → *"Ở DB có unique `(cartId, productId)`. Ở tầng service, khi thêm một Product đã có trong giỏ thì em không tạo dòng mới — vì `quantity` luôn bằng 1 nên tăng số lượng là vô nghĩa, em chỉ báo 'đã có trong giỏ'."*
 
@@ -210,7 +208,7 @@ Bỏ máy vào giỏ **không** làm `Product.status` đổi. Không có cột `
 
 ---
 
-## 6. `Product.java` — 81 dòng
+## 6. `Product.java` — 106 dòng
 
 Đây là entity **không thuộc phạm vi bạn** — thuộc module Product của Phước Anh. Bạn chỉ khai báo **tối thiểu** để `Cart`/`CartItem` và view chạy được.
 
@@ -220,7 +218,7 @@ Bỏ máy vào giỏ **không** làm `Product.status` đổi. Không có cột `
 | `status` | `ProductStatus` — `AVAILABLE/OUT_OF_STOCK/DISCONTINUED` |
 | `storeName` | **display-only**, FR-BUY-03; MVP không có entity `Store` |
 
-**Comment `ponytail:` ở dòng 15–17** ghi rõ: chỉ khai báo field mà `Cart`/`CartItem` và view đang dùng; các FK (`device`, `deviceModel`, `admin`) và `avgRating` thuộc phạm vi Phước Anh, thêm annotation khi bạn đó map entity.
+**Comment `ponytail:` ở dòng 24–27** ghi rõ: chỉ khai báo field mà `Cart`/`CartItem` và view đang dùng; các FK (`device`, `deviceModel`, `admin`) và `avgRating` thuộc phạm vi Phước Anh, thêm annotation khi bạn đó map entity.
 
 > **Nếu cô hỏi "sao `Product` sơ sài vậy?"** → *"Vì `Product` thuộc module của bạn khác trong nhóm. Em chỉ khai báo phần em cần dùng — `price` và `status` cho giỏ hàng và checkout. Em cố tình không viết thêm để tránh hai người sửa cùng một file rồi xung đột."*
 >
@@ -228,7 +226,7 @@ Bỏ máy vào giỏ **không** làm `Product.status` đổi. Không có cột `
 
 ---
 
-## 7. Năm enum — và hai enum rỗng
+## 7. Năm enum của bạn — và phần enum của người khác
 
 ### Enum của bạn (đã xong)
 
@@ -244,9 +242,14 @@ Bỏ máy vào giỏ **không** làm `Product.status` đổi. Không có cột `
 
 > ⚠️ **Chỗ dễ bị hỏi:** *"Sao không dùng `EnumType.ORDINAL`?"* → Vì `ORDINAL` lưu **số thứ tự**. Thêm một giá trị vào giữa enum là mọi dòng cũ trong DB đọc sai nghĩa — `PENDING` thành `CONFIRMED` mà không ai biết. `STRING` lưu tên, an toàn khi enum tiến hoá. **Đây là câu trả lời ăn điểm, nên nhớ.**
 
-### Enum rỗng — không phải của bạn
+### Enum của người khác
 
-`ListingCondition`, `ListingStatus`, `SpecDataType` — **rỗng**, thuộc module marketplace/product. Đừng nhận là của mình, đừng sửa.
+`ListingCondition` (3 giá trị: `DAMAGED`, `USED_FAIR`, `USED_GOOD`) và `ListingStatus`
+(4 giá trị: `AVAILABLE`, `RESERVED`, `SOLD`, `HIDDEN`) **đã có nội dung** — lấy từ
+`origin/Thanh`. `OrderService` dùng `ListingStatus.RESERVED`/`AVAILABLE` ở nhánh
+MARKETPLACE nên hai enum này là **phụ thuộc thật**, đừng sửa.
+
+`SpecDataType` vẫn rỗng — thuộc module product. Đừng nhận là của mình, đừng sửa.
 
 ---
 

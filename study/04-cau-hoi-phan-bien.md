@@ -13,7 +13,7 @@ Vì mọi thứ **giống nhau**: cùng người mua, cùng danh sách hàng, c�
 
 Tách bảng sẽ phải nhân đôi toàn bộ query lịch sử, nhân đôi phân trang, nhân đôi màn hình. Nên em giữ một bảng, thêm cột `orderType`, và mọi quy tắc riêng của kênh marketplace — giữ chỗ tin đăng, giới hạn số đơn — đều **chỉ áp dụng khi `orderType = MARKETPLACE`**.
 
-→ Mở [history.jsp:99-102](../../src/main/webapp/WEB-INF/views/order/history.jsp#L99-L102) chỉ chỗ rẽ nhánh.
+→ Mở [history.jsp:100-103](../../src/main/webapp/WEB-INF/views/order/history.jsp#L100-L103) chỉ chỗ rẽ nhánh.
 
 ---
 
@@ -39,7 +39,7 @@ Vì quan hệ là **một-nhiều-nhất-một**: một đơn có tối đa mộ
 
 Nếu để `Order.paymentId` thì không có gì chặn được hai Payment cùng trỏ vào một Order. Đặt khoá ngoại ở phía "nhiều" là cách chuẩn để biểu diễn quan hệ một-một.
 
-**Hệ quả ở tầng view:** JSP không viết được `${order.payment}`, nên servlet phải tra một `Map<orderId, Payment>` rồi truyền vào — [history.jsp:155](../../src/main/webapp/WEB-INF/views/order/history.jsp#L155).
+**Hệ quả ở tầng view:** JSP không viết được `${order.payment}`, nên servlet phải tra một `Map<orderId, Payment>` rồi truyền vào — [history.jsp:156](../../src/main/webapp/WEB-INF/views/order/history.jsp#L156).
 
 ---
 
@@ -51,7 +51,7 @@ Tính lại mỗi lần đọc thì không bao giờ lệch, và với quy mô m
 
 SDD ghi rõ điều này ở phần đặc tả `Order`: `getTotalAmount()` = `SUM(OrderItem.price × quantity)`, "computed instead of storing a denormalized totalAmount field".
 
-→ [Cart.java:31](../../src/main/java/com/electronics/marketplace/entity/Cart.java#L31)
+→ [Cart.java:62](../../src/main/java/com/electronics/marketplace/entity/Cart.java#L62)
 
 ---
 
@@ -103,25 +103,35 @@ Vì mỗi máy mới là **một cá thể duy nhất** — có số serial, có
 
 ### B4. "Vì sao chọn COD lại để `method = null`?"
 
-⚠️ **Câu này cô rất dễ hỏi** — vì SDD §12.4 ghi `method ∈ {QR, MOMO, BANK}`, tức chỉ **3** giá trị, mà form của em có **4** lựa chọn. Trả lời thẳng:
+⚠️ **Câu này cô rất dễ hỏi** — vì SDD §12.4 ghi `method ∈ {QR, MOMO, BANK}`, tức **3** giá trị, mà form của em chỉ có **2** lựa chọn (COD + MoMo), và COD lại không nằm trong enum. Trả lời thẳng:
 
-> "COD là lựa chọn em lấy từ bản mockup, **không có trong SDD**. Em giữ lại vì đó là cách mua phổ biến nhất ở Việt Nam, nhưng em **không** thêm `COD` vào enum `PaymentMethod` — enum giữ đúng 3 giá trị như SDD quy định. Chọn COD thì form gửi `value=""`, servlet hiểu là `null`, nghĩa là **không tạo giao dịch trực tuyến nào**."
+> "Enum `PaymentMethod` vẫn giữ đúng 3 giá trị như SDD: `QR`, `MOMO`, `BANK`. Em **không** xoá `QR` và `BANK` dù giao diện không còn dùng, vì enum mô tả **dữ liệu có thể có trong CSDL** — xoá đi thì Hibernate sẽ nổ khi đọc một dòng Payment cũ mang giá trị đó. Cái em đóng lại là **giao diện**: form chỉ còn COD và MoMo, nên không có đường nào sinh ra Payment `QR`/`BANK` mới nữa.
+>
+> Còn COD em **không** thêm vào enum, để `method = null`: COD nghĩa là **không có giao dịch trực tuyến nào cả**, nên `method` không có gì để mô tả. Thêm `COD` vào enum sẽ buộc mọi chỗ xử lý thanh toán phải rẽ nhánh "nếu COD thì bỏ qua", làm hỏng ý nghĩa của enum."
 
-Vì sao **không** thêm `COD` vào enum: nếu thêm thì mọi chỗ xử lý thanh toán đều phải rẽ nhánh "nếu là COD thì bỏ qua", làm hỏng ý nghĩa của enum. Để `null` rồi rẽ nhánh một lần ở tầng view thì sạch hơn.
+→ [checkout.jsp:115](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L115) (radio COD, `value=""`) và [:125](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L125) (radio MoMo) và [payment.jsp:67](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L67) (hiển thị COD).
 
-→ [checkout.jsp:116](../../src/main/webapp/WEB-INF/views/order/checkout.jsp#L116) (value rỗng) và [payment.jsp:76](../../src/main/webapp/WEB-INF/views/order/payment.jsp#L76) (hiển thị COD).
-
-> **Nếu cô hỏi "vậy đơn COD có Payment không?"** — Trả lời: theo SDD thì mọi đơn `NEW_DEVICE` đều sinh Payment ([BR-44](../../reference/_sdd.txt)), nhưng đơn COD không có giao dịch nào để xác nhận. Đây là **khoảng trống trong SDD**, không phải lỗi code. Em chọn hướng: vẫn tạo `Payment` ở `PENDING` nhưng không hiện thông tin chuyển khoản — Admin tự chuyển thẳng `PAID` khi giao hàng. **Nói rõ đây là chỗ em phải tự quyết vì SDD chưa chốt.**
+> **Nếu cô hỏi "vậy đơn COD có Payment không?"** — Trả lời: theo SDD thì mọi đơn `NEW_DEVICE` đều sinh Payment ([BR-44](../../reference/_sdd.txt)), nhưng đơn COD không có giao dịch trực tuyến nào để xác nhận. Đây là **khoảng trống trong SDD**, không phải lỗi code. Em chọn hướng: vẫn tạo `Payment` ở `PENDING` với `method = null`, và Admin tự chuyển thẳng `PAID` khi giao hàng. **Nói rõ đây là chỗ em phải tự quyết vì SDD chưa chốt.**
 
 ---
 
 ### B5. "Sao không tích hợp cổng thanh toán thật?"
 
-Vì SDD chốt là **không** tích hợp trong MVP. Hệ thống tự sinh `Payment` ở `PENDING` kèm mã giao dịch, khách chuyển khoản thủ công, Admin đối soát và xác nhận tay.
+**Câu này giờ phải trả lời ngược lại** — em **đã** tích hợp rồi.
 
-Lý do: tích hợp cổng thật cần tài khoản doanh nghiệp, webhook công khai, xử lý chữ ký — vượt phạm vi môn học. Nhưng mô hình dữ liệu em làm **đã sẵn sàng** cho việc đó: chỉ cần thêm một endpoint nhận callback và đổi `Payment.status`, không phải sửa schema.
+> "Em có tích hợp, và là tích hợp thật chứ không giả lập: gọi REST v2 của MoMo sandbox. Ba việc phải làm cho đúng:
+>
+> **Một — ký request.** MoMo yêu cầu chuỗi ký là các field xếp **theo alphabet**, nối bằng `&`, rồi HMAC-SHA256 bằng `secretKey`. Sai thứ tự field là sai chữ ký, sai một ký tự là sai luôn.
+>
+> **Hai — không tin callback.** Có hai đường về: IPN (MoMo gọi server-to-server) và URL redirect người dùng. Với IPN em verify chữ ký trên tham số đã URL-decode; với URL redirect em **bỏ qua** tham số trên URL và gọi lại `query` API lấy kết quả thật — vì người dùng sửa được query string.
+>
+> **Ba — idempotent.** MoMo gửi IPN lặp tới khi nhận HTTP 200, nên 'đã PAID' là trạng thái bình thường, không phải lỗi. Em trả 200 và không đổi gì thêm.
+>
+> Không dùng SDK vì repo chính thức `momo-wallet/payment` không có bản Java, còn SDK Java cộng đồng kéo `log4j 1.2.17` đã EOL. Project target Java 17 nên `java.net.http.HttpClient` có sẵn — em vẫn dùng `HttpURLConnection` + `javax.crypto` vì đủ dùng, không phải viết thêm gì và không thêm dependency nào."
 
-→ [BR-44](../../reference/_sdd.txt)
+→ [MomoGateway.java](../../src/main/java/com/electronics/marketplace/service/MomoGateway.java) · [PaymentServlet.java:113](../../src/main/java/com/electronics/marketplace/controller/user/PaymentServlet.java#L113) · chi tiết ở [02 — mục 21](02-kien-thuc-da-ap-dung.md#21-tích-hợp-cổng-thanh-toán--hmac-sha256--callback).
+
+> **Nếu cô hỏi "sao không chạy được giao dịch thật trên máy cô?"** — sandbox cần app **"ứng dụng MoMo Test"** riêng, phải gỡ app MoMo thật trước khi cài, và `payUrl` có TTL ngắn. Đó là giới hạn của phía MoMo, không phải của code. Đường IPN cũng cần URL công khai nên localhost không nhận được — em đã chuẩn bị biến `MOMO_PUBLIC_BASE_URL` cho lúc tunnel/deploy.
 
 ---
 
@@ -129,7 +139,7 @@ Lý do: tích hợp cổng thật cần tài khoản doanh nghiệp, webhook cô
 
 Chỉ khi **đồng thời** đơn ở `CONFIRMED` **và** thanh toán ở `PAID`. Đây là BR-46, và em cài đặt nó ở hai tầng: tầng view ẩn nút nếu chưa đủ điều kiện, tầng service từ chối nếu client cố gửi request.
 
-→ [history.jsp:178](../../src/main/webapp/WEB-INF/views/order/history.jsp#L178)
+→ [history.jsp:179](../../src/main/webapp/WEB-INF/views/order/history.jsp#L179)
 
 ---
 
@@ -183,7 +193,7 @@ AJAX: JavaScript gửi request, server trả về **chỉ dữ liệu JSON**, Ja
 
 Trong giỏ hàng, xoá một dòng chỉ cần đổi con số tổng tiền và số món trên header — không cần dựng lại cả trang. Nên server trả `{ok, subtotal, count}`.
 
-→ [cart.jsp:145-177](../../src/main/webapp/WEB-INF/views/cart/cart.jsp#L145-L177)
+→ [cart.jsp:149-177](../../src/main/webapp/WEB-INF/views/cart/cart.jsp#L149-L177)
 
 ---
 
@@ -191,7 +201,11 @@ Trong giỏ hàng, xoá một dòng chỉ cần đổi con số tổng tiền v�
 
 Vì từ Servlet 3.0 trở đi có thể khai báo servlet và filter bằng **annotation** ngay trên class (`@WebServlet`, `@WebFilter`) thay vì trong `web.xml`.
 
-> ⚠️ **Đây là chỗ em phải trả lời cẩn thận** — xem [05-checklist](05-checklist-truoc-buoi-cham.md). Hiện tại các servlet còn là class rỗng **chưa có annotation**, nên câu trả lời đúng lúc này là: *"Em dùng annotation, phần đó em đang hoàn thiện."* **Đừng nói là đã xong.**
+Trong module em, cả 4 servlet đều dùng `@WebServlet`: `CartServlet`, `CheckoutServlet`, `OrderServlet`, `PaymentServlet`. `web.xml` chỉ còn giữ 4 việc: `jsp-config` khai encoding UTF-8 cho `*.jsp`/`*.jspf` (fragment không có page directive nên thiếu dòng này là mojibake), `welcome-file`, `session-config` (`HttpOnly`, `tracking-mode COOKIE`, timeout 30), và `error-page` 404/500 để không bao giờ đổ stacktrace ra cho người dùng.
+
+Ví dụ [PaymentServlet.java:38](../../src/main/java/com/electronics/marketplace/controller/user/PaymentServlet.java#L38) — `@WebServlet("/payment")`, không có dòng nào trong `web.xml` nhắc tới nó.
+
+> **Nếu cô hỏi "vậy filter thì sao?"** — `AuthenticationFilter` hiện **rỗng**, đây là điểm hở duy nhất còn lại và thuộc phần bạn khác trong nhóm. Hiện các servlet tự kiểm tra `currentUser` và trả 401; khi filter xong thì bỏ phần kiểm tra trùng đó. Nói thẳng, đừng nhận là xong.
 
 ---
 
@@ -203,13 +217,23 @@ Trang thanh toán là `GET`, chỉ đọc dữ liệu, nên F5 vô hại.
 
 Nhưng **form đặt hàng** là `POST`. Nếu khách F5 ở trang kết quả thì trình duyệt hỏi "gửi lại form?". Cách xử lý chuẩn là **POST-redirect-GET**: sau khi tạo đơn xong, servlet không forward sang JSP mà `sendRedirect` sang `/payment?action=view&orderId=...`. Như vậy F5 chỉ load lại trang GET, không tạo đơn thứ hai.
 
+> Riêng nút "Thanh toán qua MoMo" cũng là `GET` và **cố tình** dùng được nhiều lần: mỗi lần bấm sinh một `orderId` mới cho MoMo (MoMo trả `resultCode 41` nếu trùng). Bấm F5 chỉ tạo thêm một phiên thanh toán mới, không sinh đơn mới, và phiên cũ tự hết hạn.
+
 ### D2. "Nếu khách sửa `orderId` trong form huỷ đơn thành đơn của người khác?"
 
 Đây là lỗ hổng **IDOR** kinh điển. Phòng thủ **bắt buộc** ở tầng service: load đơn theo id, rồi kiểm tra `order.buyer.id == currentUser.id`, không khớp thì trả 403. Không bao giờ tin `orderId` từ client.
 
-Cùng cách áp dụng cho `/payment?action=view&orderId=` — nếu không kiểm tra thì bất kỳ ai cũng xem được thông tin thanh toán của người khác.
+Cùng cách áp dụng cho `/payment?action=view&orderId=`. Đây là code thật, không phải thiết kế:
 
-> Đây là thứ em phải nhớ **viết** khi làm tầng service, không chỉ nhớ để trả lời.
+```java
+// PaymentServlet.java:96
+if (!canView(user, payment)) {
+    resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+    return;
+}
+```
+
+Đã verify bằng request thật: user khác mở payment của người khác → **403**, và huỷ đơn người khác → **403**. Riêng `action=create` chặt hơn — chỉ Buyer, **Admin cũng không** tạo giao dịch hộ được ([PaymentServlet.java:131](../../src/main/java/com/electronics/marketplace/controller/user/PaymentServlet.java#L131)), vì tiền phải do chính người mua trả.
 
 ### D3. "Session của em chứa gì?"
 
@@ -235,9 +259,18 @@ Với quy mô 5 màn hình thì CSS thuần khoảng 1100 dòng là hợp lý; n
 
 ### D6. "Em có viết test không?"
 
-Có một test cho `JpaConfig` — ghim hai hành vi về placeholder và override map. Em viết vì đó là chỗ em từng hiểu sai và sửa mất thời gian.
+Có — **10 test, `mvn -o test` xanh 10/10**, chia bốn file:
 
-> ⚠️ **Trả lời trung thực:** phần Cart/Order/Payment chưa có unit test vì tầng service chưa viết xong. Nếu cô hỏi tiếp, nói thẳng: *"Em dự định viết test cho `OrderService.checkout()` và luồng huỷ đơn — đó là hai chỗ logic phức tạp nhất."*
+| File | Số test | Ghim điều gì |
+|---|---|---|
+| `JpaConfigTest` | 2 | Placeholder `${env.X}` không được Hibernate thay; override map mới là đường đúng |
+| `EntityMappingTest` | 1 | Boot EMF thật, ghi/đọc lại 5 entity, assert trên **metamodel** chứ không `information_schema` |
+| `MomoGatewayTest` | 3 | Vector HMAC-SHA256 đối chiếu độc lập bằng `openssl dgst -sha256 -hmac`; parse response; verify IPN |
+| `OrderServiceTest` | 4 | Checkout chốt giá từ DB chứ không từ form; huỷ đơn trả `Listing` về `AVAILABLE`; hai người không mua được cùng một `Listing`; `complete` bị chặn khi chưa `PAID` |
+
+`OrderServiceTest` chạy trên **PostgreSQL thật** (không mock), mỗi test tự dọn dữ liệu trong `@AfterEach` — nên nó bắt được cả lỗi transaction và ràng buộc unique, thứ mà mock không bắt được.
+
+> Phần **chưa** có test là tầng servlet (HTTP status, forward/redirect). Lý do trung thực: `AuthenticationFilter` còn rỗng nên chưa dựng được session thật trong test; hiện em kiểm bằng request tay (bảng kết quả ở [00 — Bước 9](00-tien-do-cong-viec.md#bước-9-đã-chạy-được-gì-tomcat-10157-context-shb)). Khi filter xong thì viết test servlet bằng `MockHttpServletRequest`.
 
 ---
 
