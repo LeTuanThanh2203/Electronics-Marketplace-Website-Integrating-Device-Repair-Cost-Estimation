@@ -25,25 +25,25 @@
         <tbody>
         <c:forEach var="x" items="${users}">
             <tr>
-                <td>${x.userID}</td>
+                <td>${x.id}</td>
                 <td><c:out value="${x.name}"/></td>
                 <td><c:out value="${x.email}"/></td>
                 <td><c:out value="${x.phone}"/></td>
                 <td><span class="badge ${x.admin ? 'badge-admin' : 'badge-user'}">${x.role}</span></td>
-                <td><span id="status-${x.userID}" class="badge badge-${x.active ? 'ok' : 'bad'}">${x.status}</span></td>
+                <td><span id="status-${x.id}" class="badge badge-${x.active ? 'ok' : 'bad'}">${x.status}</span></td>
                 <td>${x.completedSalesCount}</td>
                 <td><fmt:formatDate value="${x.createdAt}" pattern="dd/MM/yyyy"/></td>
-                <td id="actions-${x.userID}">
+                <td id="actions-${x.id}">
                     <c:if test="${!x.admin && !x.deleted}">
                         <c:choose>
                             <c:when test="${x.suspended}">
-                                <button class="btn btn-sm" data-action="unlock" data-id="${x.userID}">Mở khóa</button>
+                                <button class="btn btn-sm" data-action="unlock" data-id="${x.id}">Mở khóa</button>
                             </c:when>
                             <c:otherwise>
-                                <button class="btn btn-sm btn-warn" data-action="lock" data-id="${x.userID}">Khóa</button>
+                                <button class="btn btn-sm btn-warn" data-action="lock" data-id="${x.id}">Khóa</button>
                             </c:otherwise>
                         </c:choose>
-                        <button class="btn btn-sm btn-danger" data-action="delete" data-id="${x.userID}">Xóa</button>
+                        <button class="btn btn-sm btn-danger" data-action="delete" data-id="${x.id}">Xóa</button>
                     </c:if>
                 </td>
             </tr>
@@ -66,7 +66,7 @@
 
     function showAlert(ok, msg) {
         alertBox.className = 'alert ' + (ok ? 'success' : 'error');
-        alertBox.textContent = msg;
+        alertBox.textContent = msg || (ok ? 'Thành công.' : 'Thao tác không thành công.');
         alertBox.style.display = 'block';
     }
 

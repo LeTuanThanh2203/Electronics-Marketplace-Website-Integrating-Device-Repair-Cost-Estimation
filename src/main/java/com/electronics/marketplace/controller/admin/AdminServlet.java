@@ -1,20 +1,23 @@
 package com.electronics.marketplace.controller.admin;
 
+import com.electronics.marketplace.DBConnection.UserDB;
+import com.electronics.marketplace.entity.User;
+import com.electronics.marketplace.entity.enums.UserStatus;
+import com.electronics.marketplace.filter.AuthenticationFilter;
+import com.electronics.marketplace.util.HttpUtil;
 import jakarta.persistence.PersistenceException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import com.electronics.marketplace.entity.enums.UserStatus;
-import com.electronics.marketplace.DBConnection.UserDB;
-import com.electronics.marketplace.entity.User;
 
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            req.setAttribute("user", UserDB.selectAll());
+            req.setAttribute("users", UserDB.selectAll());
             req.setAttribute("totalUsers", UserDB.countAll());
             req.setAttribute("activeUsers", UserDB.countByStatus(UserStatus.ACTIVE));
             req.setAttribute("suspendedUsers", UserDB.countByStatus(UserStatus.SUSPENDED));
@@ -28,20 +31,17 @@ public class AdminServlet extends HttpServlet {
     /** Nhận action=lock|unlock|delete&userId=... từ AJAX và trả về JSON. */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        User me = (User) req.getSession().getAttribute("currentUser");
+        User me = (User) req.getSession().getAttribute(AuthenticationFilter.SESSION_KEY);
         String action = req.getParameter("action") == null ? "" : req.getParameter("action");
         try {
-            int id = Integer.parseInt(req.getParameter("userId"));
+            Long id = Long.valueOf(req.getParameter("userId"));
             User target = UserDB.selectById(id);
             if (target == null) {
-                writeJson(resp, false, "Không tìm thấy người dùng.", null);
+                fail(resp, "Không tìm thấy người dùng.");
                 return;
             }
-            if (target.getUserID() == me.getUserID() || target.isAdmin()) {
-                writeJson(resp, false, "Không thể thao tác với chính bạn hoặc tài khoản admin.", null);
+            if (target.getId().equals(me.getId()) || target.isAdmin()) {
+                fail(resp, "Không thể thao tác với chính bạn hoặc tài khoản admin.");
                 return;
             }
             UserStatus newStatus;
@@ -51,32 +51,26 @@ public class AdminServlet extends HttpServlet {
                 case "unlock": newStatus = UserStatus.ACTIVE;    message = "Đã mở khóa tài khoản."; break;
                 case "delete": newStatus = UserStatus.DELETED;   message = "Đã xóa tài khoản."; break;
                 default:
-                    writeJson(resp, false, "Thao tác không hợp lệ.", null);
+                    fail(resp, "Thao tác không hợp lệ.");
                     return;
             }
             UserDB.updateStatus(id, newStatus);
-            writeJson(resp, true, message, newStatus);
+            HttpUtil.writeJson(resp, HttpServletResponse.SC_OK,
+                "{\"ok\":true,\"message\":\"" + message + "\",\"status\":\"" + newStatus.name() + "\""
+                + ",\"total\":" + UserDB.countAll()
+                + ",\"active\":" + UserDB.countByStatus(UserStatus.ACTIVE)
+                + ",\"suspended\":" + UserDB.countByStatus(UserStatus.SUSPENDED) + "}");
         } catch (NumberFormatException e) {
-            writeJson(resp, false, "Mã người dùng không hợp lệ.", null);
+            fail(resp, "Mã người dùng không hợp lệ.");
         } catch (PersistenceException e) {
             log("Loi thao tac admin", e);
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeJson(resp, false, "Lỗi hệ thống, vui lòng thử lại.", null);
+            HttpUtil.writeJson(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "{\"ok\":false,\"message\":\"Lỗi hệ thống, vui lòng thử lại.\"}");
         }
     }
 
-    private void writeJson(HttpServletResponse resp, boolean ok, String message, UserStatus status) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"ok\":").append(ok)
-          .append(",\"message\":\"").append(message).append("\"");
-        if (status != null) {
-            sb.append(",\"status\":\"").append(status.name()).append("\"")
-              .append(",\"total\":").append(UserDB.countAll())
-              .append(",\"active\":").append(UserDB.countByStatus(UserStatus.ACTIVE))
-              .append(",\"suspended\":").append(UserDB.countByStatus(UserStatus.SUSPENDED));
-        }
-        sb.append("}");
-        resp.getWriter().write(sb.toString());
+    private void fail(HttpServletResponse resp, String message) throws IOException {
+        HttpUtil.writeJson(resp, HttpServletResponse.SC_OK, "{\"ok\":false,\"message\":\"" + message + "\"}");
     }
 }
 

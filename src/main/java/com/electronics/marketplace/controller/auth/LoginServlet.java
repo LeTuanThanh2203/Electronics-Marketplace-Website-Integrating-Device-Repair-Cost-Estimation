@@ -1,20 +1,22 @@
 package com.electronics.marketplace.controller.auth;
 
+import com.electronics.marketplace.DBConnection.AuthDB;
+import com.electronics.marketplace.entity.User;
+import com.electronics.marketplace.entity.enums.UserStatus;
+import com.electronics.marketplace.filter.AuthenticationFilter;
 import jakarta.persistence.PersistenceException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import com.electronics.marketplace.entity.enums.UserStatus;
-import com.electronics.marketplace.entity.User;
-import com.electronics.marketplace.DBConnection.AuthDB;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession s = req.getSession(false);
-        if (s != null && s.getAttribute("currentUser") != null) {
+        if (s != null && s.getAttribute(AuthenticationFilter.SESSION_KEY) != null) {
             resp.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
@@ -35,7 +37,7 @@ public class LoginServlet extends HttpServlet {
                 error = "Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên.";
             } else {
                 req.changeSessionId();                       // chống session fixation
-                req.getSession().setAttribute("currentUser", u);
+                req.getSession().setAttribute(AuthenticationFilter.SESSION_KEY, u);
                 resp.sendRedirect(req.getContextPath() + (u.isAdmin() ? "/admin" : "/profile"));
                 return;
             }
