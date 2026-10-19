@@ -21,7 +21,7 @@ public class ProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         HttpSession session = req.getSession();
-        User sessionUser = (User) session.getAttribute("user");
+        User sessionUser = (User) session.getAttribute("currentUser");
         String action = req.getParameter("action");
         String error = null, success = null;
 
@@ -51,7 +51,7 @@ public class ProfileServlet extends HttpServlet {
                     success = "Đã đổi mật khẩu.";
                 }
             }
-            session.setAttribute("user", UserDB.selectById(u.getUserID()));
+            session.setAttribute("currentUser", UserDB.selectById(u.getUserID()));
         } catch (PersistenceException e) {
             log("Loi cap nhat profile", e);
             error = "Lỗi hệ thống, vui lòng thử lại.";

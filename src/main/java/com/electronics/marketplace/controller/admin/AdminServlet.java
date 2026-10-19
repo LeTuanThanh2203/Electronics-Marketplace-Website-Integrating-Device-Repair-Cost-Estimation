@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import com.electronics.marketplace.entity.enums.Status;
+import com.electronics.marketplace.entity.enums.UserStatus;
 import com.electronics.marketplace.DBConnection.UserDB;
 import com.electronics.marketplace.entity.User;
 
@@ -14,10 +14,10 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            req.setAttribute("users", UserDB.selectAll());
+            req.setAttribute("user", UserDB.selectAll());
             req.setAttribute("totalUsers", UserDB.countAll());
-            req.setAttribute("activeUsers", UserDB.countByStatus(Status.ACTIVE));
-            req.setAttribute("suspendedUsers", UserDB.countByStatus(Status.SUSPENDED));
+            req.setAttribute("activeUsers", UserDB.countByStatus(UserStatus.ACTIVE));
+            req.setAttribute("suspendedUsers", UserDB.countByStatus(UserStatus.SUSPENDED));
         } catch (PersistenceException e) {
             log("Loi tai dashboard", e);
             req.setAttribute("error", "Không tải được dữ liệu.");
@@ -31,7 +31,7 @@ public class AdminServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        User me = (User) req.getSession().getAttribute("user");
+        User me = (User) req.getSession().getAttribute("currentUser");
         String action = req.getParameter("action") == null ? "" : req.getParameter("action");
         try {
             int id = Integer.parseInt(req.getParameter("userId"));
@@ -44,12 +44,12 @@ public class AdminServlet extends HttpServlet {
                 writeJson(resp, false, "Không thể thao tác với chính bạn hoặc tài khoản admin.", null);
                 return;
             }
-            Status newStatus;
+            UserStatus newStatus;
             String message;
             switch (action) {
-                case "lock":   newStatus = Status.SUSPENDED; message = "Đã khóa tài khoản."; break;
-                case "unlock": newStatus = Status.ACTIVE;    message = "Đã mở khóa tài khoản."; break;
-                case "delete": newStatus = Status.DELETED;   message = "Đã xóa tài khoản."; break;
+                case "lock":   newStatus = UserStatus.SUSPENDED; message = "Đã khóa tài khoản."; break;
+                case "unlock": newStatus = UserStatus.ACTIVE;    message = "Đã mở khóa tài khoản."; break;
+                case "delete": newStatus = UserStatus.DELETED;   message = "Đã xóa tài khoản."; break;
                 default:
                     writeJson(resp, false, "Thao tác không hợp lệ.", null);
                     return;
@@ -65,15 +65,15 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private void writeJson(HttpServletResponse resp, boolean ok, String message, Status status) throws IOException {
+    private void writeJson(HttpServletResponse resp, boolean ok, String message, UserStatus status) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("{\"ok\":").append(ok)
           .append(",\"message\":\"").append(message).append("\"");
         if (status != null) {
             sb.append(",\"status\":\"").append(status.name()).append("\"")
               .append(",\"total\":").append(UserDB.countAll())
-              .append(",\"active\":").append(UserDB.countByStatus(Status.ACTIVE))
-              .append(",\"suspended\":").append(UserDB.countByStatus(Status.SUSPENDED));
+              .append(",\"active\":").append(UserDB.countByStatus(UserStatus.ACTIVE))
+              .append(",\"suspended\":").append(UserDB.countByStatus(UserStatus.SUSPENDED));
         }
         sb.append("}");
         resp.getWriter().write(sb.toString());

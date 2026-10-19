@@ -1,7 +1,7 @@
 package com.electronics.marketplace.DBConnection;
 
 import java.util.List;
-import com.electronics.marketplace.entity.enums.Status;
+import com.electronics.marketplace.entity.enums.UserStatus;
 import com.electronics.marketplace.entity.User;
 import com.electronics.marketplace.entity.enums.Role;
 
@@ -48,7 +48,7 @@ public class UserDB {
                 "SELECT COUNT(u) FROM User u", Long.class).getSingleResult().intValue());
     }
 
-    public static int countByStatus(Status s) {
+    public static int countByStatus(UserStatus s) {
         return DBUtil.query(em -> em.createQuery(
                 "SELECT COUNT(u) FROM User u WHERE u.status = :s", Long.class)
                 .setParameter("s", s)
@@ -69,7 +69,7 @@ public class UserDB {
         DBUtil.execute(em -> em.find(User.class, userID).setPasswordHash(passwordHash));
     }
 
-    public static void updateStatus(int userID, Status status) {
+    public static void updateStatus(int userID, UserStatus status) {
         DBUtil.execute(em -> em.find(User.class, userID).setStatus(status));
     }
 }

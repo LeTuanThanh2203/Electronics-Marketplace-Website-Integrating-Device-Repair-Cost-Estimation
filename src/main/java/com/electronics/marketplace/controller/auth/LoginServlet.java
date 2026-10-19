@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import com.electronics.marketplace.entity.enums.Status;
+import com.electronics.marketplace.entity.enums.UserStatus;
 import com.electronics.marketplace.entity.User;
 import com.electronics.marketplace.DBConnection.AuthDB;
 
@@ -14,7 +14,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession s = req.getSession(false);
-        if (s != null && s.getAttribute("user") != null) {
+        if (s != null && s.getAttribute("currentUser") != null) {
             resp.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
@@ -31,11 +31,11 @@ public class LoginServlet extends HttpServlet {
             User u = (email == null || password == null) ? null : AuthDB.authenticate(email.trim(), password);
             if (u == null) {
                 error = "Email hoặc mật khẩu không đúng.";
-            } else if (u.getStatus() == Status.SUSPENDED) {
+            } else if (u.getStatus() == UserStatus.SUSPENDED) {
                 error = "Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên.";
             } else {
                 req.changeSessionId();                       // chống session fixation
-                req.getSession().setAttribute("user", u);
+                req.getSession().setAttribute("currentUser", u);
                 resp.sendRedirect(req.getContextPath() + (u.isAdmin() ? "/admin" : "/profile"));
                 return;
             }

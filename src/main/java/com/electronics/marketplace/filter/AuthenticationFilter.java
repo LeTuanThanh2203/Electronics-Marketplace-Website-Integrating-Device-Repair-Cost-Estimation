@@ -14,7 +14,7 @@ public class AuthenticationFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         HttpSession s = req.getSession(false);
-        if (s == null || s.getAttribute("user") == null) {
+        if (s == null || s.getAttribute("currentUser") == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }

@@ -15,7 +15,7 @@ public class AuthorizationFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         HttpSession s = req.getSession(false);
-        User u = (s == null) ? null : (User) s.getAttribute("user");
+        User u = (s == null) ? null : (User) s.getAttribute("currentUser");
         if (u == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
         } else if (!u.isAdmin()) {

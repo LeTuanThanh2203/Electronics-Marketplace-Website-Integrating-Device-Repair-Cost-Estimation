@@ -3,7 +3,7 @@
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <c:set var="pageTitle" value="Thông tin cá nhân" scope="request"/>
 <%@ include file="/WEB-INF/layout/header.jspf" %>
-<c:set var="u" value="${sessionScope.user}"/>
+<c:set var="u" value="${sessionScope.currentUser}"/>
 <c:if test="${not empty error}"><div class="alert error"><c:out value="${error}"/></div></c:if>
 <c:if test="${not empty success}"><div class="alert success"><c:out value="${success}"/></div></c:if>
 

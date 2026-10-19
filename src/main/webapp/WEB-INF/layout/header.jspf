@@ -17,7 +17,7 @@
                 <c:if test="${sessionScope.user.admin}">
                     <a href="${pageContext.request.contextPath}/admin">Quản trị</a>
                 </c:if>
-                <a href="${pageContext.request.contextPath}/profile">Xin chào, <c:out value="${sessionScope.user.name}"/></a>
+                <a href="${pageContext.request.contextPath}/profile">Xin chào, <c:out value="${sessionScope.currentUser.name}"/></a>
                 <a class="btn btn-outline" href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
             </c:when>
             <c:otherwise>

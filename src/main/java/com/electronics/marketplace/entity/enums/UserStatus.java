@@ -1,6 +1,6 @@
 package com.electronics.marketplace.entity.enums;
 
 
-public enum Status {
+public enum UserStatus {
     ACTIVE, SUSPENDED, DELETED
 }
