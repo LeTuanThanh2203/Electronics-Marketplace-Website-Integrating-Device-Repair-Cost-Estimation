@@ -102,7 +102,7 @@
         </div>
 
         <c:choose>
-            <%-- ---------- Cho Admin doi soat ---------- %>
+            <%-- ---------- Cho Admin doi soat ---------- --%>
             <c:when test="${payment.status == 'PENDING'}">
                 <div class="panel-body" style="border-top: 1px solid var(--hairline)">
                     <div class="notice">
@@ -134,7 +134,7 @@
                 </div>
             </c:when>
 
-            <%-- ---------- Da thanh toan ---------- %>
+            <%-- ---------- Da thanh toan ---------- --%>
             <c:when test="${payment.status == 'PAID'}">
                 <div class="panel-body" style="border-top: 1px solid var(--hairline)">
                     <div class="notice">
@@ -144,7 +144,7 @@
                 </div>
             </c:when>
 
-            <%-- ---------- That bai / huy ---------- %>
+            <%-- ---------- That bai / huy ---------- --%>
             <c:otherwise>
                 <div class="panel-body" style="border-top: 1px solid var(--hairline)">
                     <div class="notice">
