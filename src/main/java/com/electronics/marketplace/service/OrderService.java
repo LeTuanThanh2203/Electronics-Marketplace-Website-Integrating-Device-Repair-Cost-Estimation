@@ -21,6 +21,7 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.LockModeType;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -368,6 +369,61 @@ public class OrderService {
             }
             if (payment.getStatus() == PaymentStatus.PAID) {
                 throw new ServiceException(409, "PAYMENT_ALREADY_PAID", "Thanh toan da duoc xac nhan.");
+            }
+
+            payment.setStatus(PaymentStatus.PAID);
+            payment.setPaidAt(new Date());
+
+            // BR-46: NEW_DEVICE PENDING -> CONFIRMED khi PAID.
+            if (order.getStatus() == OrderStatus.PENDING) {
+                order.setStatus(OrderStatus.CONFIRMED);
+                order.setUpdatedAt(new Date());
+            }
+
+            tx.commit();
+        } catch (RuntimeException e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Cong thanh toan (MoMo) bao da thu du tien.
+     *
+     * Khac confirmPaymentPaid: khong co Admin va IDEMPOTENT - MoMo co the goi IPN
+     * nhieu lan, hoac IPN den sau khi return URL da xu ly xong.
+     * amount la so tien MoMo bao da thu, phai khop Payment.amount de chan IPN gia.
+     */
+    public void markPaidByGateway(Long paymentId, long amount) {
+        EntityManager em = JpaConfig.getEntityManagerFactory().createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+
+            Payment payment = em.find(Payment.class, paymentId);
+            if (payment == null) {
+                throw new ServiceException(404, "PAYMENT_NOT_FOUND", "Khong tim thay thanh toan.");
+            }
+            Order order = payment.getOrder();
+            if (order.getOrderType() != OrderType.NEW_DEVICE) {
+                throw new ServiceException(404, "PAYMENT_NOT_FOUND", "Don nay khong co thanh toan.");
+            }
+            if (payment.getStatus() == PaymentStatus.PAID) {
+                return;     // IPN/return trung lap: da xu ly roi.
+            }
+            if (payment.getStatus() != PaymentStatus.PENDING) {
+                throw new ServiceException(409, "PAYMENT_NOT_PENDING", "Giao dich da ket thuc.");
+            }
+            if (payment.getMethod() != PaymentMethod.MOMO) {
+                throw new ServiceException(409, "PAYMENT_NOT_MOMO", "Don nay khong thanh toan qua MoMo.");
+            }
+            long expected = payment.getAmount().setScale(0, RoundingMode.HALF_UP).longValue();
+            if (expected != amount) {
+                throw new ServiceException(409, "PAYMENT_AMOUNT_MISMATCH", "So tien MoMo bao khong khop don hang.");
             }
 
             payment.setStatus(PaymentStatus.PAID);

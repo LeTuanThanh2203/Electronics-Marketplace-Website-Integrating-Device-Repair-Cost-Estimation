@@ -9,11 +9,10 @@
     Dia chi giao hang duoi day la mot textarea bind vao `shippingAddress`:
     gia tri form-only, khong phai truong cua Order (SDD 13.7).
 
-    Phuong thuc thanh toan map thang vao Payment.method ENUM(QR, MOMO, BANK),
-    nullable (SDD 13.8):
-      - COD (nhan hang tra tien) -> method = null
-      - Chuyen khoan QR / Vi MoMo / The ngan hang -> method = QR / MOMO / BANK
-    Du chon gi, Payment VAN duoc tao o PENDING va Admin xac nhan thu cong (BR-44).
+    Phuong thuc thanh toan (da bo chuyen khoan QR va the ngan hang):
+      - COD (nhan hang tra tien) -> Payment.method = null, Admin xac nhan thu cong
+      - Vi MoMo -> Payment.method = MOMO, redirect sang cong MoMo va tu xac nhan PAID
+    Payment VAN duoc tao o PENDING truoc khi chuyen sang cong (SDD 13.8).
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -123,30 +122,10 @@
 
                                 <div class="field">
                                     <label class="choice">
-                                        <input type="radio" name="paymentMethod" value="QR">
-                                        <span>
-                                            <strong>Chuyển khoản QR</strong>
-                                            <span>Quét mã bằng ứng dụng ngân hàng. Đơn được xác nhận sau khi đối soát.</span>
-                                        </span>
-                                    </label>
-                                </div>
-
-                                <div class="field">
-                                    <label class="choice">
                                         <input type="radio" name="paymentMethod" value="MOMO">
                                         <span>
                                             <strong>Ví MoMo</strong>
-                                            <span>Thanh toán qua ví điện tử MoMo.</span>
-                                        </span>
-                                    </label>
-                                </div>
-
-                                <div class="field">
-                                    <label class="choice">
-                                        <input type="radio" name="paymentMethod" value="BANK">
-                                        <span>
-                                            <strong>Thẻ ngân hàng</strong>
-                                            <span>Thanh toán bằng thẻ nội địa hoặc quốc tế.</span>
+                                            <span>Chuyển sang cổng MoMo để thanh toán. Đơn được xác nhận tự động.</span>
                                         </span>
                                     </label>
                                 </div>

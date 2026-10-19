@@ -1,13 +1,10 @@
 <%--
-    FR-PAY-01/02 - Man hinh thanh toan kenh NEW_DEVICE (SDD 13.8, BR-44).
+    FR-PAY-01/02 - Man hinh thanh toan kenh NEW_DEVICE (SDD 13.8).
 
-    Gop hai man mockup PaymentUI + PaymentPendingUI lam mot, vi trong MVP
-    Payment luon duoc sinh o PENDING va Admin xac nhan thu cong: man "chon
-    phuong thuc" va man "cho xac nhan" la cung mot trang thai. Trang thai
-    PAID / FAILED duoc re nhanh ngay duoi day.
-
-    Khong tich hop payment gateway (BR-44) nen KHONG co QR dong: chi hien
-    thong tin chuyen khoan va Payment.transactionCode lam noi dung chuyen khoan.
+    Hai phuong thuc (theo yeu cau: bo chuyen khoan QR va the ngan hang):
+      - COD  (Payment.method = null): PENDING, Admin xac nhan thu cong (BR-44)
+      - MOMO (Payment.method = MOMO): nut mo cong MoMo, cong tu xac nhan PAID
+        qua return URL + IPN (xem PaymentServlet)
 
     Model: ${payment} (Payment), ${payment.order} (Order).
 --%>
@@ -16,12 +13,6 @@
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="vi_VN" />
-
-<%-- ponytail: so tai khoan nhan tien la hang so tam thoi cua MVP, chua co
-     entity/config nao giu. Chuyen sang config khi Admin co man hinh cau hinh. --%>
-<c:set var="bankName" value="MB Bank — Chi nhánh Sài Gòn" />
-<c:set var="bankAccountName" value="CÔNG TY CỔ PHẦN SỬA HAY BÁN" />
-<c:set var="bankAccountNo" value="9999 8888 6868" />
 
 <c:set var="pageTitle" value="Thanh toán đơn hàng — Sửa hay bán" />
 <c:set var="order" value="${payment.order}" />
@@ -74,15 +65,13 @@
                     <dd>
                         <c:choose>
                             <c:when test="${empty payment.method}">Nhận hàng trả tiền (COD)</c:when>
-                            <c:when test="${payment.method == 'QR'}">Chuyển khoản QR</c:when>
                             <c:when test="${payment.method == 'MOMO'}">Ví MoMo</c:when>
-                            <c:when test="${payment.method == 'BANK'}">Thẻ ngân hàng</c:when>
                             <c:otherwise>${payment.method}</c:otherwise>
                         </c:choose>
                     </dd>
                 </div>
                 <div class="bank-row">
-                    <dt>Nội dung chuyển khoản</dt>
+                    <dt>Mã giao dịch</dt>
                     <dd>
                         <button type="button" class="copy js-copy" data-copy="${payment.transactionCode}">
                             <span>${payment.transactionCode}</span>
@@ -102,35 +91,31 @@
         </div>
 
         <c:choose>
-            <%-- ---------- Cho Admin doi soat ---------- --%>
+            <%-- ---------- Cho thanh toan / doi soat ---------- --%>
             <c:when test="${payment.status == 'PENDING'}">
                 <div class="panel-body" style="border-top: 1px solid var(--hairline)">
-                    <div class="notice">
-                        <strong>Đã ghi nhận yêu cầu thanh toán.</strong>
-                        Hệ thống chưa tích hợp cổng thanh toán trực tuyến. Đơn hàng chuyển sang
-                        <span class="mono">CONFIRMED</span> sau khi bộ phận kế toán đối soát và xác nhận thủ công,
-                        thường trong vòng 24 giờ làm việc.
-                    </div>
-
-                    <c:if test="${not empty payment.method}">
-                        <h3 style="margin: var(--space-lg) 0 var(--space-md); font-size: 17px">
-                            Thông tin chuyển khoản
-                        </h3>
-                        <dl class="bank-list">
-                            <div class="bank-row">
-                                <dt>Ngân hàng</dt>
-                                <dd>${bankName}</dd>
+                    <c:choose>
+                        <c:when test="${payment.method == 'MOMO'}">
+                            <div class="notice">
+                                <strong>Chưa hoàn tất thanh toán MoMo.</strong>
+                                Bấm nút bên dưới để mở cổng MoMo. Đơn hàng tự chuyển sang
+                                <span class="mono">CONFIRMED</span> ngay khi MoMo xác nhận.
                             </div>
-                            <div class="bank-row">
-                                <dt>Chủ tài khoản</dt>
-                                <dd>${bankAccountName}</dd>
+                            <a class="btn btn-primary btn-block"
+                               style="margin-top: var(--space-md)"
+                               href="${ctx}/payment?action=create&orderId=${order.id}">
+                                Thanh toán qua MoMo
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="notice">
+                                <strong>Đã ghi nhận đơn hàng.</strong>
+                                Bạn thanh toán khi nhận hàng. Đơn chuyển sang
+                                <span class="mono">CONFIRMED</span> sau khi bộ phận bán hàng
+                                xác nhận, thường trong vòng 24 giờ làm việc.
                             </div>
-                            <div class="bank-row">
-                                <dt>Số tài khoản</dt>
-                                <dd class="mono">${bankAccountNo}</dd>
-                            </div>
-                        </dl>
-                    </c:if>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </c:when>
 

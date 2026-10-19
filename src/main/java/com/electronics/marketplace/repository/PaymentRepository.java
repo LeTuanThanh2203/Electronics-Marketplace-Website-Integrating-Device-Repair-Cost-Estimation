@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Doc Payment. Xac nhan PAID do Admin lam thu cong (BR-44) nen repository nay
- * khong co thao tac ghi.
+ * Doc Payment. Xac nhan PAID do Admin hoac cong thanh toan (MomoGateway) ghi,
+ * nen repository nay khong co thao tac ghi.
  */
 public class PaymentRepository {
 
@@ -31,6 +31,30 @@ public class PaymentRepository {
                                     "WHERE o.id = :orderId",
                             Payment.class)
                     .setParameter("orderId", orderId)
+                    .getResultList();
+            return found.isEmpty() ? null : found.get(0);
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * IPN/return cua MoMo khong co session: orderId gui MoMo = transactionCode +
+     * hau to ngau nhien (PaymentServlet#momoOrderId), nen cat hau to roi tra cuu.
+     */
+    public Payment findByTransactionCode(String transactionCode) {
+        if (transactionCode == null || transactionCode.trim().isEmpty()) {
+            return null;
+        }
+        EntityManager em = JpaConfig.getEntityManagerFactory().createEntityManager();
+        try {
+            List<Payment> found = em.createQuery(
+                            "SELECT DISTINCT p FROM Payment p " +
+                                    "JOIN FETCH p.order o " +
+                                    "JOIN FETCH o.buyer " +
+                                    "WHERE p.transactionCode = :code",
+                            Payment.class)
+                    .setParameter("code", transactionCode.trim())
                     .getResultList();
             return found.isEmpty() ? null : found.get(0);
         } finally {

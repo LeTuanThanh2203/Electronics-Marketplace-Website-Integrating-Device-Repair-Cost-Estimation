@@ -24,8 +24,10 @@ import java.util.Date;
 /**
  * Ban ghi yeu cau thanh toan cho Order NEW_DEVICE (SDD 13.8).
  * Moi Order co toi da mot Payment (orderId unique); Order MARKETPLACE khong co Payment.
- * MVP khong tich hop payment gateway: he thong sinh Payment o PENDING,
- * Admin xac nhan thu cong sang PAID (BR-44).
+ *
+ * Payment sinh o PENDING. Rieng MOMO duoc cong thanh toan MoMo xac nhan tu dong
+ * qua IPN / query API (xem MomoGateway); Admin van co the xac nhan thu cong
+ * cho COD hoac khi can doi soat (BR-44).
  */
 @Entity
 @Table(name = "payments")

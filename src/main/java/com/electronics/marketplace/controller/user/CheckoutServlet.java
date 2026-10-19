@@ -50,19 +50,25 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         try {
+            PaymentMethod method = parseMethod(req.getParameter("paymentMethod"));
             // Gia KHONG lay tu form: OrderService doc lai Product.price tu DB.
-            orderService.checkoutCart(user.getId(), parseMethod(req.getParameter("paymentMethod")));
+            Long orderId = orderService.checkoutCart(user.getId(), method);
+
+            // MoMo: dua thang sang cong thanh toan; COD: ve lich su don.
+            if (method == PaymentMethod.MOMO) {
+                resp.sendRedirect(req.getContextPath()
+                        + "/payment?action=create&orderId=" + orderId);
+                return;
+            }
+            // Flash qua session de song sot qua redirect (POST-redirect-GET).
+            req.getSession().setAttribute("flashOk", "Dat hang thanh cong. Vui long cho xac nhan.");
+            resp.sendRedirect(req.getContextPath() + "/order?action=history");
         } catch (ServiceException e) {
             // Du lieu khong hop le hoac hang vua het: ve lai form kem ly do.
             req.setAttribute("flashError", e.getMessage());
             req.setAttribute("cart", cartService.viewCart(user.getId()));
             req.getRequestDispatcher(VIEW).forward(req, resp);
-            return;
         }
-
-        // Flash qua session de song sot qua redirect (POST-redirect-GET).
-        req.getSession().setAttribute("flashOk", "Dat hang thanh cong. Vui long cho xac nhan.");
-        resp.sendRedirect(req.getContextPath() + "/order?action=history");
     }
 
     private User currentUser(HttpServletRequest req) {
@@ -70,18 +76,14 @@ public class CheckoutServlet extends HttpServlet {
     }
 
     /**
-     * checkout.jsp:14 - COD gui chuoi rong (method = null), QR/MOMO/BANK map
-     * thang vao enum. Gia tri la sai thi coi nhu COD, khong nem loi: form chi
-     * co 4 radio, con lai la nguoi gui tay.
+     * checkout.jsp - COD gui chuoi rong (method = null), MOMO gui "MOMO".
+     * QR/BANK khong con tren form (da bo theo yeu cau) nhung van giu trong enum
+     * vi la du lieu cu trong DB; gia tri la thi coi nhu COD.
      */
     private PaymentMethod parseMethod(String raw) {
-        if (raw == null || raw.trim().isEmpty()) {
-            return null;
+        if ("MOMO".equalsIgnoreCase(raw == null ? null : raw.trim())) {
+            return PaymentMethod.MOMO;
         }
-        try {
-            return PaymentMethod.valueOf(raw.trim());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return null;
     }
 }
