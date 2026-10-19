@@ -1,33 +1,47 @@
 package com.electronics.marketplace.controller.pub;
 
+import com.electronics.marketplace.entity.Device;
 import com.electronics.marketplace.entity.Listing;
 import com.electronics.marketplace.entity.User;
+import com.electronics.marketplace.repository.DeviceRepository;
+import com.electronics.marketplace.repository.DeviceRepositoryImpl;
 import com.electronics.marketplace.service.MarketplaceService;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller điều phối các luồng Chợ Đồ Cũ (Marketplace & Listings - C2C) - Task của Thành.
  * Tuân thủ nghiêm ngặt:
  * - Rule 1: Kiến trúc MVC (Servlet Controller tiếp nhận Request, gọi Service xử lý và forward View).
  * - Rule 4: Tối ưu mạng bằng endpoint AJAX/JSON cho nút xem thông tin liên hệ người bán.
+ * - Rule 5: Hỗ trợ upload ảnh từ thư mục máy tính, lưu file lên đĩa, chỉ lưu URL chuỗi vào DB.
  * - BR-11, BR-15, BR-33, BR-34, BR-40: Xử lý đúng phân quyền và quy trình chợ.
  * - Handoff Nam - Thành: Nhánh action=marketplace, hỗ trợ Long id.
  */
 @WebServlet(name = "ListingServlet", urlPatterns = {"/listing", "/listing/*", "/marketplace"})
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,        // 1 MB
+        maxFileSize = 10 * 1024 * 1024,         // 10 MB
+        maxRequestSize = 25 * 1024 * 1024       // 25 MB
+)
 public class ListingServlet extends HttpServlet {
 
     private final MarketplaceService marketplaceService = new MarketplaceService();
+    private final DeviceRepository deviceRepository = new DeviceRepositoryImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -107,6 +121,8 @@ public class ListingServlet extends HttpServlet {
                 }
             }
 
+            // Nạp danh mục dòng máy hiện có để người dùng chọn hoặc tự nhập
+            request.setAttribute("devices", deviceRepository.findAll());
             request.getRequestDispatcher("/WEB-INF/views/listing/form.jsp").forward(request, response);
             return;
         }
@@ -154,38 +170,39 @@ public class ListingServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String pathInfo = request.getPathInfo();
-        String action = request.getParameter("action");
+        String action = getFormField(request, "action");
 
         // 1. Tạo mới bài đăng (action == create hoặc POST tới /form)
         if ("/form".equals(pathInfo) || "create".equals(action)) {
             try {
-                String deviceIdStr = request.getParameter("deviceId");
-                Long deviceId = (deviceIdStr != null && !deviceIdStr.isEmpty()) ? Long.parseLong(deviceIdStr) : 1L;
+                String deviceIdStr = getFormField(request, "deviceId");
+                Long deviceId = (deviceIdStr != null && !deviceIdStr.isEmpty() && !"0".equals(deviceIdStr)) 
+                        ? Long.parseLong(deviceIdStr) : null;
 
-                String condition = request.getParameter("condition");
-                String description = request.getParameter("description");
-                String priceStr = request.getParameter("price");
+                String condition = getFormField(request, "condition");
+                String description = getFormField(request, "description");
+                String priceStr = getFormField(request, "price");
                 BigDecimal price = (priceStr != null && !priceStr.isEmpty()) ? new BigDecimal(priceStr) : new BigDecimal("10000000");
 
-                String imageUrl = request.getParameter("imageUrl");
-                String brand = request.getParameter("brand");
-                String model = request.getParameter("model");
-                String cpu = request.getParameter("cpu");
-                String ram = request.getParameter("ram");
-                String storage = request.getParameter("storage");
+                // Rule 5: Ưu tiên lấy file upload từ thư mục máy tính, fallback sang URL nếu nhập
+                String imageUrl = handleImageUploadOrUrl(request, null);
 
-                String[] problemValues = request.getParameterValues("problems");
+                String brand = getFormField(request, "brand");
+                String model = getFormField(request, "model");
+                String cpu = getFormField(request, "cpu");
+                String ram = getFormField(request, "ram");
+                String storage = getFormField(request, "storage");
+
+                List<String> problemValues = getFormFieldValues(request, "problems");
                 List<String> problemNames = new ArrayList<>();
-                if (problemValues != null) {
-                    for (String pVal : problemValues) {
-                        switch (pVal) {
-                            case "1": problemNames.add("Màn hình có sọc / điểm chết"); break;
-                            case "2": problemNames.add("Bàn phím liệt một số phím"); break;
-                            case "3": problemNames.add("Pin đã chai một phần"); break;
-                            case "4": problemNames.add("Vỏ trầy xước / bản lề lỏng"); break;
-                            case "5": problemNames.add("Loa rè khi âm lượng lớn"); break;
-                            default: problemNames.add("Lỗi linh kiện khác"); break;
-                        }
+                for (String pVal : problemValues) {
+                    switch (pVal) {
+                        case "1": problemNames.add("Màn hình có sọc / điểm chết"); break;
+                        case "2": problemNames.add("Bàn phím liệt một số phím"); break;
+                        case "3": problemNames.add("Pin đã chai một phần"); break;
+                        case "4": problemNames.add("Vỏ trầy xước / bản lề lỏng"); break;
+                        case "5": problemNames.add("Loa rè khi âm lượng lớn"); break;
+                        default: problemNames.add("Lỗi linh kiện khác"); break;
                     }
                 }
 
@@ -196,9 +213,10 @@ public class ListingServlet extends HttpServlet {
                 );
 
                 // Điều hướng xem ngay bài đăng vừa tạo
-                response.sendRedirect(request.getContextPath() + "/listing/detail?id=" + newListing.getId());
+                response.sendRedirect(request.getContextPath() + "/listing/detail?id=" + newListing.getId() + "&created=1");
                 return;
             } catch (Exception e) {
+                request.setAttribute("devices", deviceRepository.findAll());
                 request.setAttribute("errorMessage", e.getMessage());
                 request.getRequestDispatcher("/WEB-INF/views/listing/form.jsp").forward(request, response);
                 return;
@@ -208,19 +226,22 @@ public class ListingServlet extends HttpServlet {
         // 2. Chỉnh sửa bài đăng (action == edit)
         if ("edit".equals(action)) {
             try {
-                long listingId = Long.parseLong(request.getParameter("id"));
+                String idStr = getFormField(request, "id");
+                long listingId = Long.parseLong(idStr != null ? idStr : "1");
                 User currentUser = (User) request.getSession().getAttribute("currentUser");
                 long currentUserId = currentUser != null && currentUser.getId() != null ? currentUser.getId() : 1L; // Fallback demo seller id
 
-                String condition = request.getParameter("condition");
-                String description = request.getParameter("description");
-                BigDecimal price = new BigDecimal(request.getParameter("price"));
-                String imageUrl = request.getParameter("imageUrl");
+                String condition = getFormField(request, "condition");
+                String description = getFormField(request, "description");
+                String priceStr = getFormField(request, "price");
+                BigDecimal price = priceStr != null ? new BigDecimal(priceStr) : new BigDecimal("10000000");
+                String imageUrl = handleImageUploadOrUrl(request, getFormField(request, "imageUrl"));
 
                 marketplaceService.updateListing(listingId, currentUserId, condition, description, price, imageUrl);
                 response.sendRedirect(request.getContextPath() + "/listing/detail?id=" + listingId);
                 return;
             } catch (Exception e) {
+                request.setAttribute("devices", deviceRepository.findAll());
                 request.setAttribute("errorMessage", e.getMessage());
                 request.getRequestDispatcher("/WEB-INF/views/listing/form.jsp").forward(request, response);
                 return;
@@ -229,6 +250,99 @@ public class ListingServlet extends HttpServlet {
 
         // Fallback điều hướng về chợ
         response.sendRedirect(request.getContextPath() + "/listing/marketplace");
+    }
+
+    /**
+     * Đọc giá trị trường form an toàn cho cả multipart/form-data và urlencoded request
+     */
+    private String getFormField(HttpServletRequest request, String fieldName) {
+        String val = request.getParameter(fieldName);
+        if (val != null && !val.trim().isEmpty()) {
+            return val.trim();
+        }
+        try {
+            Part part = request.getPart(fieldName);
+            if (part != null) {
+                try (var is = part.getInputStream()) {
+                    String str = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).trim();
+                    if (!str.isEmpty()) return str;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return val != null ? val.trim() : null;
+    }
+
+    /**
+     * Đọc danh sách giá trị mảng trường form an toàn (ví dụ: checkbox problems)
+     */
+    private List<String> getFormFieldValues(HttpServletRequest request, String fieldName) {
+        String[] vals = request.getParameterValues(fieldName);
+        List<String> list = new ArrayList<>();
+        if (vals != null && vals.length > 0) {
+            for (String v : vals) {
+                if (v != null && !v.trim().isEmpty()) list.add(v.trim());
+            }
+            return list;
+        }
+        try {
+            for (Part part : request.getParts()) {
+                if (fieldName.equals(part.getName())) {
+                    try (var is = part.getInputStream()) {
+                        String str = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).trim();
+                        if (!str.isEmpty()) list.add(str);
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return list;
+    }
+
+    /**
+     * Xử lý lưu file hình ảnh tải lên từ máy tính (Folder upload) lưu trên ổ đĩa server (Rule 5),
+     * hoặc fallback sang chuỗi URL nếu người dùng dán link ảnh trực tuyến.
+     */
+    private String handleImageUploadOrUrl(HttpServletRequest request, String fallbackUrl) {
+        String finalUrl = request.getParameter("imageUrl");
+        if (finalUrl == null || finalUrl.trim().isEmpty()) {
+            finalUrl = fallbackUrl;
+        }
+
+        try {
+            Part filePart = request.getPart("imageFile");
+            if (filePart != null && filePart.getSize() > 0) {
+                String submittedFileName = filePart.getSubmittedFileName();
+                if (submittedFileName != null && !submittedFileName.trim().isEmpty()) {
+                    String ext = "";
+                    int dotIdx = submittedFileName.lastIndexOf('.');
+                    if (dotIdx >= 0) {
+                        ext = submittedFileName.substring(dotIdx).toLowerCase();
+                    }
+                    if (ext.isEmpty() || (!ext.equals(".jpg") && !ext.equals(".jpeg") && !ext.equals(".png") && !ext.equals(".webp") && !ext.equals(".gif"))) {
+                        ext = ".jpg";
+                    }
+                    String uniqueFileName = "listing_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
+
+                    String uploadPath = request.getServletContext().getRealPath("/uploads/listings");
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+                    File targetFile = new File(uploadDir, uniqueFileName);
+                    filePart.write(targetFile.getAbsolutePath());
+
+                    finalUrl = request.getContextPath() + "/uploads/listings/" + uniqueFileName;
+                }
+            }
+        } catch (Exception uploadEx) {
+            System.err.println("Upload file warning: " + uploadEx.getMessage());
+        }
+
+        if (finalUrl == null || finalUrl.trim().isEmpty()) {
+            finalUrl = "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80";
+        }
+        return finalUrl;
     }
 
     /**

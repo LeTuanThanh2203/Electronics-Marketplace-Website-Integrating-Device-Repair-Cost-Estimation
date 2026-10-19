@@ -377,7 +377,7 @@ public class ListingRepositoryImpl implements ListingRepository {
                 Device dev = listing.getDevice();
                 if (dev != null) {
                     Device dbDev = null;
-                    if (dev.getId() != null) {
+                    if (dev.getId() != null && dev.getId() > 0) {
                         dbDev = em.find(Device.class, dev.getId());
                     }
                     if (dbDev == null && dev.getBrand() != null && dev.getModel() != null) {
@@ -392,13 +392,16 @@ public class ListingRepositoryImpl implements ListingRepository {
                         }
                     }
                     if (dbDev == null) {
-                        List<Device> devs = em.createQuery("SELECT d FROM Device d", Device.class).setMaxResults(1).getResultList();
-                        if (!devs.isEmpty()) {
-                            dbDev = devs.get(0);
-                        } else {
-                            dbDev = new Device(dev.getName(), dev.getBrand(), dev.getModel() != null ? dev.getModel() : "Default", 2023, dev.getCpu(), dev.getRam(), dev.getStorage());
-                            em.persist(dbDev);
+                        String series = dev.getSeries() != null ? dev.getSeries() : "";
+                        String devBrand = (dev.getBrand() != null && !dev.getBrand().trim().isEmpty()) ? dev.getBrand().trim() : "Khác";
+                        String devModel = (dev.getModel() != null && !dev.getModel().trim().isEmpty()) ? dev.getModel().trim() : "Laptop";
+                        dbDev = new Device(devBrand, series, devModel, 
+                                           dev.getReleaseYear() != null ? dev.getReleaseYear() : 2022, 
+                                           dev.getCpu(), dev.getRam(), dev.getStorage());
+                        if (dev.getName() != null && !dev.getName().trim().isEmpty()) {
+                            dbDev.setName(dev.getName().trim());
                         }
+                        em.persist(dbDev);
                     }
                     listing.setDevice(dbDev);
                 }
@@ -412,11 +415,25 @@ public class ListingRepositoryImpl implements ListingRepository {
                 if (listing.getProblems() != null) {
                     for (ListingProblem lp : listing.getProblems()) {
                         lp.setListing(listing);
-                        if (lp.getProblem() != null && lp.getProblem().getId() != null) {
-                            RepairProblem rp = em.find(RepairProblem.class, lp.getProblem().getId());
-                            if (rp != null) lp.setProblem(rp);
-                        } else {
-                            lp.setProblem(null);
+                        if (lp.getProblem() != null) {
+                            RepairProblem rp = null;
+                            if (lp.getProblem().getId() != null && lp.getProblem().getId() > 0) {
+                                rp = em.find(RepairProblem.class, lp.getProblem().getId());
+                            }
+                            if (rp == null && lp.getProblem().getName() != null) {
+                                List<RepairProblem> list = em.createQuery(
+                                        "SELECT r FROM RepairProblem r WHERE LOWER(r.name) = LOWER(:n)", RepairProblem.class)
+                                        .setParameter("n", lp.getProblem().getName().trim())
+                                        .setMaxResults(1)
+                                        .getResultList();
+                                if (!list.isEmpty()) {
+                                    rp = list.get(0);
+                                } else {
+                                    rp = new RepairProblem(null, lp.getProblem().getName().trim());
+                                    em.persist(rp);
+                                }
+                            }
+                            lp.setProblem(rp);
                         }
                     }
                 }

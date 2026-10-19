@@ -132,13 +132,13 @@
                             <input type="hidden" name="productId" value="${product.id}">
                             
                             <!-- Buy Now CTA -->
-                            <button type="submit" class="flex-1 h-11 bg-brand-black hover:bg-brand-orange text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+                            <button type="submit" name="buyNow" value="true" class="flex-1 h-11 bg-brand-black hover:bg-brand-orange text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <span class="material-symbols-outlined text-base">bolt</span>
                                 <span>MUA NGAY (GIAO TẬN NƠI)</span>
                             </button>
 
                             <!-- Add to Cart CTA -->
-                            <button type="submit" class="h-11 px-5 border border-brand-black bg-white hover:bg-brand-card text-brand-black font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
+                            <button type="submit" name="buyNow" value="false" class="h-11 px-5 border border-brand-black bg-white hover:bg-brand-card text-brand-black font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                                 <span class="material-symbols-outlined text-base">shopping_cart</span>
                                 <span>THÊM GIỎ HÀNG</span>
                             </button>

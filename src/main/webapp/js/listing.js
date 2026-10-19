@@ -82,9 +82,69 @@ document.addEventListener('DOMContentLoaded', function () {
     // Image URL preview on Form page
     window.previewImageUrl = function(input) {
         const previewImg = document.getElementById('image-live-preview');
-        if (previewImg && input && input.value) {
-            previewImg.src = input.value;
+        if (previewImg && input && input.value && input.value.trim().length > 0) {
+            previewImg.src = input.value.trim();
             previewImg.classList.remove('hidden');
+        }
+    };
+
+    // Image File Chooser (Folder Upload) live preview
+    window.previewSelectedFile = function(input) {
+        if (input && input.files && input.files[0]) {
+            const file = input.files[0];
+            const chosenText = document.getElementById('file-chosen-text');
+            const previewImg = document.getElementById('image-live-preview');
+            const sizeInfo = document.getElementById('file-size-info');
+
+            if (chosenText) {
+                chosenText.textContent = file.name;
+            }
+            if (sizeInfo) {
+                const sizeKb = (file.size / 1024).toFixed(1);
+                sizeInfo.textContent = 'Đã chọn tệp: ' + file.name + ' (' + sizeKb + ' KB)';
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (previewImg) {
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Device Dropdown change: auto-fill specs or allow custom input
+    window.onDeviceSelectChange = function(selectElem) {
+        if (!selectElem) return;
+        const brandInput = document.getElementById('input-brand');
+        const modelInput = document.getElementById('input-model');
+        const cpuInput = document.getElementById('input-cpu');
+        const ramInput = document.getElementById('input-ram');
+        const storageInput = document.getElementById('input-storage');
+
+        if (selectElem.value === "0" || selectElem.value === "") {
+            // Tự nhập dòng máy mới
+            if (brandInput) {
+                brandInput.value = '';
+                brandInput.placeholder = "Nhập thương hiệu (VD: Lenovo, Dell, Apple...)";
+                brandInput.focus();
+            }
+            if (modelInput) {
+                modelInput.value = '';
+                modelInput.placeholder = "Nhập model (VD: Legion 5, XPS 15...)";
+            }
+            return;
+        }
+
+        const selectedOpt = selectElem.options[selectElem.selectedIndex];
+        if (selectedOpt) {
+            if (brandInput && selectedOpt.dataset.brand) brandInput.value = selectedOpt.dataset.brand;
+            if (modelInput && selectedOpt.dataset.model) modelInput.value = selectedOpt.dataset.model;
+            if (cpuInput && selectedOpt.dataset.cpu) cpuInput.value = selectedOpt.dataset.cpu;
+            if (ramInput && selectedOpt.dataset.ram) ramInput.value = selectedOpt.dataset.ram;
+            if (storageInput && selectedOpt.dataset.storage) storageInput.value = selectedOpt.dataset.storage;
         }
     };
 

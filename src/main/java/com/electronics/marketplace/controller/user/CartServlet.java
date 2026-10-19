@@ -55,12 +55,14 @@ public class CartServlet extends HttpServlet {
         showCart(req, resp);
     }
 
-    /** cart.jsp: nut "Them vao gio" gui productId. */
+    /** cart.jsp / product detail / product list: nut "Them vao gio" hoac "Mua ngay" gui productId. */
     private void handleAdd(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         User user = currentUser(req);
         if (user == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
+            String productId = req.getParameter("productId");
+            String redirectTarget = req.getContextPath() + "/products?action=detail&id=" + (productId != null ? productId : "");
+            resp.sendRedirect(req.getContextPath() + "/login?redirect=" + java.net.URLEncoder.encode(redirectTarget, java.nio.charset.StandardCharsets.UTF_8));
             return;
         }
         Long productId = parseId(req.getParameter("productId"));
@@ -74,7 +76,13 @@ public class CartServlet extends HttpServlet {
             resp.sendError(e.getStatus(), e.getMessage());
             return;
         }
-        resp.sendRedirect(req.getContextPath() + "/cart");
+
+        boolean buyNow = "true".equalsIgnoreCase(req.getParameter("buyNow"));
+        if (buyNow) {
+            resp.sendRedirect(req.getContextPath() + "/checkout");
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/cart");
+        }
     }
 
     /**

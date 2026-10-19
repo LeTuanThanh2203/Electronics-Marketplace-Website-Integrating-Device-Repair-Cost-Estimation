@@ -17,9 +17,43 @@
             <a class="hover:text-primary transition-colors" href="${pageContext.request.contextPath}/listing/marketplace">Chợ đồ cũ</a>
             <span>/</span>
             <span class="text-primary font-bold truncate">
-                <c:out value="${not empty listing ? listing.device.name : 'ThinkPad T14 Gen 2 Carbon Edition'}"/>
+                <c:out value="${not empty listing ? listing.device.name : 'Chi tiết thiết bị'}"/>
             </span>
         </nav>
+
+        <!-- Notification Banner: Creation Success -->
+        <c:if test="${param.created == '1'}">
+            <div class="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-950 flex items-center justify-between gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-emerald-600 text-[26px]">task_alt</span>
+                    <div>
+                        <div class="font-extrabold text-sm uppercase tracking-wide text-emerald-900">ĐĂNG BÁN MÁY THÀNH CÔNG!</div>
+                        <div class="text-xs text-emerald-800 mt-0.5">Tin đăng #${listing.id} đã được khởi tạo và lưu vào hệ thống an toàn.</div>
+                    </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/listing/marketplace" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0">
+                    Xem Chợ Đồ Cũ
+                </a>
+            </div>
+        </c:if>
+
+        <!-- Notification Banner: Pending Admin Approval -->
+        <c:if test="${not empty listing && !listing.isApproved}">
+            <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-amber-600 text-[26px] shrink-0">pending_actions</span>
+                    <div>
+                        <div class="font-extrabold text-sm uppercase tracking-wide text-amber-900">TIN ĐĂNG ĐANG CHỜ DUYỆT (QUY CHUẨN BR-15)</div>
+                        <div class="text-xs text-amber-800 mt-0.5">
+                            Tin đăng của bạn hiện đang ở trạng thái chờ duyệt. Quản trị viên (Admin) sẽ kiểm duyệt trước khi tin hiển thị công khai trên Chợ Đồ Cũ.
+                        </div>
+                    </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/admin/dashboard" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0">
+                    Trang Duyệt Tin (Admin)
+                </a>
+            </div>
+        </c:if>
 
         <!-- Two-Column Product Detail Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

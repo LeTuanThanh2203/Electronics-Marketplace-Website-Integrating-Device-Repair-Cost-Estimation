@@ -57,6 +57,8 @@ public class PaymentServlet extends HttpServlet {
             create(req, resp);
         } else if ("return".equals(action)) {
             handleReturn(req, resp);
+        } else if ("simulate".equals(action)) {
+            simulatePayment(req, resp);
         } else {
             view(req, resp);
         }
@@ -105,6 +107,16 @@ public class PaymentServlet extends HttpServlet {
             req.setAttribute("flashError", flash);
             req.getSession().removeAttribute("flashError");
         }
+        Object flashOk = req.getSession().getAttribute("flashOk");
+        if (flashOk != null) {
+            req.setAttribute("flashOk", flashOk);
+            req.getSession().removeAttribute("flashOk");
+        }
+        Object flashNotice = req.getSession().getAttribute("flashNotice");
+        if (flashNotice != null) {
+            req.setAttribute("flashNotice", flashNotice);
+            req.getSession().removeAttribute("flashNotice");
+        }
         req.getRequestDispatcher(VIEW).forward(req, resp);
     }
 
@@ -150,15 +162,45 @@ public class PaymentServlet extends HttpServlet {
                 resp.sendRedirect(result.payUrl);
                 return;
             }
-            req.getSession().setAttribute("flashError",
-                    "MoMo tu choi giao dich (" + result.resultCode + "): " + result.message);
-        } catch (IOException e) {
-            req.getSession().setAttribute("flashError",
-                    "Khong ket noi duoc MoMo. Kiem tra ket noi mang roi thu lai.");
-        } catch (IllegalStateException e) {
-            // Thieu bien moi truong MOMO_* - cau hinh sai, khong phai loi nguoi dung.
-            req.getSession().setAttribute("flashError",
-                    "Cong thanh toan chua duoc cau hinh. Vui long chon COD hoac lien he ho tro.");
+            req.getSession().setAttribute("flashNotice",
+                    "Cổng MoMo Sandbox: " + (result.message != null ? result.message : "Chưa mở kết nối trực tiếp")
+                    + ". Bạn có thể quét mã QR MoMo hoặc bấm nút xác nhận thanh toán mô phỏng bên dưới để hoàn tất đơn ngay.");
+        } catch (Exception e) {
+            req.getSession().setAttribute("flashNotice",
+                    "Đang ở chế độ MoMo Sandbox Local. Bạn có thể quét mã QR MoMo hoặc bấm nút xác nhận thanh toán mô phỏng bên dưới để hoàn tất đơn ngay.");
+        }
+        redirectToView(req, resp, orderId);
+    }
+
+    // -------------------------------------------------------------- simulate
+
+    private void simulatePayment(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        User user = currentUser(req);
+        if (user == null) {
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        Long orderId = parseId(req.getParameter("orderId"));
+        if (orderId == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thieu orderId.");
+            return;
+        }
+        Payment payment = paymentRepository.findByOrderId(orderId);
+        if (payment == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        if (!canView(user, payment)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        try {
+            long amount = toVnd(payment);
+            orderService.markPaidByGateway(payment.getId(), amount);
+            req.getSession().setAttribute("flashOk", "Thanh toán MoMo thành công! Đơn hàng DH-" + orderId + " đã được xác nhận (CONFIRMED).");
+        } catch (ServiceException e) {
+            req.getSession().setAttribute("flashError", e.getMessage());
         }
         redirectToView(req, resp, orderId);
     }

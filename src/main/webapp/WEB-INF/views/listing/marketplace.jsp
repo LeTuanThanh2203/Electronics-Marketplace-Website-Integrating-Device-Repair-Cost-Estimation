@@ -23,9 +23,15 @@
                         Sàn giao dịch thiết bị đã qua sử dụng với chứng nhận kiểm định độc lập 48 bước. Minh bạch lịch sử phần cứng, ảnh thực tế 100%, bảo đảm không tráo đổi linh kiện.
                     </p>
                 </div>
-                <div class="flex items-center gap-2 bg-surface-container border border-surface-dim px-3 py-1.5 self-start md:self-auto font-mono text-xs uppercase font-semibold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                    <span>TRẠM KIỂM ĐỊNH: ONLINE</span>
+                <div class="flex items-center gap-3 self-start md:self-auto">
+                    <div class="flex items-center gap-2 bg-surface-container border border-surface-dim px-3 py-1.5 font-mono text-xs uppercase font-semibold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                        <span>TRẠM KIỂM ĐỊNH: ONLINE</span>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/listing/form" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FF4A1C] text-black font-extrabold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md">
+                        <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                        <span>ĐĂNG BÁN MÁY</span>
+                    </a>
                 </div>
             </div>
         </div>
