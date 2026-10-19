@@ -1,0 +1,53 @@
+<%--
+    Header + breadcrumb dùng chung cho các trang PUBLIC của module sửa chữa.
+    Yêu cầu trước khi include:
+      <c:set var="rpPage" value="request|track|estimate" scope="request"/>
+      <c:set var="rpCrumb" value="Tên trang" scope="request"/>
+      <c:set var="rpCrumbs" value="..." scope="request"/>  (tùy chọn, HTML breadcrumb đã dựng sẵn)
+--%>
+<header class="rp-header">
+    <div class="rp-header__inner">
+        <a class="rp-brand" href="${pageContext.request.contextPath}/repair">
+            <span class="rp-brand__dot"></span>
+            SỬA HAY BÁN
+        </a>
+        <div class="rp-header__divider"></div>
+        <nav class="rp-nav">
+            <a class="rp-nav__link ${rpPage == 'request' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/repair">
+                Sửa chữa <span class="rp-tag">LAB</span>
+            </a>
+            <a class="rp-nav__link ${rpPage == 'track' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/repair/track">Tra cứu tiến độ</a>
+        </nav>
+        <div class="rp-header__account">
+            <c:choose>
+                <c:when test="${not empty sessionScope.currentUser}">
+                    <a class="rp-account" href="${pageContext.request.contextPath}/profile">
+                        <span class="rp-avatar"><c:out value="${sessionScope.currentUser.initial}" /></span>
+                        <span>
+                            <span class="rp-account__name"><c:out value="${sessionScope.currentUser.name}" /></span>
+                            <span class="rp-account__meta"><c:out value="${sessionScope.currentUser.role}" /></span>
+                        </span>
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a class="rp-header__login" href="${pageContext.request.contextPath}/login">Đăng nhập</a>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</header>
+
+<div class="rp-breadcrumb">
+    <div class="rp-breadcrumb__inner">
+        <div>
+            <a href="${pageContext.request.contextPath}/">Trang chủ</a>
+            <span class="rp-breadcrumb__sep">/</span>
+            <a href="${pageContext.request.contextPath}/repair">Sửa chữa</a>
+            <span class="rp-breadcrumb__sep">/</span>
+            <span class="rp-breadcrumb__current"><c:out value="${rpCrumb}" /></span>
+        </div>
+        <div>HỆ THỐNG LAB MINH BẠCH</div>
+    </div>
+</div>

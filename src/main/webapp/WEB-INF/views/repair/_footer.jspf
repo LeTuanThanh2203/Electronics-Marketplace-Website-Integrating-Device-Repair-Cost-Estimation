@@ -1,0 +1,44 @@
+<%-- Footer dùng chung cho các trang PUBLIC của module sửa chữa. --%>
+<footer class="rp-footer">
+    <div class="rp-footer__cols">
+        <div>
+            <div class="rp-footer__brand">
+                <span class="rp-brand__dot"></span> SỬA HAY BÁN
+            </div>
+            <p>
+                Nền tảng mua bán laptop cũ kiểm định và dịch vụ sửa chữa phần cứng
+                minh bạch hàng đầu Việt Nam.
+            </p>
+        </div>
+        <div>
+            <h3>Hỗ trợ khách hàng</h3>
+            <ul>
+                <li>Câu hỏi thường gặp</li>
+                <li>Hướng dẫn báo giá sửa chữa</li>
+                <li><a href="${pageContext.request.contextPath}/repair/track">Tra cứu tiến độ</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3>Chính sách</h3>
+            <ul>
+                <li>Chính sách bảo hành</li>
+                <li>Chính sách bảo mật</li>
+                <li>Điều khoản sử dụng</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Liên hệ</h3>
+            <ul>
+                <li><strong style="color:var(--rp-black);">Hotline:</strong> 1900 6868</li>
+                <li><strong style="color:var(--rp-black);">Giờ làm việc:</strong> 08:00 – 21:00</li>
+            </ul>
+        </div>
+    </div>
+    <div class="rp-footer__bottom">
+        <span>© 2026 SỬA HAY BÁN. TẤT CẢ QUYỀN ĐƯỢC BẢO LƯU.</span>
+        <div class="rp-footer__bottom-links">
+            <a href="#">ĐIỀU KHOẢN SỬ DỤNG</a>
+            <a href="#">CHÍNH SÁCH BẢO MẬT</a>
+        </div>
+    </div>
+</footer>
