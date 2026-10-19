@@ -1,0 +1,227 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<!DOCTYPE html>
+<html class="h-full" lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title><c:out value="${product.name}"/> | SỬA HAY BÁN</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    
+    <!-- Tailwind CSS with Official Design System -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#0B0B0B',
+                        'brand-orange': '#FF4A1C',
+                        'brand-gray': '#747878',
+                        'brand-border': '#DADAD6',
+                        'brand-bg': '#F9F9F7',
+                        'brand-card': '#F4F4F2'
+                    },
+                    fontFamily: {
+                        'sans': ['"Be Vietnam Pro"', 'sans-serif'],
+                        'space': ['"Space Grotesk"', 'sans-serif'],
+                        'mono': ['monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-brand-bg text-[#1A1C1B] font-sans antialiased min-h-screen flex flex-col">
+
+<!-- HEADER NAVIGATION -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-brand-border h-16">
+    <div class="max-w-[1360px] mx-auto px-6 h-full flex items-center justify-between gap-4">
+        <div class="flex items-center gap-8 shrink-0">
+            <a class="flex items-center gap-2 text-brand-black font-space font-bold text-lg uppercase tracking-tight" href="${pageContext.request.contextPath}/">
+                <span class="w-3.5 h-3.5 bg-brand-orange inline-block shrink-0"></span>
+                <span>SỬA HAY BÁN</span>
+            </a>
+            <nav class="hidden lg:flex items-center h-16 gap-1 font-mono text-xs uppercase tracking-wider">
+                <a class="h-full inline-flex items-center px-3 text-brand-black border-b-2 border-brand-orange font-bold" href="${pageContext.request.contextPath}/products">MUA MỚI</a>
+                <a class="h-full inline-flex items-center px-3 text-brand-gray hover:text-brand-black border-b-2 border-transparent transition-colors" href="${pageContext.request.contextPath}/marketplace">CHỢ ĐỒ CŨ</a>
+                <a class="h-full inline-flex items-center px-3 text-brand-gray hover:text-brand-black border-b-2 border-transparent transition-colors" href="${pageContext.request.contextPath}/repair">SỬA CHỮA</a>
+            </nav>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+            <a href="${pageContext.request.contextPath}/products" class="inline-flex items-center gap-1 text-xs font-mono text-brand-gray hover:text-brand-black">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                <span>QUAY LẠI CỬA HÀNG</span>
+            </a>
+            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="${pageContext.request.contextPath}/cart">
+                <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="w-full pt-16 flex-1">
+    <!-- Breadcrumb -->
+    <div class="w-full bg-brand-card border-b border-brand-border py-3">
+        <div class="max-w-[1360px] mx-auto px-6 flex items-center gap-2 text-xs font-mono text-brand-gray">
+            <a href="${pageContext.request.contextPath}/" class="hover:text-brand-black">TRANG CHỦ</a>
+            <span>/</span>
+            <a href="${pageContext.request.contextPath}/products" class="hover:text-brand-black">MUA MỚI</a>
+            <span>/</span>
+            <span class="text-brand-black font-semibold uppercase"><c:out value="${product.brand}"/></span>
+            <span>/</span>
+            <span class="text-brand-orange font-semibold">#<c:out value="${product.sku}"/></span>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL HERO SECTION -->
+    <div class="max-w-[1360px] mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+            <!-- Left 5 cols: Product Showcase Gallery -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+                <div class="aspect-[4/3] bg-white border border-brand-border flex items-center justify-center p-6 relative">
+                    <span class="absolute top-3 left-3 bg-brand-black text-white text-[11px] font-mono px-2 py-0.5 font-bold uppercase">
+                        <c:out value="${product.badge}"/>
+                    </span>
+                    <c:if test="${not empty product.discountTag}">
+                        <span class="absolute top-3 right-3 bg-brand-orange text-white text-[11px] font-mono px-2 py-0.5 font-bold uppercase">
+                            <c:out value="${product.discountTag}"/>
+                        </span>
+                    </c:if>
+
+                    <c:choose>
+                        <c:when test="${not empty product.imageUrl}">
+                            <img class="max-h-full max-w-full object-contain mix-blend-multiply" src="<c:out value='${product.imageUrl}'/>" alt="<c:out value='${product.name}'/>">
+                        </c:when>
+                        <c:otherwise>
+                            <span class="material-symbols-outlined text-8xl text-gray-300">laptop</span>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
+                <!-- Inspection & Warranty Notes -->
+                <div class="p-4 bg-white border border-brand-border text-xs font-mono space-y-2 text-[#444748]">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-emerald-600 text-sm">verified</span>
+                        <span><strong>100% NGUYÊN SEAL:</strong> Chưa qua sử dụng, đủ phụ kiện xuất xưởng.</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-emerald-600 text-sm">home_repair_service</span>
+                        <span><strong>BẢO HÀNH CHÍNH HÃNG:</strong> <c:out value="${product.warranty}"/>.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right 7 cols: Specs, Pricing, and Purchase Actions -->
+            <div class="lg:col-span-7 flex flex-col justify-between">
+                <div>
+                    <!-- Brand & SKU -->
+                    <div class="flex items-center gap-2 text-xs font-mono text-brand-gray mb-1">
+                        <span class="uppercase font-bold text-brand-black"><c:out value="${product.brand}"/></span>
+                        <span>•</span>
+                        <span><c:out value="${product.series}"/></span>
+                        <span>•</span>
+                        <span>MÃ: #<c:out value="${product.sku}"/></span>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="text-2xl lg:text-3xl font-bold font-space text-brand-black tracking-tight leading-tight">
+                        <c:out value="${product.name}"/>
+                    </h1>
+
+                    <!-- Pricing Banner -->
+                    <div class="p-4 bg-brand-card border border-brand-border my-4 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-gray-500 uppercase block">GIÁ BÁN NIÊM YẾT ĐÃ GỒM VAT</span>
+                            <div class="text-2xl lg:text-3xl font-bold font-space text-brand-orange tracking-tight">
+                                <fmt:formatNumber value="${product.price}" pattern="#,###"/> ₫
+                            </div>
+                        </div>
+                        <c:if test="${not empty product.originalPrice && product.originalPrice > product.price}">
+                            <div class="text-right">
+                                <span class="text-xs font-mono text-gray-400 line-through">
+                                    <fmt:formatNumber value="${product.originalPrice}" pattern="#,###"/> ₫
+                                </span>
+                                <span class="block text-xs font-mono text-emerald-700 font-bold">TIẾT KIỆM NGAY</span>
+                            </div>
+                        </c:if>
+                    </div>
+
+                    <!-- Quick Hardware Specification Matrix (Ma trận phần cứng tiêu chuẩn) -->
+                    <div class="border border-brand-border bg-white mb-6">
+                        <div class="px-4 py-2.5 bg-brand-card border-b border-brand-border flex items-center justify-between text-xs font-mono">
+                            <span class="font-bold text-brand-black uppercase">CẤU HÌNH PHẦN CỨNG TIÊU CHUẨN</span>
+                            <span class="text-brand-gray">XUẤT XƯỞNG NGUYÊN BẢN</span>
+                        </div>
+                        <div class="divide-y divide-brand-border text-xs">
+                            <c:forEach var="spec" items="${specifications}">
+                                <div class="px-4 py-2.5 grid grid-cols-12 gap-2">
+                                    <span class="col-span-4 font-mono font-semibold text-brand-gray"><c:out value="${spec.specKey}"/></span>
+                                    <span class="col-span-8 font-mono text-brand-black">
+                                        <c:out value="${spec.textValue}"/>
+                                        <c:if test="${not empty spec.unit && spec.specKey != spec.textValue}">(<c:out value="${spec.unit}"/>)</c:if>
+                                    </span>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="pt-4 border-t border-brand-border flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                        <!-- Buy Now CTA -->
+                        <button type="button" class="flex-1 h-11 bg-brand-black hover:bg-brand-orange text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">bolt</span>
+                            <span>MUA NGAY (GIAO TẬN NƠI)</span>
+                        </button>
+
+                        <!-- Add to Cart CTA: BR-45 - quantity luon = 1, khong gui quantity -->
+                        <form method="post" action="${pageContext.request.contextPath}/cart?action=add" class="shrink-0">
+                            <input type="hidden" name="productId" value="${product.id}">
+                            <button type="submit" class="h-11 px-5 border border-brand-black bg-white hover:bg-brand-card text-brand-black font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
+                                <span class="material-symbols-outlined text-base">shopping_cart</span>
+                                <span>THÊM GIỎ HÀNG</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs font-mono text-brand-gray pt-1">
+                        <a href="${pageContext.request.contextPath}/products?action=compare&ids=${product.id}" class="inline-flex items-center gap-1 hover:text-brand-orange underline">
+                            <span class="material-symbols-outlined text-sm">compare_arrows</span>
+                            <span>So sánh cấu hình máy này với các mẫu cùng phân khúc</span>
+                        </a>
+                        <span>Tình trạng: <strong class="text-emerald-700">${product.status}</strong> (${product.stockQuantity} máy có sẵn)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="w-full bg-white border-t border-brand-border py-8 mt-auto">
+    <div class="max-w-[1360px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-gray-500">
+        <div>© 2026 SỬA HAY BÁN. NỀN TẢNG THƯƠNG MẠI ĐIỆN TỬ & KỸ THUẬT TIÊU CHUẨN.</div>
+        <div class="flex items-center gap-4">
+            <span>ISO 9001:2015</span>
+            <span>|</span>
+            <span class="text-brand-black font-semibold">100% HARDWARE VERIFIED</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

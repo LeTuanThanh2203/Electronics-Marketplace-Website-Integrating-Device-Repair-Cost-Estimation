@@ -126,18 +126,7 @@ Khi merge: giữ `<c:redirect>`, chỉ đổi `url` thành `/home` nếu `HomeSe
 
 ## 8. Những chỗ Thành tự sửa trước khi merge
 
-- [ ] `MarketplaceServiceTest`: 8 chỗ truyền `int` vào tham số `Long` (dòng 58, 60,
-      68, 70, 87, 95, 98, 99) → thêm hậu tố `L`, và `new User(...)` đổi theo mục 1.
-- [ ] `ProductServlet` đang rỗng nhưng JSP link `/product/list` → 404.
-- [ ] `?demo=true` bỏ qua BR-33 ở `ListingServlet:123` — phải xoá trước khi demo.
-- [ ] `currentUserId = ... : 1L` ở `ListingServlet:213` — anonymous sửa được tin
-      của seller 1 (vi phạm BR-11).
-- [ ] JSON ở `ListingServlet` ghép bằng `String.format` không escape → tên có `"`
-      là vỡ response.
-- [ ] EL raw trong `listing/detail.jsp` (tên seller, note lỗi, `data-phone`) và
-      `listing/form.jsp` (brand/model/cpu/ram/storage trong `value=""`) → dùng
-      `<c:out>`.
-- [ ] Không commit `hs_err_pid*.log`.
+> **Trạng thái 2026-10-19 @ `333df71`: xong 1/7 — xem [mục 11.2](#112-8--7-việc-thành-tự-sửa-xong-17).**
 
 ## 9. Quy ước tránh conflict về sau
 
@@ -152,7 +141,7 @@ Khi merge: giữ `<c:redirect>`, chỉ đổi `url` thành `/home` nếu `HomeSe
 ## 10. Thứ tự merge đề xuất
 
 ```
-1. Thành sửa 8 lỗi test + User constructor        → push
+1. Thành xoá 7 chỗ `new User(...)` 5 tham số (mục 11.3) → push
 2. Nam commit phần đang làm dở (entity JPA, web.xml, persistence.xml)
 3. Merge origin/Thanh vào Nam, giải quyết:
      .gitignore                  → lấy của Thành (có *.log, Thumbs.db)
@@ -164,3 +153,66 @@ Khi merge: giữ `<c:redirect>`, chỉ đổi `url` thành `/home` nếu `HomeSe
 4. mvn -o test → phải 3/3 xanh
 5. Xoá WEB-INF/lib/*.jar, chạy lại build
 ```
+
+## 11. Kết quả kiểm tra nhánh Thành — 2026-10-19 @ `origin/Thanh` `333df71`
+
+### 11.0 Đọc diff cho đúng trước đã
+
+`origin/Thanh` tách từ `9072b00` — **trước** toàn bộ module của Nam. Nên
+`git diff origin/Nam origin/Thanh` báo *100 file, −12.025 dòng* thực chất là
+"file Nam có mà Thành chưa từng có", **không phải** Thành xoá. Diff thật của
+Thành là `9072b00..333df71`: **41 file, +5.867 dòng**, 3 commit
+(`9072b00` → `2bc27b1` → `333df71`).
+
+### 11.1 §1–§7 — file dùng chung
+
+| Mục | Kết quả | Bằng chứng |
+|---|---|---|
+| §1 `User` dùng enum | ❌ | vẫn `private String role` / `private String status`; ctor 5 tham số còn ở `User.java:53` |
+| §2 `OrderItem` quan hệ | 🟡 | `OrderItem.java` bên Thành là class **rỗng** (73 byte) → merge lấy bản Nam, không conflict |
+| §3 `persistence.xml` | ❌ | vẫn `postgres`/`postgres`, db `electronics_marketplace`, 6 `<class>` + `exclude-unlisted-classes=false` |
+| §4 `web.xml` bỏ `<taglib>` | ❌ | vẫn trỏ `/WEB-INF/tld/c.tld` + `fmt.tld`; thiếu `page-encoding`, `session-config`, `error-page` |
+| §5 `pom.xml` | 🟡 | Java 17 ✅ nhưng không có `<release>`; còn `jakarta.persistence-api:3.1.0` + `jstl-api:3.0.2`; **0 dependency Hibernate** |
+| §6 `WEB-INF/lib/*.jar` | ❌ | vẫn commit 4 jar (`el-api`, `persistence-api`, `jstl`, `jstl-api`) |
+| §7 `index.jsp` bỏ scriptlet | ✅ | `<c:redirect url="/home" />` |
+
+### 11.2 §8 — 7 việc Thành tự sửa: xong 1/7
+
+| # | Việc | Kết quả |
+|---|---|---|
+| 1 | Test `int` → `Long` | 🟡 literal đã sửa (`1L`, `999L`, `10L`) nhưng `new User(...)` vẫn 5 tham số ở `MarketplaceServiceTest:58,68,98` |
+| 2 | `ProductServlet` rỗng | ❌ vẫn 367 byte, thân class rỗng |
+| 3 | `?demo=true` bỏ BR-33 | ❌ còn ở `ListingServlet:122` |
+| 4 | `currentUserId … : 1L` | ❌ còn ở `ListingServlet:213` (`// Fallback demo seller id`) |
+| 5 | JSON ghép `String.format` | ❌ còn ở `ListingServlet:142` |
+| 6 | EL raw trong JSP | ❌ `listing/detail.jsp:282,302,306,309,321`; `listing/form.jsp:161,167,184,188,192,296` |
+| 7 | Không commit `hs_err_pid*.log` | ✅ sạch |
+
+### 11.3 Hai phát hiện ngoài danh sách trên
+
+1. **Nhánh Thành không có tầng persistence nào chạy được.** `JpaConfig.java`
+   là class **rỗng** (73 byte), `ListingRepositoryImpl` là `ConcurrentHashMap`
+   in-memory, **0** tham chiếu `EntityManager`/`createQuery`; `pom.xml` không có
+   Hibernate. "10/10 test xanh" chỉ chứng minh đường in-memory —
+   `persistence.xml` ở đó không được dùng tới.
+2. **Merge xong sẽ đỏ ở compile, không phải ở assert.** 7 chỗ gọi
+   `new User(Long, String, String, String, String)` còn lại:
+   `ListingRepositoryImpl:29,32,35`, `MarketplaceService:104`,
+   `MarketplaceServiceTest:58,68,98`. `User.java` của Nam **chỉ có** ctor
+   không tham số (`User.java:83`).
+
+Phụ: `AuthenticationFilter` rỗng (84 byte), `EncodingFilter` rỗng, còn sót
+`com/example/electronics_marketplace_project/{HelloApplication,HelloResource}`.
+`Cart`/`Order`/`Payment` bên Thành cũng là stub rỗng (68–71 byte) — merge lấy
+bản Nam nên không ảnh hưởng.
+
+### 11.4 Kết luận
+
+Thành mới xong **1/7** việc trong §8 và **0/4** mục file dùng chung (§3–§6);
+chỉ `index.jsp` đã sửa đúng. Chính `PHOI-HOP-NAM-THANH.md` v3.0 của Thành ghi
+mục 06–08 là *"ĐÃ ĐỒNG THUẬN — sẽ lấy bản của Nam khi merge"* → Thành chủ động
+hoãn, không phải bỏ sót.
+
+Thứ tự merge ở §10 vẫn giữ nguyên, nhưng **thêm một bước trước bước 1**:
+xoá 7 dòng `new User(...)` 5 tham số ở trên (đổi sang `new User()` + setter
+như §1), nếu không merge xong là đỏ compile.

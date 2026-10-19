@@ -138,6 +138,7 @@ class EntityMappingTest {
             Device device = new Device();
             device.setName("ThinkPad Test");
             device.setBrand("lenovo");
+            device.setModel("ThinkPad T14");
             em.persist(device);
 
             Listing listing = new Listing();

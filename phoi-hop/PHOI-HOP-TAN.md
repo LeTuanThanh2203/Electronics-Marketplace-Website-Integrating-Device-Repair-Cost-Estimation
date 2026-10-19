@@ -413,6 +413,9 @@ Xoá luôn khi merge: `com/example/electronics_marketplace_project/HelloApplicat
 
 ## 9. Checklist của Tân trước khi push để merge
 
+> **Kết quả kiểm tra 2026-10-19 @ `origin/Tan` `03c057f`: xem [mục 12](#12-kết-quả-kiểm-tra-nhánh-tân--2026-10-19-origintan-03c057f).**
+> 9/11 ô đã đạt; 2 ô còn lại là `mvn test` và `WEB-INF/lib`.
+
 - [ ] Đổi `"user"` → `"currentUser"` đủ 9 chỗ (bảng mục 1).
 - [ ] `AuthenticationFilter` phủ thêm `/checkout`, `/order`, `/payment`, `/cart`;
       AJAX trả 401 JSON, không redirect.
@@ -429,6 +432,84 @@ Xoá luôn khi merge: `com/example/electronics_marketplace_project/HelloApplicat
 - [ ] Thay 4 chỗ `isBlank()`.
 - [ ] `mvn -o test` xanh (7/7) **trước khi** push.
 - [ ] Không commit `WEB-INF/lib/*.jar`, `target/`, `*.log`.
+
+## 12. Kết quả kiểm tra nhánh Tân — 2026-10-19 @ `origin/Tan` `03c057f`
+
+### 12.1 Đối chiếu checklist mục 9
+
+| # | Hạng mục | Kết quả | Bằng chứng |
+|---|---|---|---|
+| 1 | `"user"` → `"currentUser"` đủ 9 chỗ | ✅ | `AuthenticationFilter:14 SESSION_KEY = "currentUser"`; `git grep 'getAttribute("user")\|sessionScope\.user\b'` trên `origin/Tan` = **0** |
+| 2 | Filter phủ `/checkout /order /payment /cart`, AJAX 401 JSON | ✅ | `AuthenticationFilter:10` `{"/profile","/admin","/admin/*","/checkout","/order","/payment","/cart","/listing"}`; `:52 HttpUtil.writeJson(401)`; `:58 sendRedirect("/login")` |
+| 3 | `User` của Nam + getter Tân + `@PrePersist` | ✅ | `Long id`, `Role role`, `UserStatus status`, `Date` + `@Temporal`; 5 getter dẫn xuất; `@PrePersist/@PreUpdate` |
+| 4 | `getUserID()` → `getId()`, `int` → `Long` | ✅ | `git grep getUserID` = 0; `DBConnection/UserDB` + `ProfileServlet` + `AdminServlet` + `dashboard.jsp` đã đổi |
+| 5 | Xoá `enums/Status.java` | ✅ | Không còn file; `git grep 'enums.Status'` = 0 |
+| 6 | Xoá `DBConnection` + `DatabaseInitializer`, dùng `JpaConfig` | ✅ | Chỉ còn `DBUtil/AuthDB/UserDB`; `DBUtil:13 JpaConfig.getEntityManagerFactory()`; `org.hibernate.*` + `java.sql.*` trong `src/main/java` = **0** |
+| 7 | `persistence.xml` auto-scan | ✅ | Không `<class>`, không `exclude-unlisted-classes`, không URL/user/password |
+| 8 | Bỏ hardcode admin | ✅ | `AdminSeedListener:17-18` đọc `System.getenv("ADMIN_EMAIL"/"ADMIN_PASSWORD")`, thiếu thì log rồi bỏ qua |
+| 9 | `isBlank()` → `trim().isEmpty()` | ✅ (không cần) | Đã lên Java 17; `git grep 'isBlank('` = 0 |
+| 10 | `mvn -o test` xanh | ❌ | `src/test` **rỗng** — `3782371` xoá cả 4 file test của Nam |
+| 11 | Không commit `WEB-INF/lib/*.jar`, `target/`, `*.log` | ✅ | `git ls-tree origin/Tan -- src/main/webapp/WEB-INF/lib` = rỗng |
+
+### 12.2 Nguyên nhân gốc: commit revert `3782371`
+
+Lịch sử trên `origin/Tan`:
+
+```
+2b9e8d9 Merge branch 'Nam' into Tan        <- merge đầu tiên
+f0769f6 merge: lay lai cac file thieu tu branch Nam
+...
+3782371 Revert: bo cac file merge tu commit f0769f6   <- XOÁ LẠI toàn bộ
+4c49b5d back về java 17
+03c057f chỉnh sửa AdminServlet, dashboard theo ListingStatus
+```
+
+`3782371` xoá **45 file / 9.329 dòng**: toàn bộ `service/CartService`, `service/MomoGateway`,
+`ServiceException`, 5 JSP giỏ/đơn/thanh toán, `order.css`, 4 file test, và cả `study/`.
+Vì vậy nhánh Tân hiện **không có module Cart/Order/Payment** — merge vào Nam bây giờ
+sẽ mất module đó nếu không giải quyết conflict đúng (mục 11).
+
+### 12.3 Lỗi ngoài checklist vẫn còn
+
+| Vấn đề | Vị trí | Mức |
+|---|---|---|
+| `pom.xml` mất block surefire loại `jakarta.json.bind-api` | `pom.xml` — không còn `maven-surefire-plugin` | **CAO** — thêm lại test là `mvn test` chết `JsonBindingProvider` |
+| `css/order.css` không tồn tại nhưng `header.jspf:22` trỏ vào | `origin/Tan` không có `src/main/webapp/css/order.css` | **CAO** — mọi trang login/register/admin trắng style |
+| `css/style.css` = **0 byte** | `src/main/webapp/css/style.css` | Trung bình |
+| `header.jspf:39-40` vẫn `/auth?action=login\|register` | không có `AuthServlet` ở cả hai nhánh | **CAO** — link đăng nhập 404 |
+| `HelloApplication` / `HelloResource` còn nguyên | `com/example/electronics_marketplace_project/` | Thấp — scaffolding `@ApplicationPath("/api")` |
+| `EncodingFilter` rỗng | `public class EncodingFilter { }` | Thấp — chưa filter nào set UTF-8 |
+| `db.properties` (`db.password=____`) + `mail.properties` | `src/main/resources/` | Trung bình — file mẫu, vô hại nhưng gây nhiễu |
+
+### 12.4 Xung đột mới: `ListingStatus` (`03c057f`)
+
+`03c057f` đổi enum trên nhánh Tân:
+
+```java
+// trước: PENDING_APPROVAL, APPROVED, REJECTED, SOLD, HIDDEN
+// sau  : AVAILABLE("Đang bán"), RESERVED("Đã giữ chỗ"), SOLD("Đã bán"), HIDDEN("Đã ẩn")
+```
+
+Nhánh **Nam và Thành đều đã dùng** `AVAILABLE/RESERVED/SOLD/HIDDEN` (commit `68eb932`,
+`2bc27b1`), nên đây là **Tân đuổi kịp hai nhánh kia**, không phải xung đột. Chỉ cần
+lưu ý: file `THONG_BAO_DONG_BO_THANH_LE.md` trên nhánh Tân vẫn mô tả enum cũ
+(`PENDING_APPROVAL`…) — tài liệu lệch code, sửa khi tiện.
+
+### 12.5 Kết luận
+
+Tân **đã làm đúng hợp đồng** ở mục 1–8 (10/11 checklist). Nhánh chưa merge được vì:
+
+1. Module Cart/Order/Payment đã bị revert (`3782371`) — merge sẽ mất.
+2. Không còn test nào → không có lưới an toàn.
+3. `order.css` thiếu nhưng header trỏ vào → UI hỏng.
+4. `header.jspf:39-40` link chết.
+
+Cách rẻ nhất: merge `origin/Tan` vào Nam **theo đúng thứ tự mục 11**, lấy bản Nam cho
+`controller/user/*`, `service/*`, `css/order.css`, `src/test/*`; giữ bản Tân cho
+`filter/*`, `controller/auth/*`, `controller/admin/*`, `listener/*`. Sau merge sửa
+2 dòng `_header.jspf` + thêm lại block surefire (mục 12.3).
+
+---
 
 ## 10. Checklist của Nam sau khi merge
 

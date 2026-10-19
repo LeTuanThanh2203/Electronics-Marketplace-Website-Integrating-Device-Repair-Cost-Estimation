@@ -191,6 +191,7 @@ class OrderServiceTest {
             tx.begin();
             Product product = new Product();
             product.setName(tag + "-" + name);
+            product.setBrand("TestBrand");
             product.setPrice(new BigDecimal(price));
             product.setStatus(ProductStatus.AVAILABLE);
             em.persist(product);
@@ -209,6 +210,7 @@ class OrderServiceTest {
             Device device = new Device();
             device.setName(tag + "-ThinkPad");
             device.setBrand("lenovo");
+            device.setModel("ThinkPad T14");
             em.persist(device);
 
             Listing listing = new Listing();
