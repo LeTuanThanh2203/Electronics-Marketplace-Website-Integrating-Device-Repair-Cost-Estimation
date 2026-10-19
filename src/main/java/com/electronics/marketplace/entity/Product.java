@@ -295,4 +295,57 @@ public class Product implements Serializable {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    // Convenience getters for EL expressions in JSP
+    public String getCpu() {
+        if (device != null && device.getCpu() != null && !device.getCpu().isEmpty()) {
+            return device.getCpu();
+        }
+        ProductSpecification spec = getSpecification("CPU");
+        return spec != null ? spec.getTextValue() : "Đang cập nhật";
+    }
+
+    public Integer getRamGb() {
+        ProductSpecification spec = getSpecification("RAM");
+        if (spec != null && spec.getNumericValue() != null) {
+            return spec.getNumericValue().intValue();
+        }
+        if (device != null && device.getRam() != null) {
+            try {
+                return Integer.parseInt(device.getRam().replaceAll("[^0-9]", ""));
+            } catch (Exception ignored) {}
+        }
+        return 16;
+    }
+
+    public Integer getStorageGb() {
+        ProductSpecification spec = getSpecification("STORAGE");
+        if (spec != null && spec.getNumericValue() != null) {
+            return spec.getNumericValue().intValue();
+        }
+        if (device != null && device.getStorage() != null) {
+            try {
+                return Integer.parseInt(device.getStorage().replaceAll("[^0-9]", ""));
+            } catch (Exception ignored) {}
+        }
+        return 512;
+    }
+
+    public Double getScreenSize() {
+        ProductSpecification spec = getSpecification("SCREEN_SIZE");
+        if (spec != null && spec.getNumericValue() != null) {
+            return spec.getNumericValue().doubleValue();
+        }
+        return 14.0;
+    }
+
+    public String getScreenResolution() {
+        ProductSpecification spec = getSpecification("SCREEN_DETAIL");
+        return spec != null ? spec.getTextValue() : "Retina / OLED";
+    }
+
+    public String getGpu() {
+        ProductSpecification spec = getSpecification("GPU");
+        return spec != null ? spec.getTextValue() : "Đồ họa tích hợp";
+    }
 }
