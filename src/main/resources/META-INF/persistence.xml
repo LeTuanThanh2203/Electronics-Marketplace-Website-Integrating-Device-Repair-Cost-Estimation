@@ -11,11 +11,28 @@
         Luu y: Hibernate 6.4.4 KHONG ho tro cu phap ${env.DB_URL} (nem
         HHH10001004: No JDBC URL specified). Chi ${TEN_SYSTEM_PROPERTY} moi
         duoc thay the, nen viec doc bien moi truong bat buoc phai lam o Java.
+
+        DANH SACH ENTITY: liet ke tuong minh + exclude-unlisted-classes=true de
+        schema do DUNG cac entity duoi day quyet dinh. Neu bo trong, Hibernate
+        tu quet moi @Entity tren classpath - khi nhieu module cung co entity
+        trung ten hoac entity chua hoan chinh, schema se bi tron.
+        KHI THEM ENTITY MOI: them mot dong <class> tuong ung.
     -->
     <persistence-unit name="Electronics_MarketplacePU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <!-- Khong khai bao <class> va khong bat exclude-unlisted-classes: de
-             Hibernate tu quet @Entity trong classpath. -->
+
+        <!-- ==== Module Auth / User (Tan) ==== -->
+        <class>com.electronics.marketplace.entity.User</class>
+
+        <!-- ==== Module Repair (Quoc) ==== -->
+        <class>com.electronics.marketplace.entity.Device</class>
+        <class>com.electronics.marketplace.entity.RepairProblem</class>
+        <class>com.electronics.marketplace.entity.RepairPricing</class>
+        <class>com.electronics.marketplace.entity.RepairRequest</class>
+        <class>com.electronics.marketplace.entity.RepairEstimate</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
@@ -24,10 +41,12 @@
 
             <!-- Tu tao/cap nhat bang theo Entity -->
             <property name="hibernate.hbm2ddl.auto" value="update"/>
+
             <!-- Batch processing -->
             <property name="hibernate.jdbc.batch_size" value="50"/>
             <property name="hibernate.order_inserts" value="true"/>
             <property name="hibernate.order_updates" value="true"/>
+
             <!-- Connection pool HikariCP -->
             <property name="hibernate.connection.provider_class"
                       value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
@@ -37,7 +56,10 @@
         </properties>
     </persistence-unit>
 
-    <!-- Unit phu: chi dung 1 lan luc khoi dong de tao database neu chua co -->
+    <!--
+        Unit phu: chi dung 1 lan luc khoi dong de tao database neu chua co.
+        Giu nguyen cau hinh cua Tan - duoc dung boi AdminSeedListener.
+    -->
     <persistence-unit name="adminPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
