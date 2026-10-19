@@ -1,95 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:set var="pageTitle" value="ELECTRONICSMARKETPLACE — Nâng Cấp Laptop Hay Chọn Sửa Chữa?" scope="request"/>
+<c:set var="activeNav" value="home" scope="request"/>
+<%@ include file="/WEB-INF/layout/header.jspf" %>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ElectronicsMarketplace - Nâng cấp Laptop hay Chọn sửa chữa?</title>
-    
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home.css">
-
-    <!-- Tailwind Configuration & CDN for Stitch Source of Truth -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "surface": "#f9f9f7", "surface-dim": "#dadad8", "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#f4f4f2", "surface-container": "#eeeeec", "surface-container-high": "#e8e8e6",
-            "on-surface": "#1a1c1b", "on-surface-variant": "#444748", "outline": "#747878",
-            "primary": "#000000", "on-primary": "#ffffff", "primary-container": "#1c1b1b",
-            "secondary-container": "#dc3200"
-          },
-          fontFamily: {
-            "label-sm": ["Be Vietnam Pro"], "body-md": ["Be Vietnam Pro"], "headline-lg-mobile": ["Be Vietnam Pro"],
-            "display-xl": ["Be Vietnam Pro"], "spec-numeral": ["Be Vietnam Pro"], "body-lg": ["Be Vietnam Pro"],
-            "label-md": ["Be Vietnam Pro"], "headline-sm": ["Be Vietnam Pro"], "headline-md": ["Be Vietnam Pro"],
-            "body-sm": ["Be Vietnam Pro"], "headline-lg": ["Be Vietnam Pro"]
-          }
-        }
-      }
-    };
-    </script>
-</head>
-<body class="bg-background font-body-md text-on-surface antialiased">
-
-<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-surface-dim">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 h-16 flex items-center justify-between">
-        <div class="flex items-center shrink-0">
-            <a class="font-headline-sm text-[18px] text-primary tracking-wider uppercase font-semibold" href="${pageContext.request.contextPath}/">ELECTRONICSMARKETPLACE</a>
-        </div>
-        <nav class="hidden md:flex items-center h-full gap-6">
-            <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 font-semibold border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/product/list">LAPTOP MỚI</a>
-            <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/listing/marketplace">LAPTOP CŨ</a>
-            <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/repair/request">SỬA CHỮA</a>
-        </nav>
-        <div class="flex items-center gap-4">
-            <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/product/list">
-                <span class="material-symbols-outlined text-[18px]">search</span>
-                <span class="hidden lg:inline">Tìm kiếm</span>
-            </a>
-            <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/cart">
-                <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
-                <span class="hidden lg:inline">Giỏ hàng</span>
-            </a>
-            <c:choose>
-                <c:when test="${not empty sessionScope.currentUser}">
-                    <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors font-semibold" href="${pageContext.request.contextPath}/profile">
-                        <span class="material-symbols-outlined text-[18px]">person</span>
-                        <span class="hidden lg:inline">${sessionScope.currentUser.name}</span>
-                    </a>
-                    <c:if test="${sessionScope.currentUser.admin}">
-                        <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-amber-700 bg-amber-100 px-2 py-0.5 border border-amber-300 font-semibold" href="${pageContext.request.contextPath}/admin">
-                            <span class="hidden lg:inline">Admin</span>
-                        </a>
-                    </c:if>
-                    <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-red-600 hover:text-red-800 transition-colors" href="${pageContext.request.contextPath}/logout">
-                        <span class="hidden lg:inline">Đăng xuất</span>
-                    </a>
-                </c:when>
-                <c:otherwise>
-                    <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/login">
-                        <span class="material-symbols-outlined text-[18px]">person</span>
-                        <span class="hidden lg:inline">Tài khoản</span>
-                    </a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-</header>
-
-<main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]">
 <div class="flex flex-col w-full bg-surface-container-low text-on-surface antialiased">
 
 <!-- ==========================================
@@ -542,45 +456,6 @@
 </section>
 
 </div>
-</main>
 
-<!-- ==========================================
-       8. FOOTER (Architectural Minimal)
-       ========================================== -->
-<footer class="w-full bg-[#050505] text-on-primary border-t border-zinc-800">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-24 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 border-b border-zinc-800 pb-8 mb-8">
-            <div class="flex flex-col gap-2">
-                <a class="text-[18px] text-white tracking-wider uppercase font-semibold" href="${pageContext.request.contextPath}/">ELECTRONICSMARKETPLACE</a>
-                <p class="text-[12px] text-zinc-400 mt-2">Giải pháp nâng cấp và bảo trì thiết bị tối ưu. Tiêu chuẩn minh bạch 100%.</p>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">DANH MỤC</span>
-                <a href="${pageContext.request.contextPath}/product/list" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Máy Mới</a>
-                <a href="${pageContext.request.contextPath}/listing/marketplace" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Chợ Đồ Cũ</a>
-                <a href="${pageContext.request.contextPath}/repair/request" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Sửa Chữa</a>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">HỖ TRỢ & HỆ THỐNG</span>
-                <a href="${pageContext.request.contextPath}/order" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Tra cứu đơn hàng</a>
-                <a href="${pageContext.request.contextPath}/repair/track" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Tiến độ sửa chữa</a>
-                <a href="${pageContext.request.contextPath}/admin" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Bảng Quản Trị (Admin)</a>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">LIÊN HỆ</span>
-                <span class="text-[13px] text-zinc-300 uppercase font-medium">1900 8888</span>
-                <span class="text-[13px] text-zinc-300 uppercase font-medium">support@electronics.vn</span>
-            </div>
-        </div>
-        <div class="flex flex-col md:flex-row items-center justify-between font-mono text-[10px] text-zinc-600 uppercase tracking-widest">
-            <span>© 2026 ELECTRONICSMARKETPLACE. ALL RIGHTS RESERVED.</span>
-            <span>DESIGNED VIA STITCH ARCHITECTURE</span>
-        </div>
-    </div>
-</footer>
-
-<!-- Scripts -->
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/js/home.js"></script>
-</body>
-</html>
+<%@ include file="/WEB-INF/layout/footer.jspf" %>

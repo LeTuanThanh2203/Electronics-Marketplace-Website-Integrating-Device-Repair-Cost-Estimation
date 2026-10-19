@@ -1,92 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<!DOCTYPE html>
-<html class="h-full" lang="vi">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>SỬA HAY BÁN | Cửa Hàng Laptop Mới Chính Hãng & Gợi Ý Thông Minh</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-    
-    <!-- Tailwind CSS with Official Design System -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-black': '#0B0B0B',
-                        'brand-orange': '#FF4A1C',
-                        'brand-gray': '#747878',
-                        'brand-border': '#DADAD6',
-                        'brand-bg': '#F9F9F7',
-                        'brand-card': '#F4F4F2'
-                    },
-                    fontFamily: {
-                        'sans': ['"Be Vietnam Pro"', 'sans-serif'],
-                        'space': ['"Space Grotesk"', 'sans-serif'],
-                        'mono': ['monospace']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .font-space { font-family: 'Space Grotesk', sans-serif; }
-        ::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="bg-brand-bg text-[#1A1C1B] font-sans antialiased min-h-screen flex flex-col">
+<c:set var="pageTitle" value="Cửa Hàng Laptop Mới Chính Hãng &amp; AI Gợi Ý — ELECTRONICSMARKETPLACE" scope="request"/>
+<c:set var="activeNav" value="new" scope="request"/>
+<%@ include file="/WEB-INF/layout/header.jspf" %>
 
-<!-- HEADER NAVIGATION -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-brand-border h-16">
-    <div class="max-w-[1360px] mx-auto px-6 h-full flex items-center justify-between gap-4">
-        <div class="flex items-center gap-8 shrink-0">
-            <a class="flex items-center gap-2 text-brand-black font-space font-bold text-lg uppercase tracking-tight" href="${pageContext.request.contextPath}/">
-                <span class="w-3.5 h-3.5 bg-brand-orange inline-block shrink-0"></span>
-                <span>SỬA HAY BÁN</span>
-            </a>
-            <nav class="hidden lg:flex items-center h-16 gap-1 font-mono text-xs uppercase tracking-wider">
-                <a class="h-full inline-flex items-center px-3 text-brand-black border-b-2 border-brand-orange font-bold" href="${pageContext.request.contextPath}/products">MUA MỚI</a>
-                <a class="h-full inline-flex items-center px-3 text-brand-gray hover:text-brand-black border-b-2 border-transparent transition-colors" href="${pageContext.request.contextPath}/marketplace">CHỢ ĐỒ CŨ</a>
-                <a class="h-full inline-flex items-center px-3 text-brand-gray hover:text-brand-black border-b-2 border-transparent transition-colors" href="${pageContext.request.contextPath}/repair">SỬA CHỮA</a>
-            </nav>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="flex-1 max-w-lg hidden sm:block">
-            <form action="${pageContext.request.contextPath}/products" method="GET" class="relative flex items-center w-full border border-brand-border bg-brand-card focus-within:border-brand-black transition-colors">
-                <input type="hidden" name="action" value="search">
-                <span class="material-symbols-outlined text-brand-gray ml-2.5 text-[18px]">search</span>
-                <input class="w-full bg-transparent px-3 py-2 text-xs font-sans text-brand-black placeholder:text-brand-gray focus:outline-none" 
-                       name="q" value="${searchKeyword}" placeholder="Tìm kiếm dòng máy chính hãng, card đồ họa, thông số..." type="text">
-            </form>
-        </div>
-
-        <!-- Right CTA: Recommendation Trigger & Profile -->
-        <div class="flex items-center gap-3 shrink-0">
-            <button onclick="toggleRecModal()" class="inline-flex items-center gap-1.5 px-3 py-2 bg-brand-black text-white hover:bg-brand-orange text-xs font-mono font-semibold uppercase tracking-wider transition-colors border border-brand-black">
-                <span class="material-symbols-outlined text-sm text-brand-orange">auto_awesome</span>
-                <span>AI GỢI Ý MÁY</span>
-            </button>
-            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="${pageContext.request.contextPath}/cart" title="Giỏ hàng">
-                <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
-            </a>
-            <a class="w-8 h-8 rounded-full bg-brand-black flex items-center justify-center text-white hover:bg-brand-orange transition-colors" href="${not empty sessionScope.currentUser ? pageContext.request.contextPath.concat('/profile') : pageContext.request.contextPath.concat('/login')}" title="Tài khoản">
-                <span class="material-symbols-outlined text-[18px]">person</span>
-            </a>
-        </div>
-    </div>
-</header>
-
-<!-- MAIN CONTENT -->
-<main class="w-full pt-16 flex-1">
 
     <!-- 1. Technical Info & Breadcrumb Bar -->
     <section class="w-full bg-brand-black text-white border-b border-brand-border">
@@ -533,22 +451,12 @@
     </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="w-full bg-white border-t border-brand-border py-8 mt-auto">
-    <div class="max-w-[1360px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-gray-500">
-        <div>© 2026 SỬA HAY BÁN. NỀN TẢNG THƯƠNG MẠI ĐIỆN TỬ & KỸ THUẬT TIÊU CHUẨN.</div>
-        <div class="flex items-center gap-4">
-            <span>ISO 9001:2015</span>
-            <span>|</span>
-            <span class="text-brand-black font-semibold">100% HARDWARE VERIFIED</span>
-        </div>
-    </div>
-</footer>
-
 <script>
     function toggleRecModal() {
         const modal = document.getElementById('recModal');
-        modal.classList.toggle('hidden');
+        if (modal) {
+            modal.classList.toggle('hidden');
+        }
     }
 
     function setPriceRange(min, max) {
@@ -568,5 +476,6 @@
         window.location.href = url.toString();
     }
 </script>
-</body>
-</html>
+
+<%@ include file="/WEB-INF/layout/footer.jspf" %>
+

@@ -1,85 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<!DOCTYPE html>
-<html lang="vi" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>So Sánh Sản Phẩm | SỬA HAY BÁN</title>
-    
-    <!-- Google Fonts: Space Grotesk & Space Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            orange: '#F05A28',
-                            black: '#111315',
-                            gray: '#5A5D5E',
-                            border: '#2A2C2E',
-                            card: '#F6F6F4',
-                            bg: '#FAF9F5'
-                        }
-                    },
-                    fontFamily: {
-                        space: ['"Space Grotesk"', 'sans-serif'],
-                        mono: ['"Space Mono"', 'monospace'],
-                        inter: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="bg-brand-bg text-brand-black font-inter antialiased min-h-screen flex flex-col selection:bg-brand-orange selection:text-white">
+<c:set var="pageTitle" value="So Sánh Cấu Hình Sản Phẩm — ELECTRONICSMARKETPLACE" scope="request"/>
+<c:set var="activeNav" value="new" scope="request"/>
+<%@ include file="/WEB-INF/layout/header.jspf" %>
 
-    <!-- 1. TOP ANNOUNCEMENT TICKER -->
-    <div class="bg-brand-black text-white py-1 px-4 text-[11px] font-mono border-b border-brand-border flex justify-between items-center tracking-wider">
-        <div class="flex items-center gap-3">
-            <span class="inline-block w-2 h-2 bg-brand-orange animate-pulse"></span>
-            <span>HỆ THỐNG SO SÁNH MA TRẬN PHẦN CỨNG B2C CHUẨN XUẤT XƯỞNG</span>
-        </div>
-        <div class="hidden md:flex items-center gap-4 text-gray-400">
-            <span>HOTLINE: 1800 6868</span>
-            <span>CHÍNH HÃNG 100% NGUYÊN SEAL</span>
-        </div>
-    </div>
-
-    <!-- 2. MAIN HEADER -->
-    <header class="border-b border-brand-border bg-white sticky top-0 z-40">
-        <div class="max-w-[1360px] mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="${pageContext.request.contextPath}/products" class="flex items-center gap-2">
-                    <span class="w-8 h-8 bg-brand-orange text-white font-bold font-space flex items-center justify-center text-lg border border-brand-black shadow-[2px_2px_0px_#111315]">S</span>
-                    <span class="font-bold text-xl tracking-tight font-space text-brand-black">SỬA HAY BÁN</span>
-                </a>
-                <nav class="hidden md:flex items-center gap-6 text-xs font-mono font-semibold uppercase">
-                    <a href="${pageContext.request.contextPath}/products" class="text-brand-orange">CỬA HÀNG MÁY MỚI</a>
-                    <a href="${pageContext.request.contextPath}/" class="text-brand-gray hover:text-brand-black transition">TRANG CHỦ</a>
-                </nav>
-            </div>
-            <div>
-                <a href="${pageContext.request.contextPath}/products" class="text-xs font-mono font-semibold border border-brand-border px-3 py-2 hover:bg-brand-black hover:text-white transition flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-sm">arrow_back</span>
-                    <span>QUAY LẠI CỬA HÀNG</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- 3. MAIN CONTENT -->
-    <main class="flex-1 max-w-[1360px] mx-auto px-6 py-8 w-full">
+    <div class="flex-1 max-w-[1360px] mx-auto px-6 py-8 w-full">
         <!-- Title & Breadcrumbs -->
         <div class="mb-6 border-b border-brand-border pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -253,19 +179,8 @@
                 </div>
             </c:otherwise>
         </c:choose>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="border-t border-brand-border bg-white py-6 mt-12">
-        <div class="max-w-[1360px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-xs font-mono text-brand-gray gap-4">
-            <div>
-                © 2026 SỬA HAY BÁN - HỆ THỐNG THƯƠNG MẠI ĐIỆN TỬ &amp; ĐỊNH GIÁ SỬA CHỮA THIẾT BỊ.
-            </div>
-            <div class="flex gap-4">
-                <span>PHẠM PHƯỚC ANH - MODULE CỬA HÀNG MÁY MỚI</span>
-            </div>
         </div>
-    </footer>
+    </div>
 
-</body>
-</html>
+<%@ include file="/WEB-INF/layout/footer.jspf" %>
+
