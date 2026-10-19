@@ -21,7 +21,8 @@ import java.util.regex.Pattern;
  *
  * Vi sao khong dung SDK: momo-wallet/payment chi co sample C#/Go/Node/PHP/Ruby;
  * SDK Java rieng (io.github.momo-wallet:momopayment:1.0) keo log4j 1.2.17 da EOL.
- * pom.xml dat compiler target 8 nen khong dung duoc java.net.http.HttpClient.
+ * Target Java 17 nen co java.net.http.HttpClient, nhung HttpURLConnection du dung
+ * va khong can them code - giu nguyen.
  *
  * Khong co JSON library trong project: response cua MoMo la JSON phang, mot
  * extractor regex la du. KHONG dung cho JSON long nhau - xem ghi chu o field().

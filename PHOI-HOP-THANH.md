@@ -101,6 +101,10 @@ Code Thành chỉ dùng lambda + diamond (Java 8 là đủ) nhưng cả nhóm n�
 mức. Đề xuất: **17** (JDK đang chạy là 17.0.20) — nhưng phải sửa ở một commit
 riêng để không lẫn vào merge.
 
+> **Đã chốt 2026-10-19:** nhánh Nam nâng lên **17** (`source`/`target` = 17, cùng
+> kiểu với Thành) trong commit riêng, đúng như đề xuất trên. Mục này giữ lại làm
+> lịch sử; không cần làm gì thêm.
+
 ## 6. `WEB-INF/lib/*.jar` — không commit
 
 Thành commit 4 jar (`jakarta.el-api`, `jakarta.persistence-api`, `jstl`,

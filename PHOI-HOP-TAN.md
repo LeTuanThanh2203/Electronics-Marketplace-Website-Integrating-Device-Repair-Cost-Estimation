@@ -326,15 +326,20 @@ mọi query nổ `Unknown entity`.
 
 ---
 
-## 6. Bẫy Java 8: `String.isBlank()`
+## 6. ~~Bẫy Java 8: `String.isBlank()`~~ — đã hết, cả nhóm lên 17
 
-Cả hai `pom.xml` đều để `maven.compiler.source/target = 8`. `isBlank()` là API Java
-11 — biên dịch được vì JDK đang chạy là 17 (`-source 8` chỉ cảnh báo, không chặn), và
-test vẫn xanh, nên lỗi chỉ lộ khi chạy trên JVM 8 thật.
+> **Cập nhật 2026-10-19:** nhánh Nam đã nâng `maven.compiler.source/target` lên
+> **17** (theo yêu cầu của Thành), nên `isBlank()` không còn là bẫy. Mục này giữ
+> lại làm lịch sử. Khi merge, nhớ pom của nhánh gộp cũng phải để 17 — đừng để
+> conflict resolution kéo về 8.
 
-4 chỗ cần đổi:
+`isBlank()` là API Java 11. Nếu có nhánh nào còn để `source/target = 8` thì nó
+biên dịch được (JDK đang chạy là 17, `-source 8` chỉ cảnh báo) nhưng sẽ nổ trên
+JVM 8 thật.
 
-| File | Dòng | Sửa |
+4 chỗ từng phải sửa (nay không cần, vì đã lên 17):
+
+| File | Dòng | Sửa nếu phải quay lại 8 |
 |---|---|---|
 | `DBConnection/DBConnection.java` | 28 | `!v.trim().isEmpty()` |
 | `entity/User.java` | 97 | `name.trim().isEmpty()` |
