@@ -20,7 +20,7 @@ public class MockProductData {
         List<Product> list = new ArrayList<>();
 
         // 1. Dell XPS 13 Plus 9320
-        Device devDell = new Device("Dell XPS 13", "Dell", "XPS 9320", 2023, "Intel Core i7-1360P", "16", "512");
+        Device devDell = new Device(null, "Dell XPS 13", "Dell", "XPS 9320", 2023, "Intel Core i7-1360P", "16", "512");
         devDell.setId(1L);
 
         Product p1 = new Product(1L, "Dell XPS 13 Plus 9320", "Dell", new BigDecimal("35900000"), ProductStatus.AVAILABLE);
@@ -48,7 +48,7 @@ public class MockProductData {
         list.add(p1);
 
         // 2. MacBook Air 15 M3 2024
-        Device devApple = new Device("MacBook Air 15", "Apple", "MacBook Air M3", 2024, "Apple M3 (8-Core CPU)", "16", "512");
+        Device devApple = new Device(null, "MacBook Air 15", "Apple", "MacBook Air M3", 2024, "Apple M3 (8-Core CPU)", "16", "512");
         devApple.setId(2L);
 
         Product p2 = new Product(1L, "MacBook Air 15 M3 2024", "Apple", new BigDecimal("37490000"), ProductStatus.AVAILABLE);
@@ -76,7 +76,7 @@ public class MockProductData {
         list.add(p2);
 
         // 3. ASUS ROG Strix G16 G614J
-        Device devRog = new Device("ROG Strix G16", "ASUS", "G614J", 2024, "Intel Core i7-13650HX", "16", "1024");
+        Device devRog = new Device(null, "ROG Strix G16", "ASUS", "G614J", 2024, "Intel Core i7-13650HX", "16", "1024");
         devRog.setId(3L);
 
         Product p3 = new Product(1L, "ASUS ROG Strix G16 G614J", "ASUS", new BigDecimal("34500000"), ProductStatus.AVAILABLE);
@@ -103,7 +103,7 @@ public class MockProductData {
         list.add(p3);
 
         // 4. Lenovo ThinkPad X1 Carbon Gen 11
-        Device devThinkPad = new Device("ThinkPad X1 Carbon", "Lenovo", "Gen 11", 2023, "Intel Core i7-1355U", "16", "512");
+        Device devThinkPad = new Device(null, "ThinkPad X1 Carbon", "Lenovo", "Gen 11", 2023, "Intel Core i7-1355U", "16", "512");
         devThinkPad.setId(4L);
 
         Product p4 = new Product(1L, "Lenovo ThinkPad X1 Carbon Gen 11", "Lenovo", new BigDecimal("39900000"), ProductStatus.AVAILABLE);
@@ -130,7 +130,7 @@ public class MockProductData {
         list.add(p4);
 
         // 5. ASUS Vivobook 15 OLED
-        Device devVivo = new Device("Vivobook 15", "ASUS", "A1505", 2024, "Intel Core i5-13500H", "16", "512");
+        Device devVivo = new Device(null, "Vivobook 15", "ASUS", "A1505", 2024, "Intel Core i5-13500H", "16", "512");
         devVivo.setId(5L);
 
         Product p5 = new Product(1L, "ASUS Vivobook 15 OLED A1505", "ASUS", new BigDecimal("17490000"), ProductStatus.AVAILABLE);
@@ -157,7 +157,7 @@ public class MockProductData {
         list.add(p5);
 
         // 6. Acer Predator Helios Neo 16
-        Device devHelios = new Device("Predator Helios Neo 16", "Acer", "PHN16", 2024, "Intel Core i7-14700HX", "32", "1024");
+        Device devHelios = new Device(null, "Predator Helios Neo 16", "Acer", "PHN16", 2024, "Intel Core i7-14700HX", "32", "1024");
         devHelios.setId(6L);
 
         Product p6 = new Product(1L, "Acer Predator Helios Neo 16 2024", "Acer", new BigDecimal("41990000"), ProductStatus.AVAILABLE);

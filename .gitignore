@@ -39,3 +39,13 @@ build/
 
 ### Mac OS ###
 .DS_Store
+### Tai lieu tham khao (khong commit - SDD noi bo + anh)
+reference/
+
+### JVM crash log (khong commit)
+hs_err_pid*.log
+replay_pid*.log
+
+### Tai lieu hoc tap / demo (khong commit)
+study/
+demo/

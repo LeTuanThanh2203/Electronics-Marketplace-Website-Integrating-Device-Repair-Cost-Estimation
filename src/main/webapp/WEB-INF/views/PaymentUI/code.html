@@ -1,0 +1,528 @@
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>00 Public Layout - Sửa hay Bán</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              black: '#0B0B0B',
+              white: '#FFFFFF',
+              offwhite: '#F4F4F2',
+              gray: '#8A8A86',
+              hairline: '#DADAD6',
+              orange: '#FF4A1C',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FFFFFF;
+      color: #0B0B0B;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .hairline-border {
+      border-color: #DADAD6;
+    }
+    .custom-dashed {
+      border: 1.5px dashed #DADAD6;
+    }
+  </style>
+<meta content="web_dashboard" name="shell-type"></head>
+<body class="bg-white min-h-screen flex flex-col justify-between selection:bg-[#FF4A1C] selection:text-white">
+<!-- TOP ARCHITECTURE SPECIFICATION BAR (For Reference Documentation) -->
+<aside aria-label="Đặc tả kiến trúc kỹ thuật" class="w-full bg-[#0B0B0B] border-b border-[#262626] text-white px-8 py-2 text-[13px] flex items-center justify-between font-mono">
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2">
+<span class="inline-block w-2 h-2 rounded-full bg-[#FF4A1C]"></span>
+<span class="font-bold tracking-wider text-white">LAYOUT SPEC // 00 PUBLIC LAYOUT</span>
+</div>
+<span class="text-[#8A8A86]">ENGINE: JSP / JSTL SHARED MASTER TEMPLATE</span>
+<span class="text-[#8A8A86]">VIEWPORT: 1440PX DESKTOP</span>
+</div>
+<div class="flex items-center space-x-4 text-[#8A8A86]">
+<span>FONT: <strong class="text-white">INTER (100% UNIFIED)</strong></span>
+<span>•</span>
+<span>RADIUS: <strong class="text-white">0–4PX</strong></span>
+<span>•</span>
+<span>ACCENT: <strong class="text-[#FF4A1C]">#FF4A1C</strong></span>
+</div>
+</aside>
+<!-- SECTION 1: SHARED HEADER (72px high canonical header + annotated logged-in state callout) -->
+<header class="w-full bg-white border-b border-[#DADAD6] sticky top-0 z-50">
+<div class="max-w-[1440px] mx-auto px-8 h-[72px] flex items-center justify-between">
+<!-- Brand Wordmark Logo -->
+<div class="flex items-center space-x-8">
+<a class="flex items-center space-x-2 group" href="#">
+<span class="w-3 h-3 bg-[#FF4A1C] inline-block"></span>
+<span class="text-[20px] font-bold tracking-tight text-[#0B0B0B] uppercase">SỬA HAY BÁN</span>
+</a>
+<!-- Canonical Public Navigation -->
+<nav class="flex items-center space-x-8 ml-4">
+<a class="text-[15px] font-medium text-[#0B0B0B] hover:text-[#FF4A1C] transition-colors py-[24px]" href="#">
+            Mua mới
+          </a>
+<!-- Active tab with 2px orange underline -->
+<a class="text-[15px] font-medium text-[#0B0B0B] relative py-[24px]" href="#">
+            Chợ đồ cũ
+            <span class="absolute bottom-0 left-0 w-full h-[2px] bg-[#FF4A1C]"></span>
+</a>
+<a class="text-[15px] font-medium text-[#0B0B0B] hover:text-[#FF4A1C] transition-colors py-[24px]" href="#">
+            Sửa chữa
+          </a>
+</nav>
+</div>
+<!-- Search Input + Actions -->
+<div class="flex items-center space-x-6">
+<!-- Search bar (320px wide) -->
+<div class="relative w-[340px]">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8A8A86]">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+<path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<input class="w-full bg-[#F4F4F2] text-[#0B0B0B] placeholder-[#8A8A86] text-[15px] pl-9 pr-4 py-2 border border-[#DADAD6] rounded-[3px] focus:outline-none focus:border-[#FF4A1C] transition-all font-normal" placeholder="Tìm laptop theo tên hoặc cấu hình..." type="text">
+</div>
+<!-- Auth Navigation & Cart (Guest State) -->
+<div class="flex items-center space-x-4 pl-2 border-l border-[#DADAD6]">
+<a class="text-[15px] font-medium text-[#0B0B0B] hover:text-[#FF4A1C] px-2 py-1.5 transition-colors" href="#">
+            Đăng nhập
+          </a>
+<a class="bg-[#0B0B0B] text-white text-[15px] font-semibold px-4 py-2 rounded-[3px] hover:bg-[#262626] transition-colors" href="#">
+            Đăng ký
+          </a>
+<!-- Cart Icon with small orange count badge '2' -->
+<a class="relative p-2 text-[#0B0B0B] hover:text-[#FF4A1C] transition-colors" href="#" title="Giỏ hàng">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+<path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25c-.67 0-1.189-.578-1.119-1.243l1.263-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="absolute top-0 right-0 bg-[#FF4A1C] text-white text-[11px] font-bold w-4 h-4 rounded-full flex items-center justify-center font-mono">
+              2
+            </span>
+</a>
+</div>
+</div>
+</div>
+</header>
+<!-- LOGGED-IN STATE ANNOTATION CALLOUT (Beside/Under Header Reference) -->
+<div class="max-w-[1440px] mx-auto px-8 w-full pt-4 pb-2">
+<div class="bg-white border border-[#DADAD6] rounded-[4px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start space-x-3">
+<span class="px-2 py-0.5 bg-[#0B0B0B] text-white font-mono text-[12px] font-medium rounded-[2px] mt-0.5">
+          STATE SPEC
+        </span>
+<div>
+<h4 class="text-[15px] font-bold text-[#0B0B0B]">Trạng thái Header khi Đã đăng nhập (Logged-in Reference)</h4>
+<p class="text-[14px] text-[#8A8A86]">Cùng 1 component header dùng chung; khi session người dùng hợp lệ, khối Đăng nhập / Đăng ký được thay bằng Avatar và Dropdown menu tài khoản.</p>
+</div>
+</div>
+<!-- Interactive / Visual Dropdown Component Preview -->
+<div class="relative bg-[#F4F4F2] p-3 rounded-[3px] border border-[#DADAD6] flex items-center space-x-6">
+<div class="flex items-center space-x-3">
+<!-- User Avatar -->
+<div class="w-9 h-9 rounded-full bg-[#0B0B0B] text-white font-mono font-semibold text-[13px] flex items-center justify-center border border-[#DADAD6]">
+            AN
+          </div>
+<div class="text-left">
+<div class="text-[14px] font-semibold text-[#0B0B0B] leading-tight">Nguyễn Văn An</div>
+<div class="text-[12px] text-[#8A8A86] font-mono leading-tight">Kỹ thuật viên</div>
+</div>
+<svg class="w-4 h-4 text-[#8A8A86]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<!-- Open Dropdown Menu Annotation -->
+<div class="w-[220px] bg-white border border-[#DADAD6] rounded-[3px] shadow-none py-1.5 font-sans">
+<div class="px-3 py-1 text-[11px] font-mono text-[#8A8A86] uppercase tracking-wider border-b border-[#F4F4F2]">
+            Tài khoản cá nhân
+          </div>
+<a class="flex items-center justify-between px-3 py-1.5 text-[14px] font-medium text-[#0B0B0B] hover:bg-[#F4F4F2] hover:text-[#FF4A1C]" href="#">
+<span>Đơn hàng của tôi</span>
+<span class="text-[11px] font-mono text-[#8A8A86]">03</span>
+</a>
+<a class="flex items-center justify-between px-3 py-1.5 text-[14px] font-medium text-[#0B0B0B] hover:bg-[#F4F4F2] hover:text-[#FF4A1C]" href="#">
+<span>Yêu cầu sửa chữa</span>
+<span class="w-1.5 h-1.5 bg-[#FF4A1C] rounded-full"></span>
+</a>
+<a class="flex items-center px-3 py-1.5 text-[14px] font-medium text-[#0B0B0B] hover:bg-[#F4F4F2] hover:text-[#FF4A1C]" href="#">
+<span>Đăng bán laptop</span>
+</a>
+<div class="my-1 border-t border-[#DADAD6]"></div>
+<a class="flex items-center px-3 py-1.5 text-[14px] font-semibold text-[#FF4A1C] hover:bg-[#F4F4F2]" href="#">
+<span>Đăng xuất</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 2: PAGE CONTENT SLOT (Off-white, 450px high, dashed 1px border, centered label) -->
+<main class="w-full max-w-[1440px] mx-auto px-8 my-6 flex-grow"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1280px] mx-auto px-6 py-8">
+<!-- 1. BREADCRUMB -->
+<nav aria-label="Đường dẫn trang" class="flex items-center space-x-2 text-secondary mb-6 font-secondary text-secondary">
+<a class="hover:text-primary transition-colors" href="#">Trang chủ</a>
+<span class="text-outline-variant">/</span>
+<a class="hover:text-primary transition-colors" href="#">Giỏ hàng</a>
+<span class="text-outline-variant">/</span>
+<a class="hover:text-primary transition-colors" href="#">Thanh toán</a>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-medium">Chọn phương thức thanh toán</span>
+</nav>
+<!-- 2. PAGE HEADER -->
+<header class="mb-10 pb-6 border-b border-surface-container-highest">
+<div class="flex items-center space-x-2 mb-3">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="font-metadata-sm text-metadata-sm text-on-surface uppercase tracking-wider font-semibold">
+          GIAO DỊCH AN TOÀN // MÃ ĐƠN HÀNG: SHB-2026-001
+        </span>
+</div>
+<h1 class="font-h1 text-h1 text-primary tracking-tight mb-3">
+        Thanh toán đơn hàng
+      </h1>
+<p class="font-body text-body text-on-surface-variant max-w-3xl leading-relaxed">
+        Vui lòng chọn phương thức thanh toán phù hợp và kiểm tra lại thông tin đơn hàng trước khi xác nhận giao dịch.
+      </p>
+</header>
+<!-- 3. TWO-COLUMN LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT COLUMN: PAYMENT SELECTION (8 Cols ~ 67%) -->
+<section class="lg:col-span-8 bg-surface-container-lowest border border-surface-container-highest rounded-DEFAULT p-8">
+<div class="mb-8">
+<h2 class="font-h3 text-h3 text-primary mb-2">
+            Chọn phương thức thanh toán
+          </h2>
+<p class="font-secondary text-secondary text-on-surface-variant leading-normal">
+            Các giao dịch đều được mã hóa bảo mật chuẩn SSL 256-bit và bảo chứng bởi hệ thống Sửa hay Bán.
+          </p>
+</div>
+<!-- PAYMENT METHODS STACK -->
+<div aria-label="Phương thức thanh toán" class="space-y-4" role="radiogroup">
+<!-- OPTION 1: VIETQR / NAPAS (SELECTED) -->
+<div class="payment-method-card bg-surface-container-lowest border-2 border-primary rounded-DEFAULT p-5 transition-colors cursor-pointer" id="option-vietqr">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start space-x-3.5">
+<div class="mt-0.5 flex items-center justify-center">
+<div class="w-4 h-4 rounded-full border-2 border-primary flex items-center justify-center bg-surface-container-lowest">
+<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center flex-wrap gap-2.5">
+<span class="font-product-title text-product-title text-primary">
+                      Chuyển khoản ngân hàng qua mã QR / Napas 247
+                    </span>
+<span class="font-metadata-sm text-metadata-sm px-2 py-0.5 rounded-DEFAULT bg-secondary-fixed text-on-secondary-fixed-variant font-semibold uppercase">
+                      KHUYÊN DÙNG // XỬ LÝ TỰ ĐỘNG 30S
+                    </span>
+</div>
+<p class="font-secondary text-secondary text-on-surface-variant mt-1.5 leading-relaxed">
+                    Hệ thống tự động xác nhận giao dịch trong vòng 30 giây ngay sau khi nhận được chuyển khoản.
+                  </p>
+</div>
+</div>
+</div>
+<!-- DETAIL INSTRUCTION PANEL -->
+<div class="mt-5 pt-5 border-t border-surface-container-highest bg-surface-container-low p-4 rounded-DEFAULT">
+<div class="font-metadata-sm text-metadata-sm text-on-surface-variant uppercase tracking-wider mb-3 font-semibold">
+                THÔNG TIN THỤ HƯỞNG ĐỐI SOÁT TỰ ĐỘNG (THỬ NGHIỆM KỸ THUẬT)
+              </div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-secondary font-secondary">
+<div class="bg-surface-container-lowest p-3 border border-surface-container-highest rounded-DEFAULT">
+<div class="text-on-surface-variant text-metadata-sm font-metadata-sm">Ngân hàng thụ hưởng</div>
+<div class="font-semibold text-primary mt-0.5">MB Bank (Ngân hàng TMCP Quân Đội)</div>
+</div>
+<div class="bg-surface-container-lowest p-3 border border-surface-container-highest rounded-DEFAULT">
+<div class="text-on-surface-variant text-metadata-sm font-metadata-sm">Tên tài khoản</div>
+<div class="font-semibold text-primary mt-0.5 uppercase">CÔNG TY CỔ PHẦN SỬA HAY BÁN</div>
+</div>
+<div class="bg-surface-container-lowest p-3 border border-surface-container-highest rounded-DEFAULT">
+<div class="text-on-surface-variant text-metadata-sm font-metadata-sm">Số tài khoản mẫu</div>
+<div class="font-semibold text-primary mt-0.5 tracking-wider font-mono">9999 8888 6868</div>
+</div>
+<div class="bg-surface-container-lowest p-3 border border-surface-container-highest rounded-DEFAULT">
+<div class="text-on-surface-variant text-metadata-sm font-metadata-sm">Nội dung chuyển khoản</div>
+<div class="font-semibold text-secondary-container mt-0.5 tracking-wider font-mono">SHB 2026 001</div>
+</div>
+</div>
+<div class="mt-4 flex items-start space-x-2 text-on-surface-variant font-metadata-sm text-metadata-sm leading-relaxed">
+<svg class="w-4 h-4 text-on-surface-variant mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+<span>Lưu ý: Mã QR thanh toán chi tiết kèm đồng hồ đếm ngược sẽ hiển thị ở bước tiếp theo ngay sau khi bạn bấm “Thanh toán ngay”.</span>
+</div>
+</div>
+</div>
+<!-- OPTION 2: VNPAY GATEWAY -->
+<div class="payment-method-card bg-surface-container-lowest border border-surface-container-highest hover:border-outline rounded-DEFAULT p-5 transition-colors cursor-pointer" id="option-vnpay">
+<div class="flex items-start space-x-3.5">
+<div class="mt-0.5 flex items-center justify-center">
+<div class="w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center bg-surface-container-lowest">
+<div class="w-2 h-2 rounded-full hidden"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center flex-wrap gap-2.5">
+<span class="font-product-title text-product-title text-primary">
+                    Cổng thanh toán VNPAY
+                  </span>
+<span class="font-metadata-sm text-metadata-sm px-2 py-0.5 rounded-DEFAULT bg-surface-container text-on-surface-variant font-medium uppercase">
+                    VNPAY-QR / THẺ NỘI ĐỊA
+                  </span>
+</div>
+<p class="font-secondary text-secondary text-on-surface-variant mt-1.5 leading-relaxed">
+                  Hỗ trợ ứng dụng ngân hàng và ví điện tử quét mã VNPAY, thẻ ATM ghi nợ nội địa.
+                </p>
+</div>
+</div>
+</div>
+<!-- OPTION 3: CASH ON DELIVERY (COD) -->
+<div class="payment-method-card bg-surface-container-lowest border border-surface-container-highest hover:border-outline rounded-DEFAULT p-5 transition-colors cursor-pointer" id="option-cod">
+<div class="flex items-start space-x-3.5">
+<div class="mt-0.5 flex items-center justify-center">
+<div class="w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center bg-surface-container-lowest">
+<div class="w-2 h-2 rounded-full hidden"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center flex-wrap gap-2.5">
+<span class="font-product-title text-product-title text-primary">
+                    Thanh toán khi nhận hàng (COD)
+                  </span>
+<span class="font-metadata-sm text-metadata-sm px-2 py-0.5 rounded-DEFAULT bg-surface-container text-on-surface-variant font-medium uppercase">
+                    ĐỒNG KIỂM TẠI NHÀ
+                  </span>
+</div>
+<p class="font-secondary text-secondary text-on-surface-variant mt-1.5 leading-relaxed">
+                  Áp dụng cho đơn hàng giao tận nơi. Khách hàng được đồng kiểm ngoại hình và niêm phong phần cứng trước khi thanh toán cho nhân viên giao vận.
+                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- SECURITY & COMPLIANCE NOTE -->
+<div class="mt-8 bg-surface-container-low border border-surface-container-highest p-4 rounded-DEFAULT">
+<div class="flex items-start space-x-3">
+<svg class="w-5 h-5 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<div>
+<h3 class="font-secondary text-secondary font-semibold text-primary">
+                Vui lòng kiểm tra thông tin trước khi thanh toán.
+              </h3>
+<p class="font-secondary text-secondary text-on-surface-variant mt-1 leading-relaxed">
+                Đơn hàng của bạn được bảo hiểm 100% trong quá trình vận chuyển. Nếu có bất kỳ sự cố kỹ thuật nào, Trạm Kỹ Thuật “Sửa hay Bán” hỗ trợ đổi trả 1:1 trong 30 ngày.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: STICKY ORDER SUMMARY (4 Cols ~ 33%) -->
+<aside class="lg:col-span-4 sticky top-24 space-y-4">
+<div class="bg-surface-container-lowest border border-surface-container-highest rounded-DEFAULT p-6">
+<div class="flex items-center justify-between pb-4 border-b border-surface-container-highest mb-5">
+<h3 class="font-h4 text-h4 text-primary">Tóm tắt đơn hàng</h3>
+<span class="font-metadata-sm text-metadata-sm font-mono text-on-surface-variant font-medium">MÃ: SHB-2026-001</span>
+</div>
+<!-- ITEMS PREVIEW -->
+<div class="space-y-4 mb-6">
+<div class="flex items-start justify-between gap-3 text-secondary font-secondary">
+<div class="flex-1 pr-2">
+<div class="font-semibold text-primary">ThinkPad T14 Gen 2</div>
+<div class="text-on-surface-variant text-metadata-sm font-metadata-sm">Core i5 / 16GB / 512GB × 1</div>
+</div>
+<div class="font-semibold text-primary text-right whitespace-nowrap">12.800.000 ₫</div>
+</div>
+<div class="flex items-start justify-between gap-3 text-secondary font-secondary">
+<div class="flex-1 pr-2">
+<div class="font-semibold text-primary">Củ sạc nhanh 65W Type-C Slim</div>
+<div class="text-on-surface-variant text-metadata-sm font-metadata-sm">Zin theo máy × 1 (Kèm theo)</div>
+</div>
+<div class="font-semibold text-on-surface-variant text-right whitespace-nowrap">0 ₫</div>
+</div>
+</div>
+<!-- FINANCIAL BREAKDOWN -->
+<div class="pt-4 border-t border-surface-container-highest space-y-3 font-secondary text-secondary">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Tạm tính</span>
+<span class="text-primary font-medium">12.800.000 ₫</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Phí vận chuyển tiêu chuẩn</span>
+<span class="text-primary font-medium">0 ₫ (Miễn phí toàn quốc)</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Phí kiểm định trạm kỹ thuật (48 bước)</span>
+<span class="text-primary font-medium">0 ₫ (Đã bao gồm)</span>
+</div>
+</div>
+<!-- TOTAL CALCULATION -->
+<div class="pt-5 mt-5 border-t border-surface-container-highest">
+<div class="flex items-baseline justify-between mb-1">
+<span class="font-body text-body font-semibold text-primary">Tổng thanh toán</span>
+<span class="font-product-price text-product-price text-secondary-container tabular-nums font-bold">12.800.000 ₫</span>
+</div>
+<div class="font-metadata-sm text-metadata-sm text-on-surface-variant text-right">
+              (Đã bao gồm thuế VAT &amp; phí đóng gói chống sốc)
+            </div>
+</div>
+<!-- PRIMARY ACTION CTA -->
+<button class="w-full mt-6 bg-primary text-on-primary hover:bg-neutral-800 py-3.5 px-6 font-button text-button rounded-DEFAULT transition-colors text-center block cursor-pointer" type="button">
+            Thanh toán ngay
+          </button>
+<!-- SECONDARY ACTION LINK -->
+<a class="block text-center mt-3.5 font-secondary text-secondary text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline" href="#">
+            ← Quay lại đơn hàng
+          </a>
+</div>
+<!-- SUPPORT HOTLINE CARD -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-DEFAULT p-4 text-center">
+<div class="font-metadata-sm text-metadata-sm text-on-surface-variant">
+            Hotline hỗ trợ thanh toán &amp; xác thực đơn:
+          </div>
+<div class="font-body text-body font-bold text-primary mt-1 font-mono">
+            1900 6868 <span class="font-sans font-medium text-on-surface-variant text-secondary">(Nhánh 2 - Trạm Kỹ Thuật)</span>
+</div>
+</div>
+</aside>
+</div>
+</div>
+<script>
+    (function() {
+      const cards = document.querySelectorAll('.payment-method-card');
+      cards.forEach(card => {
+        card.addEventListener('click', function() {
+          cards.forEach(c => {
+            c.classList.remove('border-2', 'border-primary');
+            c.classList.add('border', 'border-surface-container-highest');
+            const dot = c.querySelector('.rounded-full > div');
+            if (dot) dot.classList.add('hidden');
+          });
+          this.classList.remove('border', 'border-surface-container-highest');
+          this.classList.add('border-2', 'border-primary');
+          const activeDot = this.querySelector('.rounded-full > div');
+          if (activeDot) activeDot.classList.remove('hidden');
+        });
+      });
+    })();
+  </script>
+</div></main>
+<!-- SECTION 3: SHARED FOOTER (Black background #0B0B0B, 4 columns, Inter typography, Vietnamese text) -->
+<footer class="w-full bg-[#0B0B0B] text-white border-t border-[#1C1C1E]">
+<div class="max-w-[1440px] mx-auto px-8 pt-16 pb-12">
+<!-- 4 Columns Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-14">
+<!-- Column 1: Sửa hay Bán + short descriptive sentence -->
+<div class="space-y-4">
+<div class="flex items-center space-x-2">
+<span class="w-3 h-3 bg-[#FF4A1C] inline-block"></span>
+<span class="text-[20px] font-bold tracking-tight text-white uppercase">SỬA HAY BÁN</span>
+</div>
+<p class="text-[14px] text-[#8A8A86] leading-relaxed pr-6">
+            Nền tảng kiểm định kỹ thuật và giao dịch laptop chuẩn minh bạch hàng đầu Việt Nam, tích hợp báo giá sửa chữa phòng sạch và sàn máy cũ tin cậy.
+          </p>
+<div class="pt-2">
+<span class="inline-flex items-center space-x-2 text-[12px] font-mono text-[#8A8A86] border border-[#262626] px-2.5 py-1 rounded-[2px]">
+<span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full"></span>
+<span>HỆ THỐNG KIỂM ĐỊNH 48 BƯỚC</span>
+</span>
+</div>
+</div>
+<!-- Column 2: Hỗ trợ khách hàng -->
+<div class="space-y-4">
+<h4 class="text-[16px] font-semibold text-white tracking-tight border-b border-[#262626] pb-2">
+            Hỗ trợ khách hàng
+          </h4>
+<ul class="space-y-2.5 text-[14px] text-[#8A8A86]">
+<li>
+<a class="hover:text-white transition-colors block" href="#">Câu hỏi thường gặp</a>
+</li>
+<li>
+<a class="hover:text-white transition-colors block" href="#">Hướng dẫn thanh toán</a>
+</li>
+<li>
+<a class="hover:text-white transition-colors block" href="#">Hướng dẫn báo giá sửa chữa</a>
+</li>
+<li>
+<a class="hover:text-white transition-colors block" href="#">Liên hệ</a>
+</li>
+</ul>
+</div>
+<!-- Column 3: Chính sách -->
+<div class="space-y-4">
+<h4 class="text-[16px] font-semibold text-white tracking-tight border-b border-[#262626] pb-2">
+            Chính sách
+          </h4>
+<ul class="space-y-2.5 text-[14px] text-[#8A8A86]">
+<li>
+<a class="hover:text-white transition-colors block" href="#">Chính sách mua hàng</a>
+</li>
+<li>
+<a class="hover:text-white transition-colors block" href="#">Chính sách bảo hành</a>
+</li>
+<li>
+<a class="hover:text-white transition-colors block" href="#">Chính sách bảo mật</a>
+</li>
+<li>
+<a class="hover:text-white transition-colors block" href="#">Điều khoản sử dụng</a>
+</li>
+</ul>
+</div>
+<!-- Column 4: Liên hệ -->
+<div class="space-y-4">
+<h4 class="text-[16px] font-semibold text-white tracking-tight border-b border-[#262626] pb-2">
+            Liên hệ
+          </h4>
+<div class="space-y-2 text-[14px] text-[#8A8A86]">
+<div class="flex items-baseline space-x-2">
+<span class="text-white font-medium">Hotline:</span>
+<span class="text-[#FF4A1C] font-semibold text-[15px] font-mono">1900 6868</span>
+</div>
+<div class="flex items-baseline space-x-2">
+<span class="text-white font-medium">Email:</span>
+<span class="text-[#8A8A86] hover:text-white">hotro@suahayban.vn</span>
+</div>
+<div class="pt-1">
+<span class="text-white font-medium block">Địa chỉ:</span>
+<span class="text-[#8A8A86] text-[13px] leading-relaxed block">
+                Số 19 Hoàng Cầu, Q. Đống Đa, TP. Hà Nội<br>
+                81 Võ Văn Tần, Q. 3, TP. Hồ Chí Minh
+              </span>
+</div>
+<div class="pt-1 text-[13px]">
+<span class="text-white font-medium">Giờ làm việc:</span>
+<span class="text-[#8A8A86]">08:00 – 21:00 (T2 – CN)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Hairline divider above copyright -->
+<div class="border-t border-[#262626] pt-8 flex flex-col md:flex-row items-center justify-between text-[13px] text-[#8A8A86]">
+<div>
+          © 2026 Sửa hay Bán. Tất cả quyền được bảo lưu.
+        </div>
+<div class="flex items-center space-x-6 mt-4 md:mt-0 font-mono text-[12px]">
+<span>MÃ NGUỒN: MASTER_LAYOUT.JSP</span>
+<span>TIÊU CHUẨN ISO/IEC 17025</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

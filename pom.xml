@@ -12,8 +12,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <junit.version>5.10.2</junit.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <junit.version>5.13.2</junit.version>
     </properties>
 
     <dependencies>
@@ -23,7 +24,7 @@
             <version>4.1.0</version>
             <scope>provided</scope>
         </dependency>
-
+        
         <!-- Servlet/JSP API: server (Tomcat 10.1 / GlassFish 7) đã có sẵn -->
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -37,7 +38,7 @@
             <version>4.0.0</version>
             <scope>provided</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
@@ -50,7 +51,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
+        
         <!-- JSTL: Tomcat không có sẵn nên phải đóng gói vào war -->
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
@@ -62,7 +63,7 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>3.0.1</version>
         </dependency>
-
+        
         <!-- JPA: Hibernate + connection pool HikariCP -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -79,14 +80,14 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.13</version>
         </dependency>
-
+        
         <!-- Driver PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
         </dependency>
-
+        
         <dependency>
             <groupId>org.eclipse.angus</groupId>
             <artifactId>jakarta.mail</artifactId>
@@ -100,13 +101,13 @@
             <version>0.4</version>
         </dependency>
 
-        <!-- JSON Processing: Jackson cho AJAX và Recommendation API -->
+        <!-- ProductServlet tra JSON cho AJAX (format=json / Accept: application/json) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.17.0</version>
         </dependency>
-
+        
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -121,6 +122,26 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <!--
+                      jakartaee-web-api (provided) keo jakarta.json.bind-api vao
+                      classpath test, nhung khong keo provider (yasson). Hibernate
+                      chi kiem tra API class co load duoc khong, thay co -> dung
+                      JsonBJsonFormatMapper -> JsonbBuilder.create() no
+                      ClassNotFoundException. Luc chay that trong WAR, dependency
+                      provided khong duoc dong goi va Tomcat lib khong co json-bind,
+                      nen nhanh nay khong bao gio chay. Loai no khoi classpath test
+                      de test giong production.
+                    -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>jakarta.json.bind:jakarta.json.bind-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

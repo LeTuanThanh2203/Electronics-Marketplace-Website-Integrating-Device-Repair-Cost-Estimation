@@ -1,6 +1,7 @@
 package com.electronics.marketplace.entity;
 
 import com.electronics.marketplace.entity.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -76,7 +77,7 @@ public class Product implements Serializable {
     @Column(name = "target_need", length = 50)
     private String targetNeed; // OFFICE, GAMING, GRAPHICS (used by Recommendation Engine)
 
-    @Column(name = "stock_quantity", nullable = false)
+    @Column(name = "stock_quantity", nullable = false, columnDefinition = "integer default 10")
     private Integer stockQuantity = 10;
 
     @Column(name = "store_name", length = 150)
@@ -89,7 +90,11 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductSpecification> specifications = new ArrayList<>();
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    // ponytail: default de hbm2ddl.auto=update them duoc cot NOT NULL vao bang
+    // products dang co du lieu. Hibernate sinh "ADD COLUMN ... NOT NULL" khong co
+    // DEFAULT se bi PostgreSQL tu choi.
+    @Column(name = "created_at", nullable = false, updatable = false,
+            columnDefinition = "timestamp default now()")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -129,9 +134,9 @@ public class Product implements Serializable {
     }
 
     public ProductSpecification getSpecification(String key) {
-        if (specifications == null) return null;
+        if (specifications == null || key == null) return null;
         for (ProductSpecification spec : specifications) {
-            if (spec.getSpecKey().equalsIgnoreCase(key)) {
+            if (spec.getSpecKey() != null && spec.getSpecKey().equalsIgnoreCase(key)) {
                 return spec;
             }
         }
@@ -275,6 +280,7 @@ public class Product implements Serializable {
         this.storeName = storeName;
     }
 
+    @JsonIgnore
     public Device getDevice() {
         return device;
     }
@@ -307,56 +313,56 @@ public class Product implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    // Convenience getters for EL expressions in JSP
+    // Convenience getters for EL expressions in JSP.
+    // ponytail: tra null khi thieu spec - JSP dung <c:if> de an dong, khong bia
+    // so lieu (truoc day mac dinh 16GB/512GB/14.0).
     public String getCpu() {
         if (device != null && device.getCpu() != null && !device.getCpu().isEmpty()) {
             return device.getCpu();
         }
         ProductSpecification spec = getSpecification("CPU");
-        return spec != null ? spec.getTextValue() : "Đang cập nhật";
+        return spec != null ? spec.getTextValue() : null;
     }
 
     public Integer getRamGb() {
         ProductSpecification spec = getSpecification("RAM");
         if (spec != null && spec.getNumericValue() != null) {
-            return spec.getNumericValue().intValue();
+            return spec.getNumericValue();
         }
         if (device != null && device.getRam() != null) {
             try {
                 return Integer.parseInt(device.getRam().replaceAll("[^0-9]", ""));
-            } catch (Exception ignored) {}
+            } catch (NumberFormatException ignored) {}
         }
-        return 16;
+        return null;
     }
 
     public Integer getStorageGb() {
         ProductSpecification spec = getSpecification("STORAGE");
         if (spec != null && spec.getNumericValue() != null) {
-            return spec.getNumericValue().intValue();
+            return spec.getNumericValue();
         }
         if (device != null && device.getStorage() != null) {
             try {
                 return Integer.parseInt(device.getStorage().replaceAll("[^0-9]", ""));
-            } catch (Exception ignored) {}
+            } catch (NumberFormatException ignored) {}
         }
-        return 512;
+        return null;
     }
 
     public Double getScreenSize() {
         ProductSpecification spec = getSpecification("SCREEN_SIZE");
-        if (spec != null && spec.getNumericValue() != null) {
-            return spec.getNumericValue().doubleValue();
-        }
-        return 14.0;
+        return spec != null && spec.getNumericValue() != null
+                ? spec.getNumericValue().doubleValue() : null;
     }
 
     public String getScreenResolution() {
         ProductSpecification spec = getSpecification("SCREEN_DETAIL");
-        return spec != null ? spec.getTextValue() : "Retina / OLED";
+        return spec != null ? spec.getTextValue() : null;
     }
 
     public String getGpu() {
         ProductSpecification spec = getSpecification("GPU");
-        return spec != null ? spec.getTextValue() : "Đồ họa tích hợp";
+        return spec != null ? spec.getTextValue() : null;
     }
 }

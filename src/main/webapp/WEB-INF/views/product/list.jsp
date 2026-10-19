@@ -65,7 +65,7 @@
                 <input type="hidden" name="action" value="search">
                 <span class="material-symbols-outlined text-brand-gray ml-2.5 text-[18px]">search</span>
                 <input class="w-full bg-transparent px-3 py-2 text-xs font-sans text-brand-black placeholder:text-brand-gray focus:outline-none" 
-                       name="q" value="${searchKeyword}" placeholder="Tìm kiếm dòng máy chính hãng, card đồ họa, thông số..." type="text">
+                       name="q" value="<c:out value='${searchKeyword}'/>" placeholder="Tìm kiếm dòng máy chính hãng, card đồ họa, thông số..." type="text">
             </form>
         </div>
 
@@ -75,7 +75,7 @@
                 <span class="material-symbols-outlined text-sm text-brand-orange">auto_awesome</span>
                 <span>AI GỢI Ý MÁY</span>
             </button>
-            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="#">
+            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="${pageContext.request.contextPath}/cart">
                 <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
             </a>
             <div class="w-8 h-8 rounded-full bg-brand-black flex items-center justify-center text-white">
@@ -123,8 +123,8 @@
                             <h2 class="font-bold text-sm font-space uppercase text-brand-black">KẾT QUẢ GỢI Ý THÔNG MINH CHO BẠN</h2>
                             <p class="text-xs text-brand-gray font-mono mt-0.5">
                                 Ngân sách: <strong class="text-brand-black"><fmt:formatNumber value="${recBudget}" pattern="#,###"/>₫</strong> 
-                                | Tác vụ: <strong class="text-brand-black">${recNeed}</strong>
-                                <c:if test="${not empty recBrand && recBrand != 'ALL'}"> | Hãng: <strong class="text-brand-black">${recBrand}</strong></c:if>
+                                | Tác vụ: <strong class="text-brand-black"><c:out value="${recNeed}"/></strong>
+                                <c:if test="${not empty recBrand && recBrand != 'ALL'}"> | Hãng: <strong class="text-brand-black"><c:out value="${recBrand}"/></strong></c:if>
                             </p>
                         </div>
                     </div>
@@ -139,8 +139,8 @@
                                     MATCH: ${rec.matchScore}%
                                 </div>
                                 <div>
-                                    <span class="text-[10px] font-mono uppercase text-brand-gray">${rec.product.brand} • TOP ${status.index + 1} PHÙ HỢP NHẤT</span>
-                                    <h3 class="font-bold text-sm font-space text-brand-black mt-1 leading-snug">${rec.product.name}</h3>
+                                    <span class="text-[10px] font-mono uppercase text-brand-gray"><c:out value="${rec.product.brand}"/> • TOP ${status.index + 1} PHÙ HỢP NHẤT</span>
+                                    <h3 class="font-bold text-sm font-space text-brand-black mt-1 leading-snug"><c:out value="${rec.product.name}"/></h3>
                                     <div class="text-base font-bold font-space text-brand-orange mt-2">
                                         <fmt:formatNumber value="${rec.product.price}" pattern="#,###"/> ₫
                                     </div>
@@ -148,7 +148,7 @@
                                         <c:forEach var="highlight" items="${rec.matchHighlights}">
                                             <li class="flex items-start gap-1.5">
                                                 <span class="text-emerald-600 font-bold">✓</span>
-                                                <span>${highlight}</span>
+                                                <span><c:out value="${highlight}"/></span>
                                             </li>
                                         </c:forEach>
                                     </ul>
@@ -208,12 +208,12 @@
                         <div class="flex items-center gap-2">
                             <span class="text-[11px] font-mono text-gray-400 w-7">TỪ</span>
                             <input class="w-full border border-brand-border px-2 py-1 text-xs font-mono text-right focus:border-brand-black focus:outline-none" 
-                                   type="text" name="minPrice" id="minPriceInput" value="${minPrice}" placeholder="15.000.000">
+                                   type="text" name="minPrice" id="minPriceInput" value="<c:out value='${minPrice}'/>" placeholder="15.000.000">
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-[11px] font-mono text-gray-400 w-7">ĐẾN</span>
                             <input class="w-full border border-brand-border px-2 py-1 text-xs font-mono text-right focus:border-brand-black focus:outline-none" 
-                                   type="text" name="maxPrice" id="maxPriceInput" value="${maxPrice}" placeholder="45.000.000">
+                                   type="text" name="maxPrice" id="maxPriceInput" value="<c:out value='${maxPrice}'/>" placeholder="45.000.000">
                         </div>
                     </div>
                     <!-- Quick Pills -->
@@ -257,7 +257,7 @@
                         <button type="button" onclick="setRam(32)" class="border border-brand-border py-1.5 text-center hover:border-brand-black ${minRam == '32' ? 'bg-brand-black text-white font-bold' : ''}">32GB</button>
                         <button type="button" onclick="setRam(64)" class="border border-brand-border py-1.5 text-center hover:border-brand-black ${minRam == '64' ? 'bg-brand-black text-white font-bold' : ''}">64GB</button>
                     </div>
-                    <input type="hidden" name="minRam" id="minRamInput" value="${minRam}">
+                    <input type="hidden" name="minRam" id="minRamInput" value="<c:out value='${minRam}'/>">
                 </div>
 
                 <!-- Submit Button -->
@@ -368,12 +368,12 @@
                                 <div>
                                     <!-- Badge Header -->
                                     <div class="flex items-center justify-between gap-1 mb-2">
-                                        <span class="font-mono text-[10px] text-gray-500 tracking-wider uppercase">${p.brand} OFFICIAL</span>
+                                        <span class="font-mono text-[10px] text-gray-500 tracking-wider uppercase"><c:out value="${p.brand}"/> OFFICIAL</span>
                                         <div class="flex items-center gap-1">
                                             <c:if test="${not empty p.discountTag}">
-                                                <span class="bg-brand-orange text-white text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wide">${p.discountTag}</span>
+                                                <span class="bg-brand-orange text-white text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wide"><c:out value="${p.discountTag}"/></span>
                                             </c:if>
-                                            <span class="border border-emerald-500 text-emerald-700 text-[10px] px-1 py-0.5 font-mono">${p.badge}</span>
+                                            <span class="border border-emerald-500 text-emerald-700 text-[10px] px-1 py-0.5 font-mono"><c:out value="${p.badge}"/></span>
                                         </div>
                                     </div>
 
@@ -381,28 +381,32 @@
                                     <div class="aspect-[4/3] bg-brand-card flex items-center justify-center p-3 my-2 border border-[#EAEAE8] overflow-hidden relative">
                                         <c:choose>
                                             <c:when test="${not empty p.imageUrl}">
-                                                <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
-                                                     src="${p.imageUrl}" alt="${p.name}">
+                                                <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+                                                     src="<c:out value='${p.imageUrl}'/>" alt="<c:out value='${p.name}'/>">
                                             </c:when>
                                             <c:otherwise>
                                                 <span class="material-symbols-outlined text-5xl text-gray-300">laptop</span>
                                             </c:otherwise>
                                         </c:choose>
-                                        <span class="absolute bottom-1 right-2 text-[10px] font-mono text-gray-400">#${p.sku}</span>
+                                        <span class="absolute bottom-1 right-2 text-[10px] font-mono text-gray-400">#<c:out value="${p.sku}"/></span>
                                     </div>
 
                                     <!-- Product Details -->
                                     <div class="mt-2">
-                                        <p class="text-[11px] text-gray-400 uppercase font-mono">${p.brand} • ${p.series}</p>
+                                        <p class="text-[11px] text-gray-400 uppercase font-mono"><c:out value="${p.brand}"/> • <c:out value="${p.series}"/></p>
                                         <h4 class="font-bold text-[15px] font-space text-brand-black leading-snug mt-0.5 group-hover:text-brand-orange transition-colors">
-                                            <a href="${pageContext.request.contextPath}/products?action=detail&id=${p.id}">${p.name}</a>
+                                            <a href="${pageContext.request.contextPath}/products?action=detail&id=${p.id}"><c:out value="${p.name}"/></a>
                                         </h4>
                                         <p class="text-xs text-[#444748] mt-1.5 font-mono leading-relaxed line-clamp-2">
-                                            ${p.cpu} • RAM ${p.ramGb}GB • SSD ${p.storageGb}GB • ${p.screenSize}" ${p.screenResolution}
+                                            <c:if test="${not empty p.cpu}"><c:out value="${p.cpu}"/> • </c:if>
+                                            <c:if test="${not empty p.ramGb}">RAM ${p.ramGb}GB • </c:if>
+                                            <c:if test="${not empty p.storageGb}">SSD ${p.storageGb}GB • </c:if>
+                                            <c:if test="${not empty p.screenSize}">${p.screenSize}" </c:if>
+                                            <c:if test="${not empty p.screenResolution}"><c:out value="${p.screenResolution}"/></c:if>
                                         </p>
                                         <div class="flex items-center gap-1 text-[11px] text-emerald-700 mt-2 font-mono">
                                             <span class="material-symbols-outlined text-[13px]">verified_user</span>
-                                            <span>${p.warranty}</span>
+                                            <span><c:out value="${p.warranty}"/></span>
                                         </div>
                                     </div>
                                 </div>
@@ -422,9 +426,13 @@
                                            class="border border-brand-black py-2 px-2 text-xs font-semibold hover:bg-brand-black hover:text-white transition text-center uppercase tracking-wider font-mono">
                                             CHI TIẾT →
                                         </a>
-                                        <button type="button" class="bg-brand-orange text-white py-2 px-2 text-xs font-semibold hover:bg-black transition text-center uppercase tracking-wider font-mono">
-                                            MUA NGAY
-                                        </button>
+                                        <!-- BR-45: quantity luon = 1, khong gui quantity -->
+                                        <form method="post" action="${pageContext.request.contextPath}/cart?action=add">
+                                            <input type="hidden" name="productId" value="${p.id}">
+                                            <button type="submit" class="w-full bg-brand-orange text-white py-2 px-2 text-xs font-semibold hover:bg-black transition text-center uppercase tracking-wider font-mono">
+                                                THÊM GIỎ
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </article>

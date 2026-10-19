@@ -2,63 +2,39 @@ package com.electronics.marketplace.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Entity representing an electronic device model line (e.g. Device / Laptop).
- * Defined per Lucidchart Class Diagram:
- * - id: int/Long
- * - name: string
- * - brand: string
- * - model: string
- * - releaseYear: int
- * - cpu: string
- * - ram: string / int
- * - storage: string / int
- * - products: 1 Device to N Products
+ * Thực thể Device (Bảng devices) - Danh mục thiết bị laptop.
+ * Field-based JPA mapping theo Rule 2.
+ * Dùng Long id theo thỏa thuận chung.
  */
 @Entity
 @Table(name = "devices")
 public class Device implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(nullable = false)
     private String name;
 
-    @Column(name = "brand", nullable = false, length = 50)
     private String brand;
-
-    @Column(name = "model", nullable = false, length = 100)
     private String model;
 
     @Column(name = "release_year")
     private Integer releaseYear;
 
-    @Column(name = "cpu", length = 100)
     private String cpu;
-
-    @Column(name = "ram", length = 50)
     private String ram;
-
-    @Column(name = "storage", length = 50)
     private String storage;
-
-    @Column(name = "device_type", length = 50)
-    private String deviceType = "LAPTOP";
-
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
-    private List<Product> products = new ArrayList<>();
 
     public Device() {
     }
 
-    public Device(String name, String brand, String model, Integer releaseYear, String cpu, String ram, String storage) {
+    public Device(Long id, String name, String brand, String model, Integer releaseYear, String cpu, String ram, String storage) {
+        this.id = id;
         this.name = name;
         this.brand = brand;
         this.model = model;
@@ -66,10 +42,8 @@ public class Device implements Serializable {
         this.cpu = cpu;
         this.ram = ram;
         this.storage = storage;
-        this.deviceType = "LAPTOP";
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -132,21 +106,5 @@ public class Device implements Serializable {
 
     public void setStorage(String storage) {
         this.storage = storage;
-    }
-
-    public String getDeviceType() {
-        return deviceType;
-    }
-
-    public void setDeviceType(String deviceType) {
-        this.deviceType = deviceType;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
     }
 }

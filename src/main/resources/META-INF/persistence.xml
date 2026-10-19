@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
 
-    <!-- Unit chính: database của project -->
+    <!--
+        Thong tin ket noi KHONG dat o day. Gia tri that duoc nap tu bien moi
+        truong DB_URL / DB_USER / DB_PASSWORD qua JpaConfig.connectionOverrides()
+        (xem config/JpaConfig.java) - override map luon thang gia tri trong file,
+        nen placeholder duoi day chi la duong lui cho truong hop chay bang
+        -DDB_URL=... ma khong qua JpaConfig.
+
+        Luu y: Hibernate 6.4.4 KHONG ho tro cu phap ${env.DB_URL} (nem
+        HHH10001004: No JDBC URL specified). Chi ${TEN_SYSTEM_PROPERTY} moi
+        duoc thay the, nen viec doc bien moi truong bat buoc phai lam o Java.
+    -->
     <persistence-unit name="Electronics_MarketplacePU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-
-        <!-- Managed Entities của Phước Anh -->
-        <class>com.electronics.marketplace.entity.Product</class>
-        <class>com.electronics.marketplace.entity.Device</class>
-        <class>com.electronics.marketplace.entity.ProductSpecification</class>
-
-        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <!-- Khong khai bao <class> va khong bat exclude-unlisted-classes: de
+             Hibernate tu quet @Entity trong classpath. -->
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/electronics_marketplace"/>
-            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
+            <property name="jakarta.persistence.jdbc.user" value="${DB_USER}"/>
+            <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/>
 
-            <!-- Tự tạo/cập nhật bảng theo Entity -->
-            <property name="hibernate.hbm2ddl.auto" value="none"/>
-
-            <!-- Batch processing (Rule 2) -->
+            <!-- Tu tao/cap nhat bang theo Entity -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!-- Batch processing -->
             <property name="hibernate.jdbc.batch_size" value="50"/>
             <property name="hibernate.order_inserts" value="true"/>
             <property name="hibernate.order_updates" value="true"/>
-
-            <!-- Connection pool HikariCP (Rule 3) -->
+            <!-- Connection pool HikariCP -->
             <property name="hibernate.connection.provider_class"
                       value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
             <property name="hibernate.hikari.maximumPoolSize" value="10"/>
@@ -34,12 +37,14 @@
         </properties>
     </persistence-unit>
 
-    <!-- Unit phụ: dùng khởi tạo database nếu cần -->
+    <!-- Unit phu: chi dung 1 lan luc khoi dong de tao database neu chua co -->
     <persistence-unit name="adminPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
+            <property name="jakarta.persistence.jdbc.user" value="${DB_USER}"/>
+            <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/>
             <property name="hibernate.hbm2ddl.auto" value="none"/>
             <property name="hibernate.connection.provider_class"
                       value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>

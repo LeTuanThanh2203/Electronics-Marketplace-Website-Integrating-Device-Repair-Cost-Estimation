@@ -1,12 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    web.xml toi thieu. Cac Servlet dang ky bang @WebServlet (Servlet 6.0),
+    KHONG khai lai o day de tranh trung lap hai nguon su that.
+
+    Chi con 3 viec thuoc ve deployment descriptor:
+      - welcome-file  : cho phep vao app bang "/" thay vi phai go /cart
+      - session-config: cookie JSESSIONID chi HttpOnly (chan JS doc cookie)
+      - error-page    : khong bao gio do stacktrace ra cho nguoi dung (Rule 5)
+-->
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
-    <display-name>Electronics Marketplace</display-name>
+    <display-name>Sua hay ban</display-name>
+
+    <!--
+        Khai bao encoding o MOT cho thay vi lap page directive trong tung file.
+        Can thiet vi cac fragment (.jspf) co tinh khong khai page directive:
+        khong co dong nay, Tomcat doc fragment bang ISO-8859-1 (mac dinh cua JSP)
+        nen tieng Viet trong header thanh mojibake, trong khi trang goi no
+        (da khai pageEncoding="UTF-8") lai hien dung.
+    -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <url-pattern>*.jspf</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
 
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <!-- Chi dung cookie: khong de jsessionid dinh vao URL (ro ri qua Referer). -->
+        <tracking-mode>COOKIE</tracking-mode>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+    </session-config>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/views/error/404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/views/error/500.jsp</location>
+    </error-page>
+
 </web-app>

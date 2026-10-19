@@ -125,17 +125,17 @@
                                                 <div class="aspect-[4/3] bg-white border border-brand-border p-3 flex items-center justify-center mb-3">
                                                     <c:choose>
                                                         <c:when test="${not empty p.imageUrl}">
-                                                            <img src="${p.imageUrl}" alt="${p.name}" class="max-h-full max-w-full object-contain mix-blend-multiply">
+                                                            <img src="<c:out value='${p.imageUrl}'/>" alt="<c:out value='${p.name}'/>" class="max-h-full max-w-full object-contain mix-blend-multiply">
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="material-symbols-outlined text-4xl text-gray-300">laptop</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </div>
-                                                <span class="text-[10px] font-mono text-brand-gray uppercase">${p.brand} • ${p.series}</span>
+                                                <span class="text-[10px] font-mono text-brand-gray uppercase"><c:out value="${p.brand}"/> • <c:out value="${p.series}"/></span>
                                                 <h3 class="font-bold font-space text-sm text-brand-black mt-1 leading-snug">
                                                     <a href="${pageContext.request.contextPath}/products?action=detail&id=${p.id}" class="hover:text-brand-orange">
-                                                        ${p.name}
+                                                        <c:out value="${p.name}"/>
                                                     </a>
                                                 </h3>
                                                 <div class="mt-2 text-base font-bold font-space text-brand-orange">
@@ -166,7 +166,7 @@
                                 <td class="p-4 font-semibold text-brand-gray border-r border-brand-border bg-brand-card">CPU / Bộ vi xử lý</td>
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0 font-medium text-brand-black">
-                                        ${p.cpu}
+                                        <c:out value="${p.cpu}"/>
                                     </td>
                                 </c:forEach>
                             </tr>
@@ -174,7 +174,7 @@
                                 <td class="p-4 font-semibold text-brand-gray border-r border-brand-border bg-brand-card">Dung lượng RAM</td>
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0 font-bold text-brand-black">
-                                        ${p.ramGb} GB
+                                        <c:if test="${not empty p.ramGb}">${p.ramGb} GB</c:if>
                                     </td>
                                 </c:forEach>
                             </tr>
@@ -182,7 +182,7 @@
                                 <td class="p-4 font-semibold text-brand-gray border-r border-brand-border bg-brand-card">Ổ cứng SSD</td>
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0 font-bold text-brand-black">
-                                        ${p.storageGb} GB
+                                        <c:if test="${not empty p.storageGb}">${p.storageGb} GB</c:if>
                                     </td>
                                 </c:forEach>
                             </tr>
@@ -190,7 +190,7 @@
                                 <td class="p-4 font-semibold text-brand-gray border-r border-brand-border bg-brand-card">Card đồ họa (GPU)</td>
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0 text-brand-black">
-                                        ${p.gpu}
+                                        <c:out value="${p.gpu}"/>
                                     </td>
                                 </c:forEach>
                             </tr>
@@ -198,7 +198,9 @@
                                 <td class="p-4 font-semibold text-brand-gray border-r border-brand-border bg-brand-card">Màn hình hiển thị</td>
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0 text-brand-black">
-                                        ${p.screenSize}" • ${p.screenResolution}
+                                        <c:if test="${not empty p.screenSize}">${p.screenSize}"</c:if>
+                                        <c:if test="${not empty p.screenSize && not empty p.screenResolution}"> • </c:if>
+                                        <c:out value="${p.screenResolution}"/>
                                     </td>
                                 </c:forEach>
                             </tr>
@@ -214,7 +216,7 @@
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0">
                                         <span class="inline-block px-2 py-0.5 border border-brand-border bg-white text-[10px] font-bold uppercase">
-                                            ${p.targetNeed}
+                                            <c:out value="${p.targetNeed}"/>
                                         </span>
                                     </td>
                                 </c:forEach>
@@ -223,7 +225,7 @@
                                 <td class="p-4 font-semibold text-brand-gray border-r border-brand-border bg-brand-card">Chính sách bảo hành</td>
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0 text-emerald-700 font-semibold">
-                                        ${p.warranty}
+                                        <c:out value="${p.warranty}"/>
                                     </td>
                                 </c:forEach>
                             </tr>
@@ -232,7 +234,7 @@
                                 <c:forEach var="p" items="${compareProducts}">
                                     <td class="p-4 border-r border-brand-border last:border-r-0">
                                         <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                                            ${p.badge} (${p.status})
+                                            <c:out value="${p.badge}"/> (${p.status})
                                         </span>
                                     </td>
                                 </c:forEach>

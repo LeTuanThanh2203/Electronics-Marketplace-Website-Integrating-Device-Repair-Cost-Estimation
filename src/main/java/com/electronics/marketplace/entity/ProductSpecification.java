@@ -1,6 +1,7 @@
 package com.electronics.marketplace.entity;
 
 import com.electronics.marketplace.entity.enums.SpecDataType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
@@ -117,6 +118,7 @@ public class ProductSpecification implements Serializable {
         this.unit = unit;
     }
 
+    @JsonIgnore
     public Product getProduct() {
         return product;
     }
