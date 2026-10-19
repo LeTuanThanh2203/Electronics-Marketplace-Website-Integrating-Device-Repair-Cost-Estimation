@@ -10,7 +10,7 @@ import com.electronics.marketplace.DBConnection.UserDB;
 import com.electronics.marketplace.util.PasswordUtil;
 import com.electronics.marketplace.util.MailUtilGmail;
 
-@WebServlet("/register")
+@WebServlet(name = "RegisterServlet", urlPatterns = {"/register", "/auth/register"})
 public class RegisterServlet extends HttpServlet {
 
     @Override

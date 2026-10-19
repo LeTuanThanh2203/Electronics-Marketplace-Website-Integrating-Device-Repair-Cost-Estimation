@@ -64,7 +64,7 @@
                 <span class="material-symbols-outlined text-sm">arrow_back</span>
                 <span>QUAY LẠI CỬA HÀNG</span>
             </a>
-            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="#">
+            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="${pageContext.request.contextPath}/cart">
                 <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
             </a>
         </div>
@@ -193,17 +193,23 @@
                             </button>
                         </div>
 
-                        <!-- Buy Now CTA -->
-                        <button type="button" class="flex-1 h-11 bg-brand-black hover:bg-brand-orange text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-base">bolt</span>
-                            <span>MUA NGAY (GIAO TẬN NƠI)</span>
-                        </button>
+                        <!-- Form submitting to Nam's CartServlet -->
+                        <form action="${pageContext.request.contextPath}/cart" method="POST" class="flex-1 flex items-center gap-3">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="productId" value="${product.id}">
+                            
+                            <!-- Buy Now CTA -->
+                            <button type="submit" class="flex-1 h-11 bg-brand-black hover:bg-brand-orange text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-base">bolt</span>
+                                <span>MUA NGAY (GIAO TẬN NƠI)</span>
+                            </button>
 
-                        <!-- Add to Cart CTA -->
-                        <button type="button" class="h-11 px-5 border border-brand-black bg-white hover:bg-brand-card text-brand-black font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
-                            <span class="material-symbols-outlined text-base">shopping_cart</span>
-                            <span>THÊM GIỎ HÀNG</span>
-                        </button>
+                            <!-- Add to Cart CTA -->
+                            <button type="submit" class="h-11 px-5 border border-brand-black bg-white hover:bg-brand-card text-brand-black font-mono font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
+                                <span class="material-symbols-outlined text-base">shopping_cart</span>
+                                <span>THÊM GIỎ HÀNG</span>
+                            </button>
+                        </form>
                     </div>
 
                     <div class="flex items-center justify-between text-xs font-mono text-brand-gray pt-1">

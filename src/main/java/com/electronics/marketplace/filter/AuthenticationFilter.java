@@ -7,7 +7,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 
 /** Chưa đăng nhập thì không vào được các URI cần tài khoản. */
-@WebFilter(urlPatterns = {"/profile", "/admin", "/admin/*", "/checkout", "/order", "/payment", "/cart", "/listing"})
+@WebFilter(urlPatterns = {"/profile", "/auth/profile", "/admin", "/admin/*", "/checkout", "/order", "/payment", "/cart", "/listing"})
 public class AuthenticationFilter implements Filter {
 
     /** Tên attribute session chứa User đang đăng nhập (dùng thống nhất toàn dự án). */
@@ -31,8 +31,8 @@ public class AuthenticationFilter implements Filter {
         String path = req.getServletPath();
         String action = req.getParameter("action");
 
-        // 2. GET /cart không có action = xem giỏ hàng -> Cho phép khách chưa đăng nhập
-        if ("/cart".equals(path) && action == null) {
+        // 2. GET /cart xem giỏ hàng -> Cho phép khách chưa đăng nhập
+        if ("/cart".equals(path) && "GET".equalsIgnoreCase(req.getMethod())) {
             chain.doFilter(request, response);
             return;
         }

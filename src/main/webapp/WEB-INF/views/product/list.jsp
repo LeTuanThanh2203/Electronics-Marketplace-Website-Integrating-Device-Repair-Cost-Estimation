@@ -75,12 +75,12 @@
                 <span class="material-symbols-outlined text-sm text-brand-orange">auto_awesome</span>
                 <span>AI GỢI Ý MÁY</span>
             </button>
-            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="#">
+            <a class="w-9 h-9 border border-brand-border flex items-center justify-center hover:border-brand-black text-brand-black transition-colors" href="${pageContext.request.contextPath}/cart" title="Giỏ hàng">
                 <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
             </a>
-            <div class="w-8 h-8 rounded-full bg-brand-black flex items-center justify-center text-white">
+            <a class="w-8 h-8 rounded-full bg-brand-black flex items-center justify-center text-white hover:bg-brand-orange transition-colors" href="${not empty sessionScope.currentUser ? pageContext.request.contextPath.concat('/profile') : pageContext.request.contextPath.concat('/login')}" title="Tài khoản">
                 <span class="material-symbols-outlined text-[18px]">person</span>
-            </div>
+            </a>
         </div>
     </div>
 </header>

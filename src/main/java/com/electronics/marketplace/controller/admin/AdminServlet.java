@@ -15,7 +15,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/admin")
+@WebServlet(name = "AdminServlet", urlPatterns = {"/admin", "/admin/dashboard", "/admin/users"})
 public class AdminServlet extends HttpServlet {
 
     @Override

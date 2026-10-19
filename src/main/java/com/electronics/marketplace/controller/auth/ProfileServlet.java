@@ -11,7 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-@WebServlet("/profile")
+@WebServlet(name = "ProfileServlet", urlPatterns = {"/profile", "/auth/profile"})
 public class ProfileServlet extends HttpServlet {
 
     @Override

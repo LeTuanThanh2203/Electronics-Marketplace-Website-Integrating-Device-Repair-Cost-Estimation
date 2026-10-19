@@ -29,16 +29,16 @@ public final class JpaConfig {
     private static final String ENV_USER = "DB_USER";
     private static final String ENV_PASSWORD = "DB_PASSWORD";
 
-    /** Holder: JVM chi dong bo hoa mot lan, khong can synchronized thu cong. */
-    private static class Holder {
-        private static final EntityManagerFactory EMF = build();
-    }
+    private static volatile EntityManagerFactory emf;
 
     private JpaConfig() {
     }
 
-    public static EntityManagerFactory getEntityManagerFactory() {
-        return Holder.EMF;
+    public static synchronized EntityManagerFactory getEntityManagerFactory() {
+        if (emf == null || !emf.isOpen()) {
+            emf = build();
+        }
+        return emf;
     }
 
     private static EntityManagerFactory build() {
@@ -51,19 +51,21 @@ public final class JpaConfig {
      */
     private static Map<String, Object> connectionOverrides() {
         Map<String, Object> overrides = new HashMap<>();
-        overrides.put("jakarta.persistence.jdbc.url", requireEnv(ENV_URL));
-        overrides.put("jakarta.persistence.jdbc.user", requireEnv(ENV_USER));
-        overrides.put("jakarta.persistence.jdbc.password", requireEnv(ENV_PASSWORD));
+        overrides.put("jakarta.persistence.jdbc.url", getEnvOrDefault(ENV_URL, "jdbc:postgresql://localhost:5432/electronics_marketplace"));
+        overrides.put("jakarta.persistence.jdbc.user", getEnvOrDefault(ENV_USER, "postgres"));
+        overrides.put("jakarta.persistence.jdbc.password", getEnvOrDefault(ENV_PASSWORD, "postgres"));
         return overrides;
     }
 
-    /** Fail fast: thieu bien moi truong thi bao ngay, khong de Hibernate bao loi kho hieu. */
-    private static String requireEnv(String name) {
+    /** Lay bien moi truong, hoac System property, hoac gia tri mac dinh an toan cho local dev. */
+    private static String getEnvOrDefault(String name, String defaultValue) {
         String value = System.getenv(name);
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalStateException(
-                    "Thieu bien moi truong " + name + ". Dat DB_URL, DB_USER, DB_PASSWORD truoc khi chay.");
+            value = System.getProperty(name);
         }
-        return value;
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        return value.trim();
     }
 }

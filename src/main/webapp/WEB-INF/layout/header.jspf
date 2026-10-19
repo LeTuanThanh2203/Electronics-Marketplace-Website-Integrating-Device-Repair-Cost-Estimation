@@ -36,8 +36,8 @@
         <div class="header-actions">
             <c:choose>
                 <c:when test="${empty currentUser}">
-                    <a href="${ctx}/auth?action=login" class="btn btn-ghost btn-sm">Đăng nhập</a>
-                    <a href="${ctx}/auth?action=register" class="btn btn-primary btn-sm">Đăng ký</a>
+                    <a href="${ctx}/login" class="btn btn-ghost btn-sm">Đăng nhập</a>
+                    <a href="${ctx}/register" class="btn btn-primary btn-sm">Đăng ký</a>
                 </c:when>
                 <c:otherwise>
                     <a href="${ctx}/order?action=history" class="btn btn-ghost btn-sm">Đơn hàng của tôi</a>

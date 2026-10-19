@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * URL patterns: /products, /product
  * Placed in com.electronics.marketplace.controller.storefront to align with team branch architecture.
  */
-@WebServlet(name = "ProductServlet", urlPatterns = {"/products", "/product"})
+@WebServlet(name = "ProductServlet", urlPatterns = {"/products", "/product", "/product/*"})
 public class ProductServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -54,6 +54,13 @@ public class ProductServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
+        String pathInfo = request.getPathInfo();
+        if ((action == null || action.trim().isEmpty()) && pathInfo != null) {
+            String clean = pathInfo.replace("/", "").trim().toLowerCase();
+            if (!clean.isEmpty()) {
+                action = clean;
+            }
+        }
         if (action == null || action.trim().isEmpty()) {
             action = "list";
         }
@@ -131,8 +138,13 @@ public class ProductServlet extends HttpServlet {
         Long id = parseLong(idStr);
 
         if (id == null) {
-            response.sendRedirect(request.getContextPath() + "/products");
-            return null;
+            List<Product> all = productService.getAllProducts();
+            if (!all.isEmpty()) {
+                id = all.get(0).getId();
+            } else {
+                response.sendRedirect(request.getContextPath() + "/products");
+                return null;
+            }
         }
 
         Optional<Product> productOpt = productService.getProductById(id);

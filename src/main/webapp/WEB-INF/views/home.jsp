@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -54,18 +55,36 @@
             <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/repair/request">SỬA CHỮA</a>
         </nav>
         <div class="flex items-center gap-4">
-            <button class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" type="button">
+            <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/product/list">
                 <span class="material-symbols-outlined text-[18px]">search</span>
                 <span class="hidden lg:inline">Tìm kiếm</span>
-            </button>
+            </a>
             <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/cart">
                 <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
                 <span class="hidden lg:inline">Giỏ hàng</span>
             </a>
-            <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/auth/login">
-                <span class="material-symbols-outlined text-[18px]">person</span>
-                <span class="hidden lg:inline">Tài khoản</span>
-            </a>
+            <c:choose>
+                <c:when test="${not empty sessionScope.currentUser}">
+                    <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors font-semibold" href="${pageContext.request.contextPath}/profile">
+                        <span class="material-symbols-outlined text-[18px]">person</span>
+                        <span class="hidden lg:inline">${sessionScope.currentUser.name}</span>
+                    </a>
+                    <c:if test="${sessionScope.currentUser.admin}">
+                        <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-amber-700 bg-amber-100 px-2 py-0.5 border border-amber-300 font-semibold" href="${pageContext.request.contextPath}/admin">
+                            <span class="hidden lg:inline">Admin</span>
+                        </a>
+                    </c:if>
+                    <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-red-600 hover:text-red-800 transition-colors" href="${pageContext.request.contextPath}/logout">
+                        <span class="hidden lg:inline">Đăng xuất</span>
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/login">
+                        <span class="material-symbols-outlined text-[18px]">person</span>
+                        <span class="hidden lg:inline">Tài khoản</span>
+                    </a>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </header>
@@ -209,7 +228,7 @@
                     <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Core i5-1135G7</div>
                     <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
                         <span class="text-[22px] font-black tracking-tight text-primary">18.990.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=1">XEM CHI TIẾT →</a>
                     </div>
                 </div>
             </article>
@@ -228,7 +247,7 @@
                     <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · FHD+ 500 Nits</div>
                     <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
                         <span class="text-[22px] font-black tracking-tight text-primary">24.990.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=2">XEM CHI TIẾT →</a>
                     </div>
                 </div>
             </article>
@@ -247,7 +266,7 @@
                     <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Apple Silicon 8-Core</div>
                     <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
                         <span class="text-[22px] font-black tracking-tight text-[#FF4A1C]">19.490.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary group-hover:text-[#FF4A1C] flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary group-hover:text-[#FF4A1C] flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=3">XEM CHI TIẾT →</a>
                     </div>
                 </div>
             </article>
@@ -266,7 +285,7 @@
                     <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · OLED Display</div>
                     <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
                         <span class="text-[22px] font-black tracking-tight text-primary">14.500.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=4">XEM CHI TIẾT →</a>
                     </div>
                 </div>
             </article>
@@ -542,10 +561,10 @@
                 <a href="${pageContext.request.contextPath}/repair/request" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Sửa Chữa</a>
             </div>
             <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">HỖ TRỢ</span>
-                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Tra cứu đơn hàng</a>
-                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Chính sách bảo hành</a>
-                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Liên hệ kỹ thuật</a>
+                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">HỖ TRỢ & HỆ THỐNG</span>
+                <a href="${pageContext.request.contextPath}/order" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Tra cứu đơn hàng</a>
+                <a href="${pageContext.request.contextPath}/repair/track" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Tiến độ sửa chữa</a>
+                <a href="${pageContext.request.contextPath}/admin" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Bảng Quản Trị (Admin)</a>
             </div>
             <div class="flex flex-col gap-2">
                 <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">LIÊN HỆ</span>
