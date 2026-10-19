@@ -24,6 +24,10 @@ public class UserDB {
         });
     }
 
+    public static User getByEmail(String email) {
+        return selectByEmail(email);
+    }
+
     public static User selectById(Long id) {
         return DBUtil.query(em -> em.find(User.class, id));
     }

@@ -34,7 +34,7 @@ public class AdminSeedListener implements ServletContextListener {
                 sce.getServletContext().log("Đã tạo tài khoản admin mặc định: " + email.trim() + " / " + password);
             }
 
-            if (UserDB.getByEmail("user@marketplace.com") == null) {
+            if (!UserDB.emailExists("user@marketplace.com")) {
                 User u = new User();
                 u.setName("Người dùng Mẫu");
                 u.setEmail("user@marketplace.com");
