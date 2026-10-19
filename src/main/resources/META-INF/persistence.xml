@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0"
+             xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+
+    <persistence-unit name="Electronics_MarketplacePU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- 1. Phân hệ Tài khoản (Tân) -->
+        <class>com.electronics.marketplace.entity.User</class>
+
+        <!-- 2. Phân hệ Phần cứng dùng chung (Thành, Anh, Quốc) -->
+        <class>com.electronics.marketplace.entity.Device</class>
+
+        <!-- 3. Phân hệ Chợ Đồ Cũ C2C (Thành) -->
+        <class>com.electronics.marketplace.entity.Listing</class>
+        <class>com.electronics.marketplace.entity.ListingImage</class>
+        <class>com.electronics.marketplace.entity.ListingProblem</class>
+
+        <!-- 4. Phân hệ Máy Mới B2C & Recommendation (Phước Anh) -->
+        <class>com.electronics.marketplace.entity.Product</class>
+        <class>com.electronics.marketplace.entity.ProductSpecification</class>
+
+        <!-- 5. Phân hệ Dịch Vụ Sửa Chữa & Báo Cáo (Quốc) -->
+        <class>com.electronics.marketplace.entity.RepairProblem</class>
+        <class>com.electronics.marketplace.entity.RepairPricing</class>
+        <class>com.electronics.marketplace.entity.RepairRequest</class>
+        <class>com.electronics.marketplace.entity.RepairEstimate</class>
+
+        <!-- 6. Phân hệ Giỏ Hàng, Đơn Hàng & Thanh Toán (Nam) -->
+        <class>com.electronics.marketplace.entity.Cart</class>
+        <class>com.electronics.marketplace.entity.CartItem</class>
+        <class>com.electronics.marketplace.entity.Order</class>
+        <class>com.electronics.marketplace.entity.OrderItem</class>
+        <class>com.electronics.marketplace.entity.Payment</class>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/electronics_marketplace"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password" value="postgres"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+
+            <property name="hibernate.jdbc.batch_size" value="50"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
+
+            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+            <property name="hibernate.hikari.maximumPoolSize" value="10"/>
+            <property name="hibernate.hikari.minimumIdle" value="2"/>
+            <property name="hibernate.hikari.idleTimeout" value="30000"/>
+        </properties>
+    </persistence-unit>
+</persistence>
