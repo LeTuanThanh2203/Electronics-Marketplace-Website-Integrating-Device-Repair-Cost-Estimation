@@ -81,7 +81,8 @@
                     <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden mt-8">
                         <img id="main-preview-img" 
                              class="w-full h-full object-contain p-4 transition-transform duration-300"
-                             src="${not empty listing.images ? listing.images[0].imageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx'}" 
+                             src="${not empty listing.images ? listing.images[0].imageUrl : listing.mainImageUrl}" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80';"
                              alt="Product View">
                     </div>
 
@@ -91,24 +92,32 @@
                     </div>
                 </div>
 
-                <!-- Interactive Thumbnails Grid -->
-                <div class="grid grid-cols-4 gap-3">
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx', this)" 
-                            class="thumb-btn active border-2 border-[#FF4A1C] bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx" class="w-full h-full object-cover">
-                    </button>
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuDhODs7XyBLSORa0vjBrDnTSGOgz8Itfi0qe9RFOUcklVa9bjz0kA_7DU3yhTNs-Ee-6MSYumRVJLeIXGDZ2XaGoDMrQ7JIgKHk5sFcpAyx7uyxu3fr-glBX_IXlrI0v-z8642VBFy7r4LzkZYv7BaWH4_q5MFpWFkgB8fMNzrJqfI93ggGVEPMJzmpUQKYX6xpXGvtSRotwdqMFu-LyW5TRy7hNn0wqzC4bICbCoYBb752oVC2YLQB', this)" 
-                            class="thumb-btn border border-surface-dim hover:border-primary bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhODs7XyBLSORa0vjBrDnTSGOgz8Itfi0qe9RFOUcklVa9bjz0kA_7DU3yhTNs-Ee-6MSYumRVJLeIXGDZ2XaGoDMrQ7JIgKHk5sFcpAyx7uyxu3fr-glBX_IXlrI0v-z8642VBFy7r4LzkZYv7BaWH4_q5MFpWFkgB8fMNzrJqfI93ggGVEPMJzmpUQKYX6xpXGvtSRotwdqMFu-LyW5TRy7hNn0wqzC4bICbCoYBb752oVC2YLQB" class="w-full h-full object-cover">
-                    </button>
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuA6iomvEWxZ9JcwC0wMKAmGiwmN8QMYVyGh4vWyEtYM4IAfaB8ld_BH4_Q-GkwO2IdMcZLkj52kEroIVm4zVtzr7hkHWFKKru-QjhjHaucCcwwiVXggEuR6LB7EkAcojKFnZ6LHKx5Auo7xaqjwgsuQ4i21I3NkYCGk_aLiJKd87InNEaeTlLFUzzaQBVG5Ivtw4HFQojJVQqTA0lOk7Qp9E2XPYpcGeZPbUHuw_d9YZ72ct2cvS10y', this)" 
-                            class="thumb-btn border border-surface-dim hover:border-primary bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6iomvEWxZ9JcwC0wMKAmGiwmN8QMYVyGh4vWyEtYM4IAfaB8ld_BH4_Q-GkwO2IdMcZLkj52kEroIVm4zVtzr7hkHWFKKru-QjhjHaucCcwwiVXggEuR6LB7EkAcojKFnZ6LHKx5Auo7xaqjwgsuQ4i21I3NkYCGk_aLiJKd87InNEaeTlLFUzzaQBVG5Ivtw4HFQojJVQqTA0lOk7Qp9E2XPYpcGeZPbUHuw_d9YZ72ct2cvS10y" class="w-full h-full object-cover">
-                    </button>
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuDFCa4tIIFfr-BM4ZoVNvkDoZD8vYyzTaYbV53FfiL3pQSgJS6xxfy-YlKwSY_1IC4E3ErNK3aap5aWQd90yJbzAAnn9Ji02niPO6t2AF8G5bNawW2-uHpGO_2PMw9hIf2FGB2OwIxP8W6mxFsc0L6TpA6CWdRGRISvjtrC-gs5xyYbFYk1tsS56SSi5eT6lmdXl7plqwSGhKNu1hTAkx2OJLKaybW5kMLvBuRSjVRmXG_p1SacBCNe', this)" 
-                            class="thumb-btn border border-surface-dim hover:border-primary bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFCa4tIIFfr-BM4ZoVNvkDoZD8vYyzTaYbV53FfiL3pQSgJS6xxfy-YlKwSY_1IC4E3ErNK3aap5aWQd90yJbzAAnn9Ji02niPO6t2AF8G5bNawW2-uHpGO_2PMw9hIf2FGB2OwIxP8W6mxFsc0L6TpA6CWdRGRISvjtrC-gs5xyYbFYk1tsS56SSi5eT6lmdXl7plqwSGhKNu1hTAkx2OJLKaybW5kMLvBuRSjVRmXG_p1SacBCNe" class="w-full h-full object-cover">
-                    </button>
+                <!-- Interactive Thumbnails Grid (Render đúng danh sách ảnh thực tế của bài đăng) -->
+                <div class="grid grid-cols-4 sm:grid-cols-5 gap-3" id="listing-thumbnails-grid">
+                    <c:choose>
+                        <c:when test="${not empty listing.images && listing.images.size() > 0}">
+                            <c:forEach items="${listing.images}" var="img" varStatus="status">
+                                <button type="button" 
+                                        onclick="selectThumbnail('${img.imageUrl}', this)" 
+                                        class="thumb-btn ${status.first ? 'active border-2 border-[#FF4A1C]' : 'border border-surface-dim hover:border-primary'} bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-all relative group overflow-hidden">
+                                    <img src="${img.imageUrl}" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80';" 
+                                         class="w-full h-full object-cover">
+                                    <span class="absolute bottom-1 left-1 px-1 py-0.2 bg-black/80 text-white text-[9px] font-mono">${status.first ? 'Bìa' : '#' += status.count}</span>
+                                </button>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="button" 
+                                    onclick="selectThumbnail('${listing.mainImageUrl}', this)" 
+                                    class="thumb-btn active border-2 border-[#FF4A1C] bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors relative">
+                                <img src="${listing.mainImageUrl}" 
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80';" 
+                                     class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 left-1 px-1 py-0.2 bg-black/80 text-white text-[9px] font-mono">Bìa</span>
+                            </button>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <!-- Trust Signals Box -->

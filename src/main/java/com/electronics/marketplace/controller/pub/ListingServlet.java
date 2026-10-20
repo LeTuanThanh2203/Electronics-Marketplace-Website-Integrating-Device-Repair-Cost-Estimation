@@ -184,8 +184,8 @@ public class ListingServlet extends HttpServlet {
                 String priceStr = getFormField(request, "price");
                 BigDecimal price = (priceStr != null && !priceStr.isEmpty()) ? new BigDecimal(priceStr) : new BigDecimal("10000000");
 
-                // Rule 5: Ưu tiên lấy file upload từ thư mục máy tính, fallback sang URL nếu nhập
-                String imageUrl = handleImageUploadOrUrl(request, null);
+                // Rule 5: Lấy toàn bộ file ảnh tải lên từ máy tính (hỗ trợ chọn nhiều ảnh)
+                List<String> imageUrls = handleUploadedImages(request);
 
                 String brand = getFormField(request, "brand");
                 String model = getFormField(request, "model");
@@ -208,7 +208,7 @@ public class ListingServlet extends HttpServlet {
 
                 User seller = (User) request.getSession().getAttribute("currentUser");
                 Listing newListing = marketplaceService.createListing(
-                        seller, deviceId, condition, description, price, imageUrl,
+                        seller, deviceId, condition, description, price, imageUrls,
                         brand, model, cpu, ram, storage, problemNames
                 );
 
@@ -235,9 +235,21 @@ public class ListingServlet extends HttpServlet {
                 String description = getFormField(request, "description");
                 String priceStr = getFormField(request, "price");
                 BigDecimal price = priceStr != null ? new BigDecimal(priceStr) : new BigDecimal("10000000");
-                String imageUrl = handleImageUploadOrUrl(request, getFormField(request, "imageUrl"));
+                // Kết hợp ảnh cũ được giữ lại và ảnh mới upload
+                List<String> keptExistingUrls = getFormFieldValues(request, "existingImageUrls");
+                List<String> newUploadedUrls = handleUploadedImages(request);
+                List<String> finalUrls = new ArrayList<>();
+                if (keptExistingUrls != null) {
+                    finalUrls.addAll(keptExistingUrls);
+                }
+                if (newUploadedUrls != null) {
+                    finalUrls.addAll(newUploadedUrls);
+                }
 
-                marketplaceService.updateListing(listingId, currentUserId, condition, description, price, imageUrl);
+                String imageSectionPresent = getFormField(request, "imageSectionPresent");
+                List<String> imagesToUpdate = "true".equals(imageSectionPresent) ? finalUrls : null;
+
+                marketplaceService.updateListing(listingId, currentUserId, condition, description, price, imagesToUpdate);
                 response.sendRedirect(request.getContextPath() + "/listing/detail?id=" + listingId);
                 return;
             } catch (Exception e) {
@@ -300,49 +312,44 @@ public class ListingServlet extends HttpServlet {
     }
 
     /**
-     * Xử lý lưu file hình ảnh tải lên từ máy tính (Folder upload) lưu trên ổ đĩa server (Rule 5),
-     * hoặc fallback sang chuỗi URL nếu người dùng dán link ảnh trực tuyến.
+     * Xử lý lưu các file hình ảnh tải lên từ máy tính (Folder upload) lưu trên ổ đĩa server (Rule 5).
+     * Hỗ trợ chọn và tải lên nhiều file cùng lúc (multiple files).
      */
-    private String handleImageUploadOrUrl(HttpServletRequest request, String fallbackUrl) {
-        String finalUrl = request.getParameter("imageUrl");
-        if (finalUrl == null || finalUrl.trim().isEmpty()) {
-            finalUrl = fallbackUrl;
-        }
-
+    private List<String> handleUploadedImages(HttpServletRequest request) {
+        List<String> imageUrls = new ArrayList<>();
         try {
-            Part filePart = request.getPart("imageFile");
-            if (filePart != null && filePart.getSize() > 0) {
-                String submittedFileName = filePart.getSubmittedFileName();
-                if (submittedFileName != null && !submittedFileName.trim().isEmpty()) {
-                    String ext = "";
-                    int dotIdx = submittedFileName.lastIndexOf('.');
-                    if (dotIdx >= 0) {
-                        ext = submittedFileName.substring(dotIdx).toLowerCase();
-                    }
-                    if (ext.isEmpty() || (!ext.equals(".jpg") && !ext.equals(".jpeg") && !ext.equals(".png") && !ext.equals(".webp") && !ext.equals(".gif"))) {
-                        ext = ".jpg";
-                    }
-                    String uniqueFileName = "listing_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
+            for (Part part : request.getParts()) {
+                String name = part.getName();
+                if (("imageFiles".equals(name) || "imageFile".equals(name)) && part.getSize() > 0) {
+                    String submittedFileName = part.getSubmittedFileName();
+                    if (submittedFileName != null && !submittedFileName.trim().isEmpty()) {
+                        String ext = "";
+                        int dotIdx = submittedFileName.lastIndexOf('.');
+                        if (dotIdx >= 0) {
+                            ext = submittedFileName.substring(dotIdx).toLowerCase();
+                        }
+                        if (ext.isEmpty() || (!ext.equals(".jpg") && !ext.equals(".jpeg") && !ext.equals(".png") && !ext.equals(".webp") && !ext.equals(".gif"))) {
+                            ext = ".jpg";
+                        }
+                        String uniqueFileName = "listing_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
 
-                    String uploadPath = request.getServletContext().getRealPath("/uploads/listings");
-                    File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) {
-                        uploadDir.mkdirs();
-                    }
-                    File targetFile = new File(uploadDir, uniqueFileName);
-                    filePart.write(targetFile.getAbsolutePath());
+                        String uploadPath = request.getServletContext().getRealPath("/uploads/listings");
+                        File uploadDir = new File(uploadPath);
+                        if (!uploadDir.exists()) {
+                            uploadDir.mkdirs();
+                        }
+                        File targetFile = new File(uploadDir, uniqueFileName);
+                        part.write(targetFile.getAbsolutePath());
 
-                    finalUrl = request.getContextPath() + "/uploads/listings/" + uniqueFileName;
+                        imageUrls.add(request.getContextPath() + "/uploads/listings/" + uniqueFileName);
+                    }
                 }
             }
         } catch (Exception uploadEx) {
-            System.err.println("Upload file warning: " + uploadEx.getMessage());
+            System.err.println("Upload multi-file warning: " + uploadEx.getMessage());
         }
 
-        if (finalUrl == null || finalUrl.trim().isEmpty()) {
-            finalUrl = "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80";
-        }
-        return finalUrl;
+        return imageUrls;
     }
 
     /**

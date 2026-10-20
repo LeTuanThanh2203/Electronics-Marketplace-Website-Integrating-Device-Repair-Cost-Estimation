@@ -77,12 +77,13 @@ public class MarketplaceService {
         return listing;
     }
 
+    public static final String DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80";
+
     /**
-     * Tạo mới bài đăng bán máy cũ
-     * Tuân thủ BR-08 (condition bắt buộc) và BR-12 (tối thiểu 1 ảnh)
+     * Tạo mới bài đăng bán máy cũ hỗ trợ danh sách nhiều hình ảnh thực tế (BR-12).
      */
     public Listing createListing(User seller, Long deviceId, String conditionStr,
-                                 String description, BigDecimal price, String imageUrl,
+                                 String description, BigDecimal price, List<String> imageUrls,
                                  String brand, String model, String cpu, String ram, String storage,
                                  List<String> problemNames) {
         // Kiểm tra BR-08
@@ -90,11 +91,6 @@ public class MarketplaceService {
             throw new IllegalArgumentException("Vui lòng chọn tình trạng thiết bị (BR-08)!");
         }
         ListingCondition condition = ListingCondition.valueOf(conditionStr.trim().toUpperCase());
-
-        // Kiểm tra BR-12
-        if (imageUrl == null || imageUrl.trim().isEmpty()) {
-            imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx";
-        }
 
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             price = new BigDecimal("10000000");
@@ -114,7 +110,19 @@ public class MarketplaceService {
         device.setName(devName);
 
         Listing listing = new Listing(null, seller, device, condition, description, price);
-        listing.addImage(new ListingImage(listing, imageUrl, 0));
+
+        // Thêm danh sách hình ảnh thực tế (tối thiểu 1 ảnh theo BR-12)
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            int order = 0;
+            for (String imgUrl : imageUrls) {
+                if (imgUrl != null && !imgUrl.trim().isEmpty()) {
+                    listing.addImage(new ListingImage(listing, imgUrl.trim(), order++));
+                }
+            }
+        }
+        if (listing.getImages().isEmpty()) {
+            listing.addImage(new ListingImage(listing, DEFAULT_FALLBACK_IMAGE, 0));
+        }
 
         // Nếu là Admin đăng tin, tự động duyệt tin ngay
         if (seller != null && seller.getRole() != null && "ADMIN".equalsIgnoreCase(seller.getRole().name())) {
@@ -133,11 +141,26 @@ public class MarketplaceService {
     }
 
     /**
-     * Cập nhật tin đăng theo BR-11 và BR-40:
+     * Overload tạo mới bài đăng cho trường hợp 1 ảnh chuỗi (Tương thích ngược)
+     */
+    public Listing createListing(User seller, Long deviceId, String conditionStr,
+                                 String description, BigDecimal price, String imageUrl,
+                                 String brand, String model, String cpu, String ram, String storage,
+                                 List<String> problemNames) {
+        List<String> urls = new ArrayList<>();
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            urls.add(imageUrl.trim());
+        }
+        return createListing(seller, deviceId, conditionStr, description, price, urls,
+                brand, model, cpu, ram, storage, problemNames);
+    }
+
+    /**
+     * Cập nhật tin đăng hỗ trợ danh sách nhiều ảnh theo BR-11 và BR-40:
      * Chỉ chủ sở hữu (sellerId == currentUserId) mới được sửa, và chỉ khi trạng thái là AVAILABLE hoặc HIDDEN
      */
     public boolean updateListing(Long listingId, Long currentUserId, String conditionStr,
-                                 String description, BigDecimal price, String imageUrl) {
+                                 String description, BigDecimal price, List<String> imageUrls) {
         Listing listing = listingRepository.findById(listingId);
         if (listing == null) {
             return false;
@@ -162,17 +185,25 @@ public class MarketplaceService {
         if (price != null && price.compareTo(BigDecimal.ZERO) > 0) {
             listing.setPrice(price);
         }
-        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-            if (listing.getImages().isEmpty()) {
-                listing.addImage(new ListingImage(listing, imageUrl, 0));
+        if (imageUrls != null) {
+            listing.getImages().clear();
+            if (!imageUrls.isEmpty()) {
+                int order = 0;
+                for (String url : imageUrls) {
+                    if (url != null && !url.trim().isEmpty()) {
+                        listing.addImage(new ListingImage(listing, url.trim(), order++));
+                    }
+                }
             } else {
-                listing.getImages().get(0).setImageUrl(imageUrl);
+                listing.addImage(new ListingImage(listing, DEFAULT_FALLBACK_IMAGE, 0));
             }
         }
 
         listingRepository.update(listing);
         return true;
     }
+
+
 
     /**
      * Ẩn tin bán (Chuyển trạng thái sang HIDDEN)
