@@ -337,12 +337,17 @@
                                     </div>
                                     <div class="grid grid-cols-2 gap-2">
                                         <a href="${pageContext.request.contextPath}/products?action=detail&id=${p.id}" 
-                                           class="border border-brand-black py-2 px-2 text-xs font-semibold hover:bg-brand-black hover:text-white transition text-center uppercase tracking-wider font-mono">
+                                           class="border border-brand-black py-2 px-2 text-xs font-semibold hover:bg-brand-black hover:text-white transition text-center uppercase tracking-wider font-mono flex items-center justify-center">
                                             CHI TIẾT →
                                         </a>
-                                        <button type="button" class="bg-brand-orange text-white py-2 px-2 text-xs font-semibold hover:bg-black transition text-center uppercase tracking-wider font-mono">
-                                            MUA NGAY
-                                        </button>
+                                        <form action="${pageContext.request.contextPath}/cart" method="POST" class="m-0 p-0 block w-full">
+                                            <input type="hidden" name="action" value="add">
+                                            <input type="hidden" name="productId" value="${p.id}">
+                                            <input type="hidden" name="buyNow" value="true">
+                                            <button type="submit" class="w-full h-full bg-brand-orange text-white py-2 px-2 text-xs font-semibold hover:bg-black transition text-center uppercase tracking-wider font-mono cursor-pointer border-0">
+                                                MUA NGAY
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </article>

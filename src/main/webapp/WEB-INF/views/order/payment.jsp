@@ -40,6 +40,16 @@
 <c:if test="${not empty flashError}">
     <p class="flash flash-error">${flashError}</p>
 </c:if>
+<c:if test="${not empty flashOk}">
+    <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 500; font-family: monospace;">
+        ✓ ${flashOk}
+    </div>
+</c:if>
+<c:if test="${not empty flashNotice}">
+    <div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; line-height: 1.5;">
+        ℹ <strong>Thông báo MoMo Sandbox:</strong> ${flashNotice}
+    </div>
+</c:if>
 
 <div class="split">
     <div class="panel">
@@ -65,7 +75,7 @@
                     <dd>
                         <c:choose>
                             <c:when test="${empty payment.method}">Nhận hàng trả tiền (COD)</c:when>
-                            <c:when test="${payment.method == 'MOMO'}">Ví MoMo</c:when>
+                            <c:when test="${payment.method == 'MOMO'}">Ví MoMo (Sandbox)</c:when>
                             <c:otherwise>${payment.method}</c:otherwise>
                         </c:choose>
                     </dd>
@@ -96,16 +106,40 @@
                 <div class="panel-body" style="border-top: 1px solid var(--hairline)">
                     <c:choose>
                         <c:when test="${payment.method == 'MOMO'}">
-                            <div class="notice">
-                                <strong>Chưa hoàn tất thanh toán MoMo.</strong>
-                                Bấm nút bên dưới để mở cổng MoMo. Đơn hàng tự chuyển sang
-                                <span class="mono">CONFIRMED</span> ngay khi MoMo xác nhận.
+                            <div class="notice" style="margin-bottom: 16px;">
+                                <strong>Cổng Thanh Toán MoMo (Môi trường Sandbox Thử Nghiệm)</strong><br>
+                                Bạn có thể quét mã QR MoMo bên dưới bằng app MoMo test hoặc bấm nút xác nhận mô phỏng để tự động chuyển đơn hàng sang trạng thái <span class="mono">CONFIRMED</span>.
                             </div>
-                            <a class="btn btn-primary btn-block"
-                               style="margin-top: var(--space-md)"
-                               href="${ctx}/payment?action=create&orderId=${order.id}">
-                                Thanh toán qua MoMo
-                            </a>
+
+                            <!-- MoMo QR Code & Instant Demo Confirmation -->
+                            <div style="background: #fff5f7; border: 1.5px dashed #f43f5e; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 16px;">
+                                <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                    <span style="background: #a50064; color: #fff; font-weight: 800; font-size: 13px; padding: 3px 8px; border-radius: 4px; font-family: monospace;">MoMo</span>
+                                    <span style="color: #9f1239; font-weight: 700; font-size: 14px;">Quét Mã QR MoMo</span>
+                                </div>
+                                <div style="background: #fff; padding: 10px; display: inline-block; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 12px;">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=2|99|0912888999|||0|0|${payment.amount}|DH-${order.id}|transfer_myqr"
+                                         alt="Mã QR MoMo"
+                                         style="width: 180px; height: 180px; display: block;" />
+                                </div>
+                                <div style="font-size: 13px; color: #475569; line-height: 1.6;">
+                                    <div>Số tiền thanh toán: <strong style="color: #e11d48; font-size: 16px; font-family: monospace;"><fmt:formatNumber value="${payment.amount}" pattern="#,###"/> ₫</strong></div>
+                                    <div>Nội dung chuyển khoản: <strong class="mono" style="color: #0f172a;">DH-<fmt:formatNumber value="${order.id}" pattern="00000" /></strong></div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <a class="btn btn-primary btn-block"
+                                   style="background: #059669; border-color: #059669; color: #fff; text-align: center; text-decoration: none; padding: 12px; font-weight: 700;"
+                                   href="${ctx}/payment?action=simulate&orderId=${order.id}">
+                                    ⚡ XÁC NHẬN ĐÃ THANH TOÁN (MÔ PHỎNG TEST SANDBOX)
+                                </a>
+                                <a class="btn btn-secondary btn-block"
+                                   style="text-align: center; text-decoration: none; font-size: 13px;"
+                                   href="${ctx}/payment?action=create&orderId=${order.id}">
+                                    Mở Cổng Trực Tiếp test-payment.momo.vn →
+                                </a>
+                            </div>
                         </c:when>
                         <c:otherwise>
                             <div class="notice">

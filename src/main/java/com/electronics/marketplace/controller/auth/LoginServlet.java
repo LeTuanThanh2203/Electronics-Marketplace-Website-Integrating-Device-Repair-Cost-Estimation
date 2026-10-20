@@ -38,6 +38,11 @@ public class LoginServlet extends HttpServlet {
             } else {
                 req.changeSessionId();                       // chống session fixation
                 req.getSession().setAttribute(AuthenticationFilter.SESSION_KEY, u);
+                String redirect = req.getParameter("redirect");
+                if (redirect != null && !redirect.trim().isEmpty() && !redirect.contains("://")) {
+                    resp.sendRedirect(redirect);
+                    return;
+                }
                 resp.sendRedirect(req.getContextPath() + (u.isAdmin() ? "/admin" : "/profile"));
                 return;
             }

@@ -52,12 +52,38 @@ public class OrderServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String action = req.getParameter("action");
+        if ("create".equals(action)) {
+            handleCreate(req, resp);
+            return;
+        }
         if ("cancel".equals(action) || "complete".equals(action)) {
             handleStatusChange(req, resp, action);
             return;
         }
         // POST la do action ngoai du lieu (F5 sau khi submit) - dua ve GET.
         resp.sendRedirect(req.getContextPath() + "/order?action=history");
+    }
+
+    private void handleCreate(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        User user = currentUser(req);
+        if (user == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+        Long listingId = parseId(req.getParameter("listingId"));
+        if (listingId == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thieu listingId.");
+            return;
+        }
+        try {
+            Long orderId = orderService.createMarketplaceOrder(user.getId(), listingId);
+            req.getSession().setAttribute("flashOk", "Đã chốt giữ chỗ thành công đơn hàng DH-" + orderId + ". Người bán sẽ liên hệ bạn để bàn giao máy!");
+            resp.sendRedirect(req.getContextPath() + "/order?action=history");
+        } catch (ServiceException e) {
+            req.getSession().setAttribute("flashError", e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/listing/detail?id=" + listingId);
+        }
     }
 
     private void showHistory(HttpServletRequest req, HttpServletResponse resp)

@@ -104,12 +104,22 @@ public class MarketplaceService {
             seller = new User(1L, "Trần Minh Đức (Demo Seller)", "duc.tran@gmail.com", "0912 888 999", "TP. Hồ Chí Minh");
         }
 
-        // Tạo hoặc liên kết Device
-        String devName = (brand != null ? brand.toUpperCase() + " " : "") + (model != null ? model : "Laptop");
-        Device device = new Device(deviceId != null ? deviceId : 1L, devName, brand, model, 2021, cpu, ram, storage);
+        // Tạo hoặc liên kết Device linh hoạt (không cố định dòng máy)
+        String devBrand = (brand != null && !brand.trim().isEmpty()) ? brand.trim() : "Khác";
+        String devModel = (model != null && !model.trim().isEmpty()) ? model.trim() : "Laptop";
+        String devName = devBrand + " " + devModel;
+        Long devId = (deviceId != null && deviceId > 0) ? deviceId : null;
+        Device device = new Device(devBrand, "", devModel, 2022, cpu, ram, storage);
+        device.setId(devId);
+        device.setName(devName);
 
         Listing listing = new Listing(null, seller, device, condition, description, price);
         listing.addImage(new ListingImage(listing, imageUrl, 0));
+
+        // Nếu là Admin đăng tin, tự động duyệt tin ngay
+        if (seller != null && seller.getRole() != null && "ADMIN".equalsIgnoreCase(seller.getRole().name())) {
+            listing.setIsApproved(true);
+        }
 
         // Thêm các lỗi khai báo nếu có
         if (problemNames != null && !problemNames.isEmpty()) {

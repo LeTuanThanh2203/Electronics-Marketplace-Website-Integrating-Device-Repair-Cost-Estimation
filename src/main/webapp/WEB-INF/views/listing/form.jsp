@@ -44,8 +44,19 @@
             </div>
         </div>
 
+        <!-- Error Banner if any -->
+        <c:if test="${not empty errorMessage}">
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-900 text-sm flex items-start gap-3 shadow-sm">
+                <span class="material-symbols-outlined text-red-600 text-[22px] shrink-0">error</span>
+                <div>
+                    <div class="font-bold">Đã xảy ra lỗi khi đăng tin:</div>
+                    <div class="mt-0.5"><c:out value="${errorMessage}"/></div>
+                </div>
+            </div>
+        </c:if>
+
         <!-- Form Layout: 8 Cols Form / 4 Cols Sticky Valuation -->
-        <form method="POST" action="${pageContext.request.contextPath}/listing/form" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <form method="POST" action="${pageContext.request.contextPath}/listing/form" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <input type="hidden" name="action" value="${not empty listing ? 'edit' : 'create'}">
             <input type="hidden" name="id" value="${listing.id}">
 
@@ -63,30 +74,42 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">
-                                Dòng máy (Device) <span class="text-secondary-container">*</span>
-                            </label>
-                            <select name="deviceId" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none cursor-pointer">
-                                <option value="1" ${listing.device.id == 1 ? 'selected' : ''}>ThinkPad T14 Gen 2 (Lenovo)</option>
-                                <option value="2" ${listing.device.id == 2 ? 'selected' : ''}>Dell XPS 13 9310 (Dell)</option>
-                                <option value="3" ${listing.device.id == 3 ? 'selected' : ''}>MacBook Air M1 2020 (Apple)</option>
-                                <option value="4" ${listing.device.id == 4 ? 'selected' : ''}>Acer Nitro 5 Gaming (Acer)</option>
-                                <option value="5" ${listing.device.id == 5 ? 'selected' : ''}>Asus ZenBook 14 (Asus)</option>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-primary">
+                                    Dòng máy (Device Model) <span class="text-secondary-container">*</span>
+                                </label>
+                                <span class="text-[11px] text-outline">Chọn từ danh mục hoặc chọn "Tự nhập"</span>
+                            </div>
+                            <select name="deviceId" id="device-select" onchange="onDeviceSelectChange(this)" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none cursor-pointer">
+                                <option value="0" ${empty listing || empty listing.device || listing.device.id == 0 ? 'selected' : ''}>
+                                    + TỰ NHẬP DÒNG MÁY KHÁC (Tùy chỉnh thương hiệu & model)
+                                </option>
+                                <c:forEach items="${devices}" var="d">
+                                    <option value="${d.id}" 
+                                            data-brand="${d.brand}" 
+                                            data-model="${d.model}" 
+                                            data-cpu="${d.cpu}" 
+                                            data-ram="${d.ram}" 
+                                            data-storage="${d.storage}"
+                                            ${not empty listing.device && listing.device.id == d.id ? 'selected' : ''}>
+                                        ${d.name} (${d.brand.toUpperCase()} - ${d.model})
+                                    </option>
+                                </c:forEach>
                             </select>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">
-                                    Thương hiệu <span class="text-secondary-container">*</span>
+                                    Thương hiệu (Brand) <span class="text-secondary-container">*</span>
                                 </label>
-                                <input type="text" name="brand" value="${not empty listing.device ? listing.device.brand : 'Lenovo'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none" placeholder="Lenovo, Dell, Apple...">
+                                <input type="text" name="brand" id="input-brand" required value="${not empty listing.device ? listing.device.brand : 'Lenovo'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none" placeholder="Lenovo, Dell, Apple, Asus, HP, Acer...">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">
-                                    Model cụ thể
+                                    Model cụ thể <span class="text-secondary-container">*</span>
                                 </label>
-                                <input type="text" name="model" value="${not empty listing.device ? listing.device.model : 'T14 Gen 2'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none" placeholder="20W00049US, XPS 9310...">
+                                <input type="text" name="model" id="input-model" required value="${not empty listing.device ? listing.device.model : 'T14 Gen 2'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none" placeholder="20W00049US, XPS 9310, MacBook Air M1...">
                             </div>
                         </div>
                     </div>
@@ -103,19 +126,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">Vi xử lý (CPU)</label>
-                            <input type="text" name="cpu" value="${not empty listing.device ? listing.device.cpu : 'Intel Core i5-1135G7 (4.2GHz)'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
+                            <input type="text" name="cpu" id="input-cpu" value="${not empty listing.device ? listing.device.cpu : 'Intel Core i5-1135G7 (4.2GHz)'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">Bộ nhớ RAM</label>
-                            <input type="text" name="ram" value="${not empty listing.device ? listing.device.ram : '16GB DDR4 3200MHz'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
+                            <input type="text" name="ram" id="input-ram" value="${not empty listing.device ? listing.device.ram : '16GB DDR4 3200MHz'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">Ổ cứng (Storage)</label>
-                            <input type="text" name="storage" value="${not empty listing.device ? listing.device.storage : '512GB NVMe PCIe Gen 4'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
+                            <input type="text" name="storage" id="input-storage" value="${not empty listing.device ? listing.device.storage : '512GB NVMe PCIe Gen 4'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">Chu kỳ sạc / Tình trạng pin</label>
-                            <input type="text" name="battery" value="142 lần sạc, pin còn 95%" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
+                            <input type="text" name="battery" id="input-battery" value="142 lần sạc, pin còn 95%" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-sm text-primary focus:border-primary focus:outline-none">
                         </div>
                     </div>
                 </section>
@@ -225,20 +248,45 @@
 
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">
-                                Đường dẫn hình ảnh thực tế (URL) <span class="text-secondary-container">*</span>
+                                Hình ảnh thực tế của máy <span class="text-secondary-container">*</span>
                             </label>
-                            <input type="text" name="imageUrl" id="image-url-input" onchange="previewImageUrl(this)" onkeyup="previewImageUrl(this)" value="${not empty listing.images ? listing.images[0].imageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx'}" class="w-full h-11 px-3 bg-surface-container-low border border-surface-dim text-xs text-primary focus:border-primary focus:outline-none">
-                            <div class="text-[11px] text-outline mt-1 font-mono">
-                                Rule 5: Lưu URL hình ảnh, tối thiểu 1 ảnh rõ nét (BR-12).
+
+                            <!-- Folder File Chooser -->
+                            <div class="space-y-3">
+                                <div>
+                                    <label for="image-file-input" 
+                                           class="w-full h-11 px-4 bg-[#FF4A1C]/10 border-2 border-dashed border-[#FF4A1C] hover:bg-[#FF4A1C]/20 transition-all cursor-pointer flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                                        <span class="material-symbols-outlined text-[#FF4A1C] text-[20px]">folder_open</span>
+                                        <span id="file-chosen-text">Chọn ảnh từ thư mục máy tính...</span>
+                                    </label>
+                                    <input type="file" name="imageFile" id="image-file-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="previewSelectedFile(this)">
+                                </div>
+
+                                <!-- Alternative: Image URL Input -->
+                                <div>
+                                    <div class="text-[11px] text-outline mb-1">
+                                        Hoặc dán đường dẫn ảnh trực tuyến (URL):
+                                    </div>
+                                    <input type="text" name="imageUrl" id="image-url-input" onchange="previewImageUrl(this)" onkeyup="previewImageUrl(this)" value="${not empty listing.images ? listing.images[0].imageUrl : ''}" placeholder="https://example.com/anh-laptop.jpg" class="w-full h-10 px-3 bg-surface-container-low border border-surface-dim text-xs text-primary focus:border-primary focus:outline-none font-mono">
+                                </div>
+                            </div>
+
+                            <div class="text-[11px] text-outline mt-2 font-mono">
+                                Rule 5: Chọn ảnh từ thư mục máy tính (upload) hoặc dán link ảnh rõ nét (BR-12).
                             </div>
                         </div>
                     </div>
 
                     <!-- Image Preview -->
-                    <div class="mt-4 pt-4 border-t border-surface-dim">
-                        <span class="block text-xs font-bold uppercase tracking-wider text-outline mb-2">Xem trước ảnh bìa:</span>
-                        <div class="w-48 aspect-[4/3] bg-surface-container-low border border-surface-dim flex items-center justify-center overflow-hidden">
-                            <img id="image-live-preview" src="${not empty listing.images ? listing.images[0].imageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx'}" class="w-full h-full object-cover">
+                    <div class="mt-4 pt-4 border-t border-surface-dim flex items-center gap-4">
+                        <div class="w-48 aspect-[4/3] bg-surface-container-low border border-surface-dim flex items-center justify-center overflow-hidden shrink-0 relative">
+                            <img id="image-live-preview" src="${not empty listing.images ? listing.images[0].imageUrl : 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80'}" class="w-full h-full object-cover">
+                            <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/75 text-white text-[10px] font-mono">Xem trước</span>
+                        </div>
+                        <div class="text-xs text-outline space-y-1">
+                            <div class="font-bold text-primary uppercase">Ảnh bìa đại diện sản phẩm</div>
+                            <div>Hỗ trợ tải lên từ thư mục (.jpg, .png, .webp) hoặc dùng ảnh mẫu.</div>
+                            <div id="file-size-info" class="text-emerald-700 font-mono text-[11px]"></div>
                         </div>
                     </div>
                 </section>

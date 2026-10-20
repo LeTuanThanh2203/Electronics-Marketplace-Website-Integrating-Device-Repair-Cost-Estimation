@@ -38,6 +38,9 @@
 
         <!-- Login Form -->
         <form method="post" action="${pageContext.request.contextPath}/login" id="loginForm">
+            <c:if test="${not empty param.redirect}">
+                <input type="hidden" name="redirect" value="<c:out value='${param.redirect}'/>">
+            </c:if>
             <!-- Email -->
             <div class="auth-field">
                 <label class="auth-label" for="loginEmail">Email</label>

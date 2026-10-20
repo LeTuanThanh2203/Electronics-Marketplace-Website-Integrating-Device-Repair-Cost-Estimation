@@ -48,7 +48,7 @@ public class Product implements Serializable {
     private ProductStatus status = ProductStatus.AVAILABLE;
 
     // UI & Storefront display fields from template
-    @Column(name = "sku", length = 50)
+    @Column(name = "sku", unique = true, length = 50)
     private String sku;
 
     @Column(name = "series", length = 100)
@@ -69,8 +69,7 @@ public class Product implements Serializable {
     @Column(name = "warranty", length = 150)
     private String warranty = "Bảo hành 24 tháng chính hãng";
 
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "target_need", length = 50)

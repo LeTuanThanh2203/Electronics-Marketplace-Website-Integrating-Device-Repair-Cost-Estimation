@@ -1,8 +1,13 @@
 package com.electronics.marketplace.repository;
 
+import com.electronics.marketplace.config.JpaConfig;
 import com.electronics.marketplace.entity.*;
 import com.electronics.marketplace.entity.enums.ListingCondition;
 import com.electronics.marketplace.entity.enums.ListingStatus;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -11,12 +16,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * Triển khai ListingRepository với cơ chế dự phòng an toàn (Fail-safe In-Memory Store & JPA Ready).
- * Dùng Long id và java.util.Date theo chuẩn chốt của dự án.
+ * Triển khai ListingRepository với JPA / Hibernate kết nối PostgreSQL thật
+ * và có cơ chế fallback in-memory an toàn (Fail-safe Store).
+ * Tuân thủ Rule 2: Chuẩn hóa truy xuất CSDL qua tầng DAO/Repository.
  */
 public class ListingRepositoryImpl implements ListingRepository {
 
-    // Kho lưu trữ trong bộ nhớ dùng cho phiên làm việc hiện tại và demo không lỗi kết nối CSDL
+    // Kho lưu trữ trong bộ nhớ dùng cho fallback khi CSDL chưa bật hoặc kiểm thử unit test
     private static final Map<Long, Listing> memoryStore = new ConcurrentHashMap<>();
     private static final AtomicLong idCounter = new AtomicLong(100L);
 
@@ -70,7 +76,7 @@ public class ListingRepositoryImpl implements ListingRepository {
         l2.setCreatedAt(new Date(now - 2 * oneDay));
         memoryStore.put(2L, l2);
 
-        // 3. Listing 3: Acer Nitro 5 (Cần sửa chữa / DAMAGED)
+        // 3. Listing 3: Acer Nitro 5
         Listing l3 = new Listing(3L, sellerQuan, devAcer, ListingCondition.DAMAGED,
                 "Máy gaming cày đồ họa nhiều. Loa bên phải bị rè khi bật âm lượng trên 80%. Màn hình có 1 chấm sáng nhỏ ở góc dưới nhưng không ảnh hưởng chiến game. Bán rẻ cho anh em thợ hoặc về cắm tai nghe xài.",
                 new BigDecimal("9900000"));
@@ -109,9 +115,45 @@ public class ListingRepositoryImpl implements ListingRepository {
         memoryStore.put(6L, l6);
     }
 
+    private EntityManager getEntityManagerSafely() {
+        try {
+            EntityManagerFactory emf = JpaConfig.getEntityManagerFactory();
+            if (emf != null && emf.isOpen()) {
+                return emf.createEntityManager();
+            }
+        } catch (Exception ignored) {
+            // Database chưa kết nối được
+        }
+        return null;
+    }
+
     @Override
     public List<Listing> findAllAvailable() {
-        // Lọc theo BR-15: status == AVAILABLE && isApproved == true && isRemovedByAdmin == false
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            try {
+                String jpql = "SELECT DISTINCT l FROM Listing l " +
+                        "LEFT JOIN FETCH l.device " +
+                        "LEFT JOIN FETCH l.seller " +
+                        "LEFT JOIN FETCH l.images " +
+                        "WHERE l.status = :status AND l.isApproved = true AND (l.isRemovedByAdmin IS NULL OR l.isRemovedByAdmin = false) " +
+                        "ORDER BY l.createdAt DESC";
+                TypedQuery<Listing> query = em.createQuery(jpql, Listing.class);
+                query.setParameter("status", ListingStatus.AVAILABLE);
+                List<Listing> list = query.getResultList();
+                if (list != null && !list.isEmpty()) {
+                    return list;
+                }
+            } catch (Exception e) {
+                System.err.println("JPA findAllAvailable warning: " + e.getMessage());
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
+        }
+
+        // Fallback in-memory
         return memoryStore.values().stream()
                 .filter(l -> l.getStatus() == ListingStatus.AVAILABLE
                         && Boolean.TRUE.equals(l.getIsApproved())
@@ -123,9 +165,70 @@ public class ListingRepositoryImpl implements ListingRepository {
     @Override
     public List<Listing> searchAndFilter(String keyword, String brand, ListingCondition condition,
                                           BigDecimal minPrice, BigDecimal maxPrice, String ram) {
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            try {
+                StringBuilder jpql = new StringBuilder(
+                        "SELECT DISTINCT l FROM Listing l " +
+                        "LEFT JOIN FETCH l.device d " +
+                        "LEFT JOIN FETCH l.seller s " +
+                        "LEFT JOIN FETCH l.images " +
+                        "WHERE l.status = :status AND l.isApproved = true AND (l.isRemovedByAdmin IS NULL OR l.isRemovedByAdmin = false)"
+                );
+                Map<String, Object> params = new HashMap<>();
+                params.put("status", ListingStatus.AVAILABLE);
+
+                if (brand != null && !brand.trim().isEmpty()) {
+                    String b = brand.trim().toLowerCase();
+                    if ("thinkpad".equals(b) || "lenovo".equals(b)) {
+                        jpql.append(" AND (LOWER(d.brand) LIKE :lenovo OR LOWER(d.name) LIKE :thinkpad)");
+                        params.put("lenovo", "%lenovo%");
+                        params.put("thinkpad", "%thinkpad%");
+                    } else {
+                        jpql.append(" AND (LOWER(d.brand) LIKE :brand OR LOWER(d.name) LIKE :brand)");
+                        params.put("brand", "%" + b + "%");
+                    }
+                }
+                if (condition != null) {
+                    jpql.append(" AND l.condition = :condition");
+                    params.put("condition", condition);
+                }
+                if (minPrice != null) {
+                    jpql.append(" AND l.price >= :minPrice");
+                    params.put("minPrice", minPrice);
+                }
+                if (maxPrice != null) {
+                    jpql.append(" AND l.price <= :maxPrice");
+                    params.put("maxPrice", maxPrice);
+                }
+                if (ram != null && !ram.trim().isEmpty()) {
+                    jpql.append(" AND LOWER(d.ram) LIKE :ram");
+                    params.put("ram", "%" + ram.trim().toLowerCase() + "%");
+                }
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    jpql.append(" AND (LOWER(d.name) LIKE :kw OR LOWER(d.model) LIKE :kw OR LOWER(l.description) LIKE :kw OR LOWER(s.name) LIKE :kw)");
+                    params.put("kw", "%" + keyword.trim().toLowerCase() + "%");
+                }
+                jpql.append(" ORDER BY l.createdAt DESC");
+
+                TypedQuery<Listing> query = em.createQuery(jpql.toString(), Listing.class);
+                params.forEach(query::setParameter);
+                List<Listing> list = query.getResultList();
+                if (list != null && !list.isEmpty()) {
+                    return list;
+                }
+            } catch (Exception e) {
+                System.err.println("JPA searchAndFilter warning: " + e.getMessage());
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
+        }
+
+        // Fallback in-memory
         return findAllAvailable().stream()
                 .filter(l -> {
-                    // Lọc theo từ khóa
                     if (keyword != null && !keyword.trim().isEmpty()) {
                         String kw = keyword.toLowerCase().trim();
                         boolean matchName = l.getDevice() != null && l.getDevice().getName() != null 
@@ -143,49 +246,28 @@ public class ListingRepositoryImpl implements ListingRepository {
                         }
                     }
 
-                    // Lọc theo thương hiệu (Brand) - Hỗ trợ cả tên thương hiệu lẫn dòng máy
                     if (brand != null && !brand.trim().isEmpty()) {
                         String b = brand.trim().toLowerCase();
-                        if (l.getDevice() == null) {
-                            return false;
-                        }
+                        if (l.getDevice() == null) return false;
                         String devBrand = l.getDevice().getBrand() != null ? l.getDevice().getBrand().toLowerCase() : "";
                         String devName = l.getDevice().getName() != null ? l.getDevice().getName().toLowerCase() : "";
                         boolean matchBrand = devBrand.contains(b) || devName.contains(b);
                         if ("thinkpad".equals(b) || "lenovo".equals(b)) {
                             matchBrand = matchBrand || devBrand.contains("lenovo") || devName.contains("thinkpad");
                         }
-                        if (!matchBrand) {
-                            return false;
-                        }
+                        if (!matchBrand) return false;
                     }
 
-                    // Lọc theo tình trạng (Condition)
-                    if (condition != null) {
-                        if (l.getCondition() != condition) {
-                            return false;
-                        }
-                    }
+                    if (condition != null && l.getCondition() != condition) return false;
+                    if (minPrice != null && l.getPrice().compareTo(minPrice) < 0) return false;
+                    if (maxPrice != null && l.getPrice().compareTo(maxPrice) > 0) return false;
 
-                    // Lọc theo khoảng giá (Price Range)
-                    if (minPrice != null && l.getPrice().compareTo(minPrice) < 0) {
-                        return false;
-                    }
-                    if (maxPrice != null && l.getPrice().compareTo(maxPrice) > 0) {
-                        return false;
-                    }
-
-                    // Lọc theo RAM
                     if (ram != null && !ram.trim().isEmpty()) {
                         String r = ram.trim().toLowerCase();
-                        if (l.getDevice() == null || l.getDevice().getRam() == null) {
-                            return false;
-                        }
+                        if (l.getDevice() == null || l.getDevice().getRam() == null) return false;
                         String devRam = l.getDevice().getRam().toLowerCase();
                         boolean matchRam = devRam.contains(r + "gb") || devRam.contains(r);
-                        if (!matchRam) {
-                            return false;
-                        }
+                        if (!matchRam) return false;
                     }
 
                     return true;
@@ -195,17 +277,69 @@ public class ListingRepositoryImpl implements ListingRepository {
 
     @Override
     public Listing findById(Long id) {
-        if (id == null) {
-            return null;
+        if (id == null) return null;
+
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            try {
+                String jpql = "SELECT DISTINCT l FROM Listing l " +
+                        "LEFT JOIN FETCH l.device " +
+                        "LEFT JOIN FETCH l.seller " +
+                        "LEFT JOIN FETCH l.images " +
+                        "WHERE l.id = :id";
+                List<Listing> list = em.createQuery(jpql, Listing.class)
+                        .setParameter("id", id)
+                        .getResultList();
+                if (!list.isEmpty()) {
+                    Listing l = list.get(0);
+                    try {
+                        em.createQuery("SELECT DISTINCT l FROM Listing l LEFT JOIN FETCH l.problems lp LEFT JOIN FETCH lp.problem WHERE l.id = :id", Listing.class)
+                                .setParameter("id", id)
+                                .getResultList();
+                    } catch (Exception ignored) {
+                    }
+                    return l;
+                }
+            } catch (Exception e) {
+                System.err.println("JPA findById warning: " + e.getMessage());
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
         }
+
         return memoryStore.get(id);
     }
 
     @Override
     public List<Listing> findBySellerId(Long sellerId) {
-        if (sellerId == null) {
-            return Collections.emptyList();
+        if (sellerId == null) return Collections.emptyList();
+
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            try {
+                String jpql = "SELECT DISTINCT l FROM Listing l " +
+                        "LEFT JOIN FETCH l.device " +
+                        "LEFT JOIN FETCH l.seller " +
+                        "LEFT JOIN FETCH l.images " +
+                        "WHERE l.seller.id = :sellerId " +
+                        "ORDER BY l.createdAt DESC";
+                List<Listing> list = em.createQuery(jpql, Listing.class)
+                        .setParameter("sellerId", sellerId)
+                        .getResultList();
+                if (list != null && !list.isEmpty()) {
+                    return list;
+                }
+            } catch (Exception e) {
+                System.err.println("JPA findBySellerId warning: " + e.getMessage());
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
         }
+
         return memoryStore.values().stream()
                 .filter(l -> l.getSeller() != null && sellerId.equals(l.getSeller().getId()))
                 .sorted(Comparator.comparing(Listing::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
@@ -214,13 +348,122 @@ public class ListingRepositoryImpl implements ListingRepository {
 
     @Override
     public Listing save(Listing listing) {
-        if (listing.getId() == null) {
-            listing.setId(idCounter.incrementAndGet());
-        }
         if (listing.getCreatedAt() == null) {
             listing.setCreatedAt(new Date());
         }
         listing.setUpdatedAt(new Date());
+
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            EntityTransaction tx = em.getTransaction();
+            try {
+                tx.begin();
+
+                // 1. Gắn seller thật trong DB
+                User seller = listing.getSeller();
+                if (seller != null && seller.getId() != null) {
+                    User dbUser = em.find(User.class, seller.getId());
+                    if (dbUser != null) {
+                        listing.setSeller(dbUser);
+                    } else {
+                        List<User> users = em.createQuery("SELECT u FROM User u", User.class).setMaxResults(1).getResultList();
+                        if (!users.isEmpty()) {
+                            listing.setSeller(users.get(0));
+                        }
+                    }
+                }
+
+                // 2. Gắn device thật trong DB
+                Device dev = listing.getDevice();
+                if (dev != null) {
+                    Device dbDev = null;
+                    if (dev.getId() != null && dev.getId() > 0) {
+                        dbDev = em.find(Device.class, dev.getId());
+                    }
+                    if (dbDev == null && dev.getBrand() != null && dev.getModel() != null) {
+                        List<Device> list = em.createQuery(
+                                "SELECT d FROM Device d WHERE LOWER(d.brand) = LOWER(:b) AND LOWER(d.model) = LOWER(:m)", Device.class)
+                                .setParameter("b", dev.getBrand().trim())
+                                .setParameter("m", dev.getModel().trim())
+                                .setMaxResults(1)
+                                .getResultList();
+                        if (!list.isEmpty()) {
+                            dbDev = list.get(0);
+                        }
+                    }
+                    if (dbDev == null) {
+                        String series = dev.getSeries() != null ? dev.getSeries() : "";
+                        String devBrand = (dev.getBrand() != null && !dev.getBrand().trim().isEmpty()) ? dev.getBrand().trim() : "Khác";
+                        String devModel = (dev.getModel() != null && !dev.getModel().trim().isEmpty()) ? dev.getModel().trim() : "Laptop";
+                        dbDev = new Device(devBrand, series, devModel, 
+                                           dev.getReleaseYear() != null ? dev.getReleaseYear() : 2022, 
+                                           dev.getCpu(), dev.getRam(), dev.getStorage());
+                        if (dev.getName() != null && !dev.getName().trim().isEmpty()) {
+                            dbDev.setName(dev.getName().trim());
+                        }
+                        em.persist(dbDev);
+                    }
+                    listing.setDevice(dbDev);
+                }
+
+                // 3. Liên kết hình ảnh và lỗi
+                if (listing.getImages() != null) {
+                    for (ListingImage img : listing.getImages()) {
+                        img.setListing(listing);
+                    }
+                }
+                if (listing.getProblems() != null) {
+                    for (ListingProblem lp : listing.getProblems()) {
+                        lp.setListing(listing);
+                        if (lp.getProblem() != null) {
+                            RepairProblem rp = null;
+                            if (lp.getProblem().getId() != null && lp.getProblem().getId() > 0) {
+                                rp = em.find(RepairProblem.class, lp.getProblem().getId());
+                            }
+                            if (rp == null && lp.getProblem().getName() != null) {
+                                List<RepairProblem> list = em.createQuery(
+                                        "SELECT r FROM RepairProblem r WHERE LOWER(r.name) = LOWER(:n)", RepairProblem.class)
+                                        .setParameter("n", lp.getProblem().getName().trim())
+                                        .setMaxResults(1)
+                                        .getResultList();
+                                if (!list.isEmpty()) {
+                                    rp = list.get(0);
+                                } else {
+                                    rp = new RepairProblem(null, lp.getProblem().getName().trim());
+                                    em.persist(rp);
+                                }
+                            }
+                            lp.setProblem(rp);
+                        }
+                    }
+                }
+
+                if (listing.getId() == null) {
+                    em.persist(listing);
+                } else {
+                    listing = em.merge(listing);
+                }
+                tx.commit();
+
+                // Đồng bộ memoryStore
+                memoryStore.put(listing.getId(), listing);
+                return listing;
+            } catch (Exception e) {
+                System.err.println("JPA save listing warning: " + e.getMessage());
+                if (tx != null && tx.isActive()) {
+                    tx.rollback();
+                }
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
+        }
+
+        // Fallback in-memory
+        if (listing.getId() == null) {
+            listing.setId(idCounter.incrementAndGet());
+        }
         memoryStore.put(listing.getId(), listing);
         return listing;
     }
@@ -231,6 +474,28 @@ public class ListingRepositoryImpl implements ListingRepository {
             return null;
         }
         listing.setUpdatedAt(new Date());
+
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            EntityTransaction tx = em.getTransaction();
+            try {
+                tx.begin();
+                Listing merged = em.merge(listing);
+                tx.commit();
+                memoryStore.put(merged.getId(), merged);
+                return merged;
+            } catch (Exception e) {
+                System.err.println("JPA update listing warning: " + e.getMessage());
+                if (tx != null && tx.isActive()) {
+                    tx.rollback();
+                }
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
+        }
+
         memoryStore.put(listing.getId(), listing);
         return listing;
     }
@@ -240,6 +505,32 @@ public class ListingRepositoryImpl implements ListingRepository {
         if (id == null) {
             return false;
         }
+
+        EntityManager em = getEntityManagerSafely();
+        if (em != null) {
+            EntityTransaction tx = em.getTransaction();
+            try {
+                tx.begin();
+                Listing l = em.find(Listing.class, id);
+                if (l != null) {
+                    em.remove(l);
+                    tx.commit();
+                    memoryStore.remove(id);
+                    return true;
+                }
+                tx.commit();
+            } catch (Exception e) {
+                System.err.println("JPA delete listing warning: " + e.getMessage());
+                if (tx != null && tx.isActive()) {
+                    tx.rollback();
+                }
+            } finally {
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
+        }
+
         return memoryStore.remove(id) != null;
     }
 }

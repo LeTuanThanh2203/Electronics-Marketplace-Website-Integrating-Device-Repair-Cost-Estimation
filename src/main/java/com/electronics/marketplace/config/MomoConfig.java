@@ -29,6 +29,10 @@ public final class MomoConfig {
 
     private static final String DEFAULT_ENDPOINT = "https://test-payment.momo.vn";
 
+    private static final String DEFAULT_PARTNER_CODE = "MOMO";
+    private static final String DEFAULT_ACCESS_KEY = "klm05TvNBzhg7h7j";
+    private static final String DEFAULT_SECRET_KEY = "at67qH6mk8w5Y1nAyMoYKMWACiEi2Aca";
+
     private final String partnerCode;
     private final String accessKey;
     private final String secretKey;
@@ -40,9 +44,9 @@ public final class MomoConfig {
     }
 
     private MomoConfig() {
-        this.partnerCode = requireEnv(ENV_PARTNER_CODE);
-        this.accessKey = requireEnv(ENV_ACCESS_KEY);
-        this.secretKey = requireEnv(ENV_SECRET_KEY);
+        this.partnerCode = getEnvOrDefault(ENV_PARTNER_CODE, DEFAULT_PARTNER_CODE);
+        this.accessKey = getEnvOrDefault(ENV_ACCESS_KEY, DEFAULT_ACCESS_KEY);
+        this.secretKey = getEnvOrDefault(ENV_SECRET_KEY, DEFAULT_SECRET_KEY);
         String configured = System.getenv(ENV_ENDPOINT);
         this.endpoint = (configured == null || configured.trim().isEmpty())
                 ? DEFAULT_ENDPOINT
@@ -82,13 +86,8 @@ public final class MomoConfig {
         return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
 
-    /** Fail fast: thieu bien moi truong thi bao ngay, khong de loi HMAC kho hieu. */
-    private static String requireEnv(String name) {
+    private static String getEnvOrDefault(String name, String fallback) {
         String value = System.getenv(name);
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalStateException(
-                    "Thieu bien moi truong " + name + ". Dat MOMO_PARTNER_CODE, MOMO_ACCESS_KEY, MOMO_SECRET_KEY truoc khi thanh toan MoMo.");
-        }
-        return value.trim();
+        return (value != null && !value.trim().isEmpty()) ? value.trim() : fallback;
     }
 }

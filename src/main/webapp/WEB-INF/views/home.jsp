@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="ELECTRONICSMARKETPLACE — Nâng Cấp Laptop Hay Chọn Sửa Chữa?" scope="request"/>
 <c:set var="activeNav" value="home" scope="request"/>
 <%@ include file="/WEB-INF/layout/header.jspf" %>
@@ -128,81 +129,110 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border-t border-l border-surface-dim">
-            <!-- Product 1 -->
-            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
-                <div class="p-4 flex justify-between items-start">
-                    <span class="text-[15px] font-bold text-outline group-hover:text-primary">01</span>
-                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
-                </div>
-                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
-                </div>
-                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ThinkPad T14 Gen 2</h3>
-                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Core i5-1135G7</div>
-                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
-                        <span class="text-[22px] font-black tracking-tight text-primary">18.990.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=1">XEM CHI TIẾT →</a>
-                    </div>
-                </div>
-            </article>
+            <c:choose>
+                <c:when test="${not empty featuredProducts}">
+                    <c:forEach items="${featuredProducts}" var="prod" varStatus="loop">
+                        <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                            <div class="p-4 flex justify-between items-start">
+                                <span class="text-[15px] font-bold text-outline group-hover:text-primary">0${loop.count}</span>
+                                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">
+                                    <c:out value="${not empty prod.badge ? prod.badge : 'NEW SEAL'}"/>
+                                </span>
+                            </div>
+                            <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                                <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="${prod.imageUrl}" alt="${prod.name}">
+                            </div>
+                            <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                                <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight line-clamp-1"><c:out value="${prod.name}"/></h3>
+                                <div class="text-[12px] text-outline line-clamp-1"><c:out value="${not empty prod.description ? prod.description : prod.series}"/></div>
+                                <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                                    <span class="text-[22px] font-black tracking-tight text-primary">
+                                        <fmt:formatNumber value="${prod.price}" pattern="#,###"/> ₫
+                                    </span>
+                                    <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=${prod.id}">XEM CHI TIẾT →</a>
+                                </div>
+                            </div>
+                        </article>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <!-- Product 1 -->
+                    <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                        <div class="p-4 flex justify-between items-start">
+                            <span class="text-[15px] font-bold text-outline group-hover:text-primary">01</span>
+                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
+                        </div>
+                        <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ThinkPad T14 Gen 2</h3>
+                            <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Core i5-1135G7</div>
+                            <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                                <span class="text-[22px] font-black tracking-tight text-primary">18.990.000 ₫</span>
+                                <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=1">XEM CHI TIẾT →</a>
+                            </div>
+                        </div>
+                    </article>
 
-            <!-- Product 2 -->
-            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
-                <div class="p-4 flex justify-between items-start">
-                    <span class="text-[15px] font-bold text-outline group-hover:text-primary">02</span>
-                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
-                </div>
-                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
-                </div>
-                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">Dell XPS 13 9310</h3>
-                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · FHD+ 500 Nits</div>
-                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
-                        <span class="text-[22px] font-black tracking-tight text-primary">24.990.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=2">XEM CHI TIẾT →</a>
-                    </div>
-                </div>
-            </article>
+                    <!-- Product 2 -->
+                    <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                        <div class="p-4 flex justify-between items-start">
+                            <span class="text-[15px] font-bold text-outline group-hover:text-primary">02</span>
+                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
+                        </div>
+                        <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">Dell XPS 13 9310</h3>
+                            <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · FHD+ 500 Nits</div>
+                            <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                                <span class="text-[22px] font-black tracking-tight text-primary">24.990.000 ₫</span>
+                                <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=2">XEM CHI TIẾT →</a>
+                            </div>
+                        </div>
+                    </article>
 
-            <!-- Product 3 -->
-            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#FF4A1C] hover:shadow-xl">
-                <div class="p-4 flex justify-between items-start">
-                    <span class="text-[15px] font-bold text-outline group-hover:text-[#FF4A1C]">03</span>
-                    <span class="text-[11px] bg-[#FF4A1C] text-[#000000] px-2.5 py-0.5 uppercase tracking-widest font-extrabold shadow-sm">ĐƯỢC QUAN TÂM</span>
-                </div>
-                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
-                </div>
-                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary group-hover:text-[#FF4A1C] transition-colors leading-tight">MacBook Air M1 2020</h3>
-                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Apple Silicon 8-Core</div>
-                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
-                        <span class="text-[22px] font-black tracking-tight text-[#FF4A1C]">19.490.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary group-hover:text-[#FF4A1C] flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=3">XEM CHI TIẾT →</a>
-                    </div>
-                </div>
-            </article>
+                    <!-- Product 3 -->
+                    <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#FF4A1C] hover:shadow-xl">
+                        <div class="p-4 flex justify-between items-start">
+                            <span class="text-[15px] font-bold text-outline group-hover:text-[#FF4A1C]">03</span>
+                            <span class="text-[11px] bg-[#FF4A1C] text-[#000000] px-2.5 py-0.5 uppercase tracking-widest font-extrabold shadow-sm">ĐƯỢC QUAN TÂM</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
+                        </div>
+                        <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary group-hover:text-[#FF4A1C] transition-colors leading-tight">MacBook Air M1 2020</h3>
+                            <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Apple Silicon 8-Core</div>
+                            <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                                <span class="text-[22px] font-black tracking-tight text-[#FF4A1C]">19.490.000 ₫</span>
+                                <a class="text-[11px] uppercase tracking-widest font-bold text-primary group-hover:text-[#FF4A1C] flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=3">XEM CHI TIẾT →</a>
+                            </div>
+                        </div>
+                    </article>
 
-            <!-- Product 4 -->
-            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
-                <div class="p-4 flex justify-between items-start">
-                    <span class="text-[15px] font-bold text-outline group-hover:text-primary">04</span>
-                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
-                </div>
-                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
-                </div>
-                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ASUS Vivobook 15</h3>
-                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · OLED Display</div>
-                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
-                        <span class="text-[22px] font-black tracking-tight text-primary">14.500.000 ₫</span>
-                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=4">XEM CHI TIẾT →</a>
-                    </div>
-                </div>
-            </article>
+                    <!-- Product 4 -->
+                    <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                        <div class="p-4 flex justify-between items-start">
+                            <span class="text-[15px] font-bold text-outline group-hover:text-primary">04</span>
+                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
+                        </div>
+                        <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ASUS Vivobook 15</h3>
+                            <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · OLED Display</div>
+                            <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                                <span class="text-[22px] font-black tracking-tight text-primary">14.500.000 ₫</span>
+                                <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail?id=4">XEM CHI TIẾT →</a>
+                            </div>
+                        </div>
+                    </article>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </section>
@@ -277,93 +307,131 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Used Card 1 -->
-            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
-                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
-                    <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
-                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 8841-TP</span>
-                </div>
-                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
-                </div>
-                <div class="p-4 flex flex-col gap-2">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">ThinkPad T14 Gen 2</h3>
-                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
-                        <div class="text-outline">CHU KỲ SẠC</div>
-                        <div class="text-right font-bold text-primary">142 LẦN</div>
-                    </div>
-                    <div class="flex items-center justify-between pt-1 mt-1">
-                        <span class="text-[22px] font-black text-primary tracking-tight">12.800.000 ₫</span>
-                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=1">→</a>
-                    </div>
-                </div>
-            </article>
+            <c:choose>
+                <c:when test="${not empty featuredListings}">
+                    <c:forEach items="${featuredListings}" var="l" varStatus="loop">
+                        <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                            <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                                <span class="text-[11px] font-bold px-2.5 py-1 uppercase tracking-wider leading-none ${l.condition == 'DAMAGED' ? 'bg-[#FF4A1C] text-black' : (l.condition == 'USED_FAIR' ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white')}">
+                                    <c:choose>
+                                        <c:when test="${l.condition == 'DAMAGED'}">TÌNH TRẠNG: HƯ HỎNG</c:when>
+                                        <c:when test="${l.condition == 'USED_FAIR'}">TÌNH TRẠNG: TẠM (95%)</c:when>
+                                        <c:otherwise>TÌNH TRẠNG: LIKE NEW (99%)</c:otherwise>
+                                    </c:choose>
+                                </span>
+                                <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: #${l.id}</span>
+                            </div>
+                            <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                                <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="${l.mainImageUrl}" alt="${not empty l.device ? l.device.name : 'Laptop Cũ'}">
+                            </div>
+                            <div class="p-4 flex flex-col gap-2">
+                                <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight line-clamp-1">
+                                    <c:out value="${not empty l.device ? l.device.name : l.title}"/>
+                                </h3>
+                                <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                                    <div class="text-outline">CẤU HÌNH</div>
+                                    <div class="text-right font-bold text-primary">${not empty l.device ? l.device.ram : 'RAM 16GB'}</div>
+                                </div>
+                                <div class="flex items-center justify-between pt-1 mt-1">
+                                    <span class="text-[22px] font-black text-primary tracking-tight">
+                                        <fmt:formatNumber value="${l.price}" pattern="#,###"/> ₫
+                                    </span>
+                                    <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=${l.id}">→</a>
+                                </div>
+                            </div>
+                        </article>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <!-- Used Card 1 -->
+                    <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                        <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                            <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
+                            <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 8841-TP</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
+                        </div>
+                        <div class="p-4 flex flex-col gap-2">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">ThinkPad T14 Gen 2</h3>
+                            <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                                <div class="text-outline">CHU KỲ SẠC</div>
+                                <div class="text-right font-bold text-primary">142 LẦN</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-1 mt-1">
+                                <span class="text-[22px] font-black text-primary tracking-tight">12.800.000 ₫</span>
+                                <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=1">→</a>
+                            </div>
+                        </div>
+                    </article>
 
-            <!-- Used Card 2 -->
-            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
-                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
-                    <span class="text-[11px] bg-amber-500 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TẠM</span>
-                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 9022-MB</span>
-                </div>
-                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
-                </div>
-                <div class="p-4 flex flex-col gap-2">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">MacBook Air M1 2020</h3>
-                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
-                        <div class="text-outline">CHU KỲ SẠC</div>
-                        <div class="text-right font-bold text-primary">310 LẦN</div>
-                    </div>
-                    <div class="flex items-center justify-between pt-1 mt-1">
-                        <span class="text-[22px] font-black text-primary tracking-tight">13.900.000 ₫</span>
-                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=2">→</a>
-                    </div>
-                </div>
-            </article>
+                    <!-- Used Card 2 -->
+                    <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                        <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                            <span class="text-[11px] bg-amber-500 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TẠM</span>
+                            <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 9022-MB</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
+                        </div>
+                        <div class="p-4 flex flex-col gap-2">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">MacBook Air M1 2020</h3>
+                            <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                                <div class="text-outline">CHU KỲ SẠC</div>
+                                <div class="text-right font-bold text-primary">310 LẦN</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-1 mt-1">
+                                <span class="text-[22px] font-black text-primary tracking-tight">13.900.000 ₫</span>
+                                <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=2">→</a>
+                            </div>
+                        </div>
+                    </article>
 
-            <!-- Used Card 3 -->
-            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-[#FF4A1C] transition-all hover:shadow-xl">
-                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
-                    <span class="text-[11px] bg-[#FF4A1C] text-black font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: HƯ HỎNG</span>
-                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 1542-AC</span>
-                </div>
-                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
-                </div>
-                <div class="p-4 flex flex-col gap-2">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Acer Nitro 5</h3>
-                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
-                        <div class="text-outline">CHU KỲ SẠC</div>
-                        <div class="text-right font-bold text-primary">215 LẦN</div>
-                    </div>
-                    <div class="flex items-center justify-between pt-1 mt-1">
-                        <span class="text-[22px] font-black text-[#FF4A1C] tracking-tight">9.900.000 ₫</span>
-                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=3">→</a>
-                    </div>
-                </div>
-            </article>
+                    <!-- Used Card 3 -->
+                    <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-[#FF4A1C] transition-all hover:shadow-xl">
+                        <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                            <span class="text-[11px] bg-[#FF4A1C] text-black font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: HƯ HỎNG</span>
+                            <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 1542-AC</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
+                        </div>
+                        <div class="p-4 flex flex-col gap-2">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Acer Nitro 5</h3>
+                            <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                                <div class="text-outline">CHU KỲ SẠC</div>
+                                <div class="text-right font-bold text-primary">215 LẦN</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-1 mt-1">
+                                <span class="text-[22px] font-black text-[#FF4A1C] tracking-tight">9.900.000 ₫</span>
+                                <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=3">→</a>
+                            </div>
+                        </div>
+                    </article>
 
-            <!-- Used Card 4 -->
-            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
-                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
-                    <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
-                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 4109-DX</span>
-                </div>
-                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
-                </div>
-                <div class="p-4 flex flex-col gap-2">
-                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Dell XPS 13 9310</h3>
-                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
-                        <div class="text-outline">CHU KỲ SẠC</div>
-                        <div class="text-right font-bold text-primary">88 LẦN</div>
-                    </div>
-                    <div class="flex items-center justify-between pt-1 mt-1">
-                        <span class="text-[22px] font-black text-primary tracking-tight">16.500.000 ₫</span>
-                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=4">→</a>
-                    </div>
-                </div>
-            </article>
+                    <!-- Used Card 4 -->
+                    <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                        <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                            <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
+                            <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 4109-DX</span>
+                        </div>
+                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
+                        </div>
+                        <div class="p-4 flex flex-col gap-2">
+                            <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Dell XPS 13 9310</h3>
+                            <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                                <div class="text-outline">CHU KỲ SẠC</div>
+                                <div class="text-right font-bold text-primary">88 LẦN</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-1 mt-1">
+                                <span class="text-[22px] font-black text-primary tracking-tight">16.500.000 ₫</span>
+                                <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=4">→</a>
+                            </div>
+                        </div>
+                    </article>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </section>
