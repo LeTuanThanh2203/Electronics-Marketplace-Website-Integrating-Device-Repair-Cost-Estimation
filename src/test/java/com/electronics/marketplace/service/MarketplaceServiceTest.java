@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,6 +85,26 @@ class MarketplaceServiceTest {
         assertEquals(ListingCondition.USED_GOOD, created.getCondition());
         assertEquals(ListingStatus.AVAILABLE, created.getStatus());
         assertFalse(created.getImages().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Hỗ trợ tải lên nhiều hình ảnh thực tế cho một bài đăng")
+    void testCreateListingWithMultipleImages() {
+        User seller = new User(1L, "Test Seller", "seller@test.com", "0900000000", "TP.HCM");
+        List<String> images = Arrays.asList(
+                "https://example.com/img1.jpg",
+                "https://example.com/img2.jpg",
+                "https://example.com/img3.jpg"
+        );
+        Listing created = service.createListing(
+                seller, 1L, "USED_GOOD", "Máy đa góc chụp", new BigDecimal("15000000"),
+                images, "Apple", "MacBook Pro", "M2", "16GB", "512GB",
+                Collections.emptyList()
+        );
+
+        assertNotNull(created);
+        assertEquals(3, created.getImages().size());
+        assertEquals("https://example.com/img1.jpg", created.getMainImageUrl());
     }
 
     @Test

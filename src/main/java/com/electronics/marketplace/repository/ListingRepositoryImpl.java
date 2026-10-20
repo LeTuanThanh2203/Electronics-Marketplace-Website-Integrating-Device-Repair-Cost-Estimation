@@ -62,8 +62,9 @@ public class ListingRepositoryImpl implements ListingRepository {
                 "Máy cá nhân dùng làm việc kỹ thuật văn phòng tại nhà, giữ gìn rất cẩn thận. Mặt A dán skin nhôm carbon, màn hình sáng đẹp không tì vết. Bàn phím nảy tốt, kèm sạc zin Type-C 65W.",
                 new BigDecimal("12800000"));
         l1.setIsApproved(true);
-        l1.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx", 0));
-        l1.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuDhODs7XyBLSORa0vjBrDnTSGOgz8Itfi0qe9RFOUcklVa9bjz0kA_7DU3yhTNs-Ee-6MSYumRVJLeIXGDZ2XaGoDMrQ7JIgKHk5sFcpAyx7uyxu3fr-glBX_IXlrI0v-z8642VBFy7r4LzkZYv7BaWH4_q5MFpWFkgB8fMNzrJqfI93ggGVEPMJzmpUQKYX6xpXGvtSRotwdqMFu-LyW5TRy7hNn0wqzC4bICbCoYBb752oVC2YLQB", 1));
+        l1.addImage(new ListingImage("https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80", 0));
+        l1.addImage(new ListingImage("https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80", 1));
+        l1.addImage(new ListingImage("https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80", 2));
         l1.setCreatedAt(new Date(now - oneDay));
         memoryStore.put(1L, l1);
 
@@ -72,7 +73,7 @@ public class ListingRepositoryImpl implements ListingRepository {
                 "MacBook Air M1 bản Space Gray, máy xước nhẹ viền cạnh đáy do mang đi cà phê nhiều. Mọi chức năng TrueTone, Touch ID nhạy, pin còn 87% (310 chu kỳ sạc).",
                 new BigDecimal("13900000"));
         l2.setIsApproved(true);
-        l2.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0", 0));
+        l2.addImage(new ListingImage("https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80", 0));
         l2.setCreatedAt(new Date(now - 2 * oneDay));
         memoryStore.put(2L, l2);
 
@@ -81,7 +82,7 @@ public class ListingRepositoryImpl implements ListingRepository {
                 "Máy gaming cày đồ họa nhiều. Loa bên phải bị rè khi bật âm lượng trên 80%. Màn hình có 1 chấm sáng nhỏ ở góc dưới nhưng không ảnh hưởng chiến game. Bán rẻ cho anh em thợ hoặc về cắm tai nghe xài.",
                 new BigDecimal("9900000"));
         l3.setIsApproved(true);
-        l3.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E", 0));
+        l3.addImage(new ListingImage("https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80", 0));
         l3.addProblem(new ListingProblem(l3, probSpeaker, "Loa phải rè khi volume > 80%"));
         l3.addProblem(new ListingProblem(l3, probScreen, "1 đốm sáng góc dưới bên phải"));
         l3.setCreatedAt(new Date(now - 3 * oneDay));
@@ -92,7 +93,7 @@ public class ListingRepositoryImpl implements ListingRepository {
                 "Dell XPS 13 viền vô cực InfinityEdge tuyệt đẹp, pin sạc 88 lần. Vỏ nhôm nguyên khối màu Platinum Silver, chiếu nghỉ tay sợi carbon không bong tróc.",
                 new BigDecimal("16500000"));
         l4.setIsApproved(true);
-        l4.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU", 0));
+        l4.addImage(new ListingImage("https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&auto=format&fit=crop&q=80", 0));
         l4.setCreatedAt(new Date(now - 4 * oneDay));
         memoryStore.put(4L, l4);
 
@@ -101,7 +102,7 @@ public class ListingRepositoryImpl implements ListingRepository {
                 "Asus ROG Zephyrus G14 màu Moonlight White, ngoại hình đẹp 99%. Đầy đủ sạc zin 180W. Máy mát, hiệu năng cực khỏe làm Photoshop và Premiere mượt mà.",
                 new BigDecimal("18200000"));
         l5.setIsApproved(true);
-        l5.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw", 0));
+        l5.addImage(new ListingImage("https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&auto=format&fit=crop&q=80", 0));
         l5.setCreatedAt(new Date(now - 5 * oneDay));
         memoryStore.put(5L, l5);
 
@@ -110,7 +111,7 @@ public class ListingRepositoryImpl implements ListingRepository {
                 "Dòng doanh nhân siêu bền HP EliteBook. Ngoại hình 95%, bàn phím chống tràn nước tốt, loa Bang & Olufsen nghe nhạc rất hay.",
                 new BigDecimal("10500000"));
         l6.setIsApproved(true);
-        l6.addImage(new ListingImage("https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx", 0));
+        l6.addImage(new ListingImage("https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80", 0));
         l6.setCreatedAt(new Date(now - 6 * oneDay));
         memoryStore.put(6L, l6);
     }
