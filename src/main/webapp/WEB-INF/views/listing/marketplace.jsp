@@ -41,11 +41,12 @@
             <form id="marketplace-filter-form" method="GET" action="${pageContext.request.contextPath}/listing/marketplace" class="flex flex-col xl:flex-row items-stretch xl:items-center gap-3">
                 <div class="relative flex-1 min-w-[260px]">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none select-none flex items-center justify-center">search</span>
-                    <input id="live-search-input" name="keyword" value="${param.keyword}" class="w-full h-11 pl-11 pr-10 bg-surface-container-low border border-surface-dim text-sm text-primary placeholder:text-outline focus:border-primary focus:outline-none transition-colors" style="padding-left: 44px !important; padding-right: 40px !important;" placeholder="Tìm theo tên máy, cấu hình hoặc người bán..." type="text" autocomplete="off">
-                    <span id="search-spinner" class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#FF4A1C] text-[18px] animate-spin hidden pointer-events-none">progress_activity</span>
-                    <button type="button" id="search-clear-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary ${empty param.keyword ? 'hidden' : ''}" title="Xóa tìm kiếm">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
+                    <input id="search-input" name="keyword" value="<c:out value='${param.keyword}'/>" class="w-full h-11 pl-11 pr-10 bg-surface-container-low border border-surface-dim text-sm text-primary placeholder:text-outline focus:border-primary focus:outline-none transition-colors" style="padding-left: 44px !important; padding-right: 40px !important;" placeholder="Tìm theo tên máy, cấu hình hoặc người bán..." type="text">
+                    <c:if test="${not empty param.keyword}">
+                        <a href="${pageContext.request.contextPath}/listing/marketplace" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary flex items-center" title="Xóa tìm kiếm">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </a>
+                    </c:if>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     <div class="relative">

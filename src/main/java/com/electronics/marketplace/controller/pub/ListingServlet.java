@@ -61,33 +61,8 @@ public class ListingServlet extends HttpServlet {
             String ram = request.getParameter("ram");
 
             List<Listing> listings = marketplaceService.getAvailableMarketplaceListings(keyword, brand, condition, priceRange, ram);
-
-            // Rule 4: Hỗ trợ tìm kiếm Live Search (gõ đến đâu tìm đến đó qua AJAX/JSON)
-            String acceptHeader = request.getHeader("Accept");
-            boolean isAjax = "true".equalsIgnoreCase(request.getParameter("ajax"))
-                    || (acceptHeader != null && acceptHeader.contains("application/json"));
-            if (isAjax) {
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write(toJson(listings, request.getContextPath()));
-                return;
-            }
-
             request.setAttribute("listings", listings);
             request.getRequestDispatcher("/WEB-INF/views/listing/marketplace.jsp").forward(request, response);
-            return;
-        }
-
-        // Tuyến đường /listing/search (AJAX Live Search chuyên dụng)
-        if ("/search".equals(pathInfo) || "search".equals(action)) {
-            String keyword = request.getParameter("keyword");
-            String brand = request.getParameter("brand");
-            String condition = request.getParameter("condition");
-            String priceRange = request.getParameter("priceRange");
-            String ram = request.getParameter("ram");
-
-            List<Listing> listings = marketplaceService.getAvailableMarketplaceListings(keyword, brand, condition, priceRange, ram);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(toJson(listings, request.getContextPath()));
             return;
         }
 
@@ -350,85 +325,5 @@ public class ListingServlet extends HttpServlet {
         }
 
         return imageUrls;
-    }
-
-    /**
-     * Chuyển đổi danh sách bài đăng sang chuẩn JSON cho phản hồi Live Search (Rule 4)
-     */
-    private String toJson(List<Listing> listings, String contextPath) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"total\":").append(listings != null ? listings.size() : 0).append(",\"listings\":[");
-        if (listings != null) {
-            for (int i = 0; i < listings.size(); i++) {
-                if (i > 0) sb.append(",");
-                Listing l = listings.get(i);
-                sb.append("{");
-                sb.append("\"id\":").append(l.getId()).append(",");
-                sb.append("\"deviceName\":").append(escapeJson(l.getDevice() != null ? l.getDevice().getName() : "Laptop Đã Qua Sử Dụng")).append(",");
-                sb.append("\"brand\":").append(escapeJson(l.getDevice() != null && l.getDevice().getBrand() != null ? l.getDevice().getBrand() : "")).append(",");
-                sb.append("\"model\":").append(escapeJson(l.getDevice() != null && l.getDevice().getModel() != null ? l.getDevice().getModel() : "")).append(",");
-                sb.append("\"description\":").append(escapeJson(l.getDescription() != null ? l.getDescription() : "")).append(",");
-                sb.append("\"price\":").append(l.getPrice() != null ? l.getPrice().toPlainString() : "0").append(",");
-                sb.append("\"formattedPrice\":\"").append(formatCurrency(l.getPrice())).append("\",");
-                sb.append("\"condition\":").append(escapeJson(l.getCondition() != null ? l.getCondition().name() : "")).append(",");
-                sb.append("\"conditionLabel\":").append(escapeJson(getConditionLabel(l.getCondition()))).append(",");
-                sb.append("\"conditionBadgeClass\":").append(escapeJson(getConditionBadgeClass(l.getCondition()))).append(",");
-                sb.append("\"imageUrl\":").append(escapeJson(l.getMainImageUrl())).append(",");
-                sb.append("\"detailUrl\":\"").append(contextPath).append("/listing/detail?id=").append(l.getId()).append("\"");
-                sb.append("}");
-            }
-        }
-        sb.append("]}");
-        return sb.toString();
-    }
-
-    private String escapeJson(String s) {
-        if (s == null) return "\"\"";
-        StringBuilder sb = new StringBuilder("\"");
-        for (char c : s.toCharArray()) {
-            switch (c) {
-                case '"': sb.append("\\\""); break;
-                case '\\': sb.append("\\\\"); break;
-                case '\b': sb.append("\\b"); break;
-                case '\f': sb.append("\\f"); break;
-                case '\n': sb.append("\\n"); break;
-                case '\r': sb.append("\\r"); break;
-                case '\t': sb.append("\\t"); break;
-                default:
-                    if (c < ' ') {
-                        sb.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        sb.append(c);
-                    }
-            }
-        }
-        sb.append("\"");
-        return sb.toString();
-    }
-
-    private String formatCurrency(BigDecimal price) {
-        if (price == null) return "0";
-        java.text.DecimalFormat df = new java.text.DecimalFormat("#,###");
-        return df.format(price);
-    }
-
-    private String getConditionLabel(com.electronics.marketplace.entity.enums.ListingCondition condition) {
-        if (condition == com.electronics.marketplace.entity.enums.ListingCondition.USED_GOOD) {
-            return "TÌNH TRẠNG: TỐT (99%)";
-        }
-        if (condition == com.electronics.marketplace.entity.enums.ListingCondition.USED_FAIR) {
-            return "TÌNH TRẠNG: TẠM (95%)";
-        }
-        return "HƯ HỎNG LINH KIỆN";
-    }
-
-    private String getConditionBadgeClass(com.electronics.marketplace.entity.enums.ListingCondition condition) {
-        if (condition == com.electronics.marketplace.entity.enums.ListingCondition.USED_GOOD) {
-            return "bg-emerald-600 text-white";
-        }
-        if (condition == com.electronics.marketplace.entity.enums.ListingCondition.USED_FAIR) {
-            return "bg-amber-500 text-white";
-        }
-        return "bg-[#FF4A1C] text-black";
     }
 }
