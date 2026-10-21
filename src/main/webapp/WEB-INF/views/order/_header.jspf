@@ -1,0 +1,2 @@
+<%-- Bridge to master unified header --%>
+<%@ include file="/WEB-INF/layout/header.jspf" %>

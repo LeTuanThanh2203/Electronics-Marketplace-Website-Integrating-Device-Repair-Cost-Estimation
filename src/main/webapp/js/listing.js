@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(err => {
                 console.warn('Contact fetch:', err);
-                // Fallback for mock preview if server endpoint is in mock mode
                 const fallbackPhone = contactBtn.getAttribute('data-phone') || '0912 888 999';
                 contactBox.innerHTML = `
                     <div class="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 flex items-center justify-between">
@@ -79,12 +78,262 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     };
 
-    // Image URL preview on Form page
-    window.previewImageUrl = function(input) {
+    // ========================================================
+    // Form Image Gallery Manager (Hỗ trợ thêm nhiều ảnh & nút ✕ xóa ảnh)
+    // ========================================================
+    window.uploadedFilesList = []; // Mảng chứa các file mới: { id, file, url }
+
+    // Đồng bộ mảng uploadedFilesList vào thẻ <input type="file" name="imageFiles" id="image-file-input"> bằng DataTransfer
+    window.syncFileInput = function() {
+        const input = document.getElementById('image-file-input');
+        if (!input) return;
+        try {
+            const dt = new DataTransfer();
+            window.uploadedFilesList.forEach(item => {
+                if (item.file) dt.items.add(item.file);
+            });
+            input.files = dt.files;
+        } catch (e) {
+            console.warn('DataTransfer sync warning:', e);
+        }
+    };
+
+    // Chọn ảnh xem trước trên Form đăng/sửa
+    window.selectFormPreview = function(src, element) {
         const previewImg = document.getElementById('image-live-preview');
-        if (previewImg && input && input.value) {
-            previewImg.src = input.value;
+        const previewEmpty = document.getElementById('main-preview-empty');
+        const previewBadge = document.getElementById('main-preview-badge');
+
+        if (previewImg && src) {
+            previewImg.src = src;
             previewImg.classList.remove('hidden');
+        }
+        if (previewEmpty) {
+            previewEmpty.classList.add('hidden');
+        }
+        if (previewBadge) {
+            previewBadge.classList.remove('hidden');
+        }
+
+        document.querySelectorAll('#multi-preview-thumbnails .form-thumb-item').forEach(item => {
+            item.classList.remove('border-[#FF4A1C]', 'ring-1', 'ring-[#FF4A1C]');
+            item.classList.add('border-surface-dim');
+        });
+
+        if (element) {
+            element.classList.add('border-[#FF4A1C]', 'ring-1', 'ring-[#FF4A1C]');
+            element.classList.remove('border-surface-dim');
+            const badge = element.querySelector('.thumb-badge');
+            if (previewBadge && badge) {
+                previewBadge.textContent = badge.textContent === 'Bìa' ? 'Ảnh bìa chính' : 'Ảnh ' + badge.textContent;
+            }
+        }
+    };
+
+    // Cập nhật nhãn số thứ tự ảnh (Bìa, #2, #3...) và trạng thái khung preview lớn
+    window.updateGalleryState = function() {
+        const previewImg = document.getElementById('image-live-preview');
+        const previewEmpty = document.getElementById('main-preview-empty');
+        const previewBadge = document.getElementById('main-preview-badge');
+        const sizeInfo = document.getElementById('file-size-info');
+        const chosenText = document.getElementById('file-chosen-text');
+        const thumbnailsContainer = document.getElementById('multi-preview-thumbnails');
+        const allItems = document.querySelectorAll('#multi-preview-thumbnails .form-thumb-item');
+
+        const totalCount = allItems.length;
+
+        if (totalCount === 0) {
+            if (previewImg) {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+            }
+            if (previewEmpty) {
+                previewEmpty.classList.remove('hidden');
+            }
+            if (previewBadge) {
+                previewBadge.classList.add('hidden');
+            }
+            if (sizeInfo) {
+                sizeInfo.textContent = 'Chưa có ảnh nào';
+            }
+            if (chosenText) {
+                chosenText.textContent = '+ THÊM ẢNH TỪ MÁY TÍNH';
+            }
+            if (thumbnailsContainer && !document.getElementById('no-thumbs-msg')) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.id = 'no-thumbs-msg';
+                emptyMsg.className = 'col-span-full py-4 px-3 text-center text-xs text-outline italic border border-dashed border-surface-dim bg-surface-container-low';
+                emptyMsg.textContent = 'Chưa chọn ảnh nào. Hãy bấm nút "+ THÊM ẢNH TỪ MÁY TÍNH" ở trên để chọn ảnh thiết bị của bạn.';
+                thumbnailsContainer.appendChild(emptyMsg);
+            }
+            return;
+        }
+
+        const noMsg = document.getElementById('no-thumbs-msg');
+        if (noMsg) noMsg.remove();
+
+        let hasActive = false;
+        let activeItem = null;
+        allItems.forEach((item, idx) => {
+            const badge = item.querySelector('.thumb-badge');
+            if (badge) {
+                badge.textContent = (idx === 0) ? 'Bìa' : '#' + (idx + 1);
+            }
+            if (item.classList.contains('border-[#FF4A1C]')) {
+                hasActive = true;
+                activeItem = item;
+            }
+        });
+
+        // Nếu chưa có ảnh nào được active, chọn ảnh đầu tiên
+        if (!hasActive && allItems[0]) {
+            const firstImg = allItems[0].querySelector('img');
+            if (firstImg) {
+                selectFormPreview(firstImg.src, allItems[0]);
+            }
+        } else if (activeItem) {
+            const activeImg = activeItem.querySelector('img');
+            if (activeImg) {
+                selectFormPreview(activeImg.src, activeItem);
+            }
+        }
+
+        if (chosenText) {
+            chosenText.textContent = '+ THÊM ẢNH KHÁC TỪ MÁY TÍNH';
+        }
+
+        // Tính dung lượng file mới thêm
+        let totalBytes = 0;
+        window.uploadedFilesList.forEach(item => {
+            if (item.file && item.file.size) totalBytes += item.file.size;
+        });
+        const mbText = totalBytes > 0 ? ' (' + (totalBytes / (1024 * 1024)).toFixed(1) + ' MB mới)' : '';
+        if (sizeInfo) {
+            sizeInfo.textContent = 'Đã chọn ' + totalCount + ' ảnh' + mbText;
+        }
+    };
+
+    // Xử lý khi người dùng chọn 1 hoặc nhiều ảnh từ máy tính (nút chọn nhiều lần)
+    window.handleImageSelection = function(pickerInput) {
+        if (!pickerInput || !pickerInput.files || pickerInput.files.length === 0) return;
+
+        const newFiles = Array.from(pickerInput.files);
+        const thumbnailsContainer = document.getElementById('multi-preview-thumbnails');
+        const noMsg = document.getElementById('no-thumbs-msg');
+        if (noMsg) noMsg.remove();
+
+        newFiles.forEach(file => {
+            const fileId = 'f_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+            const objectUrl = URL.createObjectURL(file);
+
+            window.uploadedFilesList.push({
+                id: fileId,
+                file: file,
+                url: objectUrl
+            });
+
+            // Tạo thẻ thumbnail thu nhỏ có nút ✕ ở góc trên bên phải
+            const thumbDiv = document.createElement('div');
+            thumbDiv.id = 'thumb-new-' + fileId;
+            thumbDiv.className = 'form-thumb-item new-image-item aspect-[4/3] border border-surface-dim bg-surface-container-low p-0.5 relative overflow-hidden transition-all group';
+
+            const img = document.createElement('img');
+            img.src = objectUrl;
+            img.className = 'w-full h-full object-cover cursor-pointer';
+            img.onclick = function() {
+                selectFormPreview(objectUrl, thumbDiv);
+            };
+
+            const badge = document.createElement('span');
+            badge.className = 'thumb-badge absolute bottom-0.5 left-0.5 px-1 py-0.2 bg-black/75 text-white text-[9px] font-mono';
+            badge.textContent = '#';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-[11px] font-bold shadow z-10 transition-transform hover:scale-110 cursor-pointer border-0';
+            removeBtn.title = 'Xóa ảnh này';
+            removeBtn.textContent = '✕';
+            removeBtn.onclick = function(ev) {
+                ev.stopPropagation();
+                removeNewUploadedFile(fileId);
+            };
+
+            thumbDiv.appendChild(img);
+            thumbDiv.appendChild(badge);
+            thumbDiv.appendChild(removeBtn);
+            if (thumbnailsContainer) {
+                thumbnailsContainer.appendChild(thumbDiv);
+            }
+        });
+
+        // Reset giá trị picker để lần sau bấm chọn tiếp vẫn kích hoạt sự kiện onchange
+        pickerInput.value = '';
+
+        syncFileInput();
+        updateGalleryState();
+    };
+
+    // Xóa ảnh mới vừa chọn từ máy tính theo ID
+    window.removeNewUploadedFile = function(fileId) {
+        const itemObj = window.uploadedFilesList.find(f => f.id === fileId);
+        if (itemObj && itemObj.url) {
+            try { URL.revokeObjectURL(itemObj.url); } catch (e) {}
+        }
+        window.uploadedFilesList = window.uploadedFilesList.filter(f => f.id !== fileId);
+        const item = document.getElementById('thumb-new-' + fileId);
+        if (item) {
+            item.remove();
+        }
+        syncFileInput();
+        updateGalleryState();
+    };
+
+    // Xóa ảnh cũ đã lưu trước đó (khi chỉnh sửa tin đăng)
+    window.removeExistingImage = function(buttonElem) {
+        if (!buttonElem) return;
+        const item = buttonElem.closest('.form-thumb-item');
+        if (item) {
+            item.remove();
+            updateGalleryState();
+        }
+    };
+
+    // Khởi tạo trạng thái ban đầu cho giao diện ảnh nếu đang ở form
+    const thumbnailsContainer = document.getElementById('multi-preview-thumbnails');
+    if (thumbnailsContainer) {
+        updateGalleryState();
+    }
+
+    // Device Dropdown change: auto-fill specs or allow custom input
+    window.onDeviceSelectChange = function(selectElem) {
+        if (!selectElem) return;
+        const brandInput = document.getElementById('input-brand');
+        const modelInput = document.getElementById('input-model');
+        const cpuInput = document.getElementById('input-cpu');
+        const ramInput = document.getElementById('input-ram');
+        const storageInput = document.getElementById('input-storage');
+
+        if (selectElem.value === "0" || selectElem.value === "") {
+            // Tự nhập dòng máy mới
+            if (brandInput) {
+                brandInput.value = '';
+                brandInput.placeholder = "Nhập thương hiệu (VD: Lenovo, Dell, Apple...)";
+                brandInput.focus();
+            }
+            if (modelInput) {
+                modelInput.value = '';
+                modelInput.placeholder = "Nhập model (VD: Legion 5, XPS 15...)";
+            }
+            return;
+        }
+
+        const selectedOpt = selectElem.options[selectElem.selectedIndex];
+        if (selectedOpt) {
+            if (brandInput && selectedOpt.dataset.brand) brandInput.value = selectedOpt.dataset.brand;
+            if (modelInput && selectedOpt.dataset.model) modelInput.value = selectedOpt.dataset.model;
+            if (cpuInput && selectedOpt.dataset.cpu) cpuInput.value = selectedOpt.dataset.cpu;
+            if (ramInput && selectedOpt.dataset.ram) ramInput.value = selectedOpt.dataset.ram;
+            if (storageInput && selectedOpt.dataset.storage) storageInput.value = selectedOpt.dataset.storage;
         }
     };
 
@@ -215,8 +464,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             </span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold uppercase">ID: #${item.id}</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
-                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" 
+                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" 
                                  src="${item.imageUrl}" 
                                  alt="${escapeHtml(item.deviceName)}">
                         </div>

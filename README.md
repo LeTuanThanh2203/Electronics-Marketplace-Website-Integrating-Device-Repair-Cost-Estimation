@@ -1,40 +1,4 @@
-# 🤝 TRUNG TÂM PHỐI HỢP DỰ ÁN & ĐIỀU HỢP XUNG ĐỘT (5 THÀNH VIÊN)
-> **Dự án:** Electronics Marketplace & Repair System  
-> **Nhánh đích:** `integration` | **Trạng thái:** ✅ **100% BUILD SUCCESS & 31/31 UNIT TESTS PASS**  
-> **Nguyên tắc vàng:** *"Mỗi người một module — Giao tiếp qua URL, Entity chuẩn & Session — Không ghi đè file chung."*
-
----
-
-## 📌 DANH MỤC TÀI LIỆU PHỐI HỢP CỦA 5 THÀNH VIÊN
-
-| Thành viên | Phân hệ phụ trách | Tài liệu hướng dẫn & Xử lý Conflict | Test Suite & Trạng thái |
-|---|---|---|:---:|
-| **Lê Tuấn Thành** | Chợ Đồ Cũ C2C (`/listing`), Trang Chủ (`/home`) & UI Core Google Stitch | 📖 [PHOI-HOP-THANH.md](phoi-hop/PHOI-HOP-THANH.md) | **10/10 PASS** (`MarketplaceServiceTest`) |
-| **Ca Ngọc Tân** | Tài khoản, Bảo mật RBAC (`/auth/*`), Admin Dashboard (`/admin/*`) | 📖 [PHOI-HOP-TAN.md](phoi-hop/PHOI-HOP-TAN.md) | Sạch 100% Session `currentUser` |
-| **Phạm Phước Anh** | Cửa Hàng Máy Mới B2C (`/product`), Thuật toán Gợi ý AI & So sánh EAV | 📖 [PHOI-HOP-ANH.md](phoi-hop/PHOI-HOP-ANH.md) | Chuẩn Form POST Giỏ hàng & Fail-safe |
-| **Huỳnh Thuyên Nam**| Giỏ Hàng (`/cart`), Đơn Hàng (`/order`), Thanh toán MoMo Sandbox | 📖 [PHOI-HOP-NAM.md](phoi-hop/PHOI-HOP-NAM.md) | **3/3 PASS** (`MomoGatewayTest`) |
-| **Phạm Nguyễn Vương Quốc**| Dịch Vụ Sửa Chữa (`/repair`), Báo Giá Dự Toán & Báo Cáo Thống Kê | 📖 [PHOI-HOP-QUOC.md](phoi-hop/PHOI-HOP-QUOC.md) | **18/18 PASS** (`RepairServiceTest`) |
-
----
-
-## ⚡ 4 QUY TẮC CỐT LÕI BẢO VỆ CODEBASE (TOÀN ĐỘI TUÂN THỦ)
-
-```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ 1. SESSION KEY THỐNG NHẤT:                                                             │
-│    • Dùng duy nhất "currentUser" (User), không dùng "user".                            │
-│ 2. CHỐNG TRANH MUA MÁY CŨ (BR-20):                                                     │
-│    • Chốt mua máy cũ phải qua lệnh Atomic UPDATE trạng thái sang RESERVED.             │
-│ 3. KHÔNG SỬA ĐÈ CẤU HÌNH CHUNG:                                                        │
-│    • persistence.xml, JpaConfig.java, pom.xml, web.xml do Nam/Tân đồng bộ.             │
-│ 4. UNIT TEST TRƯỚC KHI PUSH:                                                           │
-│    • Chạy `mvn test` để đảm bảo không ai làm gãy test của người khác.                  │
-└────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-# 🚀 HƯỚNG DẪN CÀI ĐẶT & CHẠY DỰ ÁN ELECTRONICS MARKETPLACE
+# Hướng Dẫn Cài Đặt & Chạy Dự Án Electronics Marketplace
 
 Dự án Web Java Servlet / Jakarta EE 10 (Tomcat 10.1+) kết hợp Hibernate JPA 6.4.4 và cơ sở dữ liệu PostgreSQL.
 
@@ -110,4 +74,3 @@ Dự án sử dụng `JpaConfig` tự động nhận diện kết nối theo th�
    - Nút **"CHỐT MUA MÁY (GIỮ CHỖ)"**: Khóa giữ chỗ máy và tạo đơn hàng `orders` trạng thái chờ người bán xác nhận.
 4. **Phân hệ Sửa chữa (`/repair`):**
    - Dự toán chi phí sửa chữa theo dòng máy và loại lỗi, tra cứu tiến độ sửa chữa (`/repair/track`).
-

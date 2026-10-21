@@ -296,10 +296,10 @@
                                     </div>
 
                                     <!-- Product Image -->
-                                    <div class="aspect-[4/3] bg-white flex items-center justify-center p-3 my-2 border border-[#EAEAE8] overflow-hidden relative">
+                                    <div class="aspect-[4/3] bg-brand-card flex items-center justify-center p-3 my-2 border border-[#EAEAE8] overflow-hidden relative">
                                         <c:choose>
                                             <c:when test="${not empty p.imageUrl}">
-                                                <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" 
+                                                <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
                                                      src="${p.imageUrl}" alt="${p.name}">
                                             </c:when>
                                             <c:otherwise>
@@ -483,3 +483,4 @@
 </script>
 
 <%@ include file="/WEB-INF/layout/footer.jspf" %>
+

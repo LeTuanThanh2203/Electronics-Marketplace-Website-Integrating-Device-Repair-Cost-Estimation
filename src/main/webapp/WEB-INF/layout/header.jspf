@@ -154,16 +154,9 @@
                     <div class="flex items-center gap-2">
                         <a class="flex items-center gap-1.5 h-9 px-2.5 border border-surface-dim bg-surface-container-lowest hover:border-primary text-primary transition-colors text-xs font-semibold" 
                            href="${ctx}/profile" title="Hồ sơ cá nhân">
-                            <c:choose>
-                                <c:when test="${not empty currentUser.avatar}">
-                                    <img src="<c:url value='${currentUser.avatar}'/>" alt="Avatar" class="w-5 h-5 rounded-full object-cover">
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="w-5 h-5 rounded-full bg-primary text-white font-mono text-[10px] flex items-center justify-center">
-                                        ${currentUser.initial}
-                                    </span>
-                                </c:otherwise>
-                            </c:choose>
+                            <span class="w-5 h-5 rounded-full bg-primary text-white font-mono text-[10px] flex items-center justify-center">
+                                ${currentUser.initial}
+                            </span>
                             <span class="hidden xl:inline max-w-[100px] truncate">${currentUser.name}</span>
                         </a>
 

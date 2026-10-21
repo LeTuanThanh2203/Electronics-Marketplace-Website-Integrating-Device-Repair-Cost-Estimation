@@ -1,88 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Laptop Cũ - ElectronicsMarketplace</title>
-    
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/listing.css">
+<c:set var="pageTitle" value="Chi Tiết Laptop Cũ — ELECTRONICSMARKETPLACE" scope="request"/>
+<c:set var="activeNav" value="used" scope="request"/>
+<%@ include file="/WEB-INF/layout/header.jspf" %>
 
-    <!-- Tailwind Configuration & CDN for Stitch Source of Truth -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "surface": "#f9f9f7", "surface-dim": "#dadad8", "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#f4f4f2", "surface-container": "#eeeeec", "surface-container-high": "#e8e8e6",
-            "on-surface": "#1a1c1b", "on-surface-variant": "#444748", "outline": "#747878",
-            "primary": "#000000", "on-primary": "#ffffff", "primary-container": "#1c1b1b",
-            "secondary-container": "#dc3200"
-          },
-          fontFamily: {
-            "body": ["Be Vietnam Pro", "sans-serif"],
-            "headline": ["Be Vietnam Pro", "sans-serif"]
-          }
-        }
-      }
-    };
-    </script>
-</head>
-<body class="bg-surface font-body text-on-surface antialiased">
-
-<!-- Unified Fixed Header (100% Đồng bộ home.jsp) -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-surface-dim">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 h-16 flex items-center justify-between">
-        <div class="flex items-center shrink-0">
-            <a class="text-[18px] text-primary tracking-wider uppercase font-extrabold flex items-center gap-2" href="${pageContext.request.contextPath}/home">
-                <span class="w-3.5 h-3.5 bg-[#FF4A1C] inline-block"></span>
-                ELECTRONICSMARKETPLACE
-            </a>
-        </div>
-        <nav class="hidden md:flex items-center h-full gap-6">
-            <a class="text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary font-medium" href="${pageContext.request.contextPath}/product/list">LAPTOP MỚI</a>
-            <a class="text-[13px] uppercase tracking-wider text-primary border-b-2 border-primary font-bold transition-colors py-2" href="${pageContext.request.contextPath}/listing/marketplace">CHỢ LAPTOP CŨ</a>
-            <a class="text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary font-medium" href="${pageContext.request.contextPath}/repair/request">SỬA CHỮA</a>
-        </nav>
-        <div class="flex items-center gap-3">
-            <a class="inline-flex items-center gap-1.5 h-9 px-4 bg-[#FF4A1C] text-black font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-sm" href="${pageContext.request.contextPath}/listing/form">
-                <span class="material-symbols-outlined text-[16px]">add_circle</span>
-                <span>ĐĂNG BÁN MÁY</span>
-            </a>
-            <a class="flex items-center justify-center w-9 h-9 border border-surface-dim text-on-surface-variant hover:text-primary hover:border-primary transition-colors" href="${pageContext.request.contextPath}/cart" title="Giỏ hàng">
-                <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
-            </a>
-            <c:choose>
-                <c:when test="${not empty sessionScope.currentUser}">
-                    <a class="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase ml-1" href="${pageContext.request.contextPath}/auth/profile">
-                        <span class="material-symbols-outlined text-[20px]">account_circle</span>
-                        <span class="hidden lg:inline"><c:out value="${sessionScope.currentUser.name}"/></span>
-                    </a>
-                </c:when>
-                <c:otherwise>
-                    <a class="flex items-center gap-1 text-xs uppercase text-on-surface-variant hover:text-primary transition-colors font-medium ml-1" href="${pageContext.request.contextPath}/auth/login">
-                        <span class="material-symbols-outlined text-[18px]">person</span>
-                        <span class="hidden lg:inline">Tài khoản</span>
-                    </a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-</header>
-
-<main class="w-full pt-16 bg-surface min-h-[calc(100vh-64px)]">
     <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-8">
         
         <!-- Breadcrumb Navigation -->
@@ -95,9 +17,43 @@
             <a class="hover:text-primary transition-colors" href="${pageContext.request.contextPath}/listing/marketplace">Chợ đồ cũ</a>
             <span>/</span>
             <span class="text-primary font-bold truncate">
-                <c:out value="${not empty listing ? listing.device.name : 'ThinkPad T14 Gen 2 Carbon Edition'}"/>
+                <c:out value="${not empty listing ? listing.device.name : 'Chi tiết thiết bị'}"/>
             </span>
         </nav>
+
+        <!-- Notification Banner: Creation Success -->
+        <c:if test="${param.created == '1'}">
+            <div class="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-950 flex items-center justify-between gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-emerald-600 text-[26px]">task_alt</span>
+                    <div>
+                        <div class="font-extrabold text-sm uppercase tracking-wide text-emerald-900">ĐĂNG BÁN MÁY THÀNH CÔNG!</div>
+                        <div class="text-xs text-emerald-800 mt-0.5">Tin đăng #${listing.id} đã được khởi tạo và lưu vào hệ thống an toàn.</div>
+                    </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/listing/marketplace" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0">
+                    Xem Chợ Đồ Cũ
+                </a>
+            </div>
+        </c:if>
+
+        <!-- Notification Banner: Pending Admin Approval -->
+        <c:if test="${not empty listing && !listing.isApproved}">
+            <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-amber-600 text-[26px] shrink-0">pending_actions</span>
+                    <div>
+                        <div class="font-extrabold text-sm uppercase tracking-wide text-amber-900">TIN ĐĂNG ĐANG CHỜ DUYỆT (QUY CHUẨN BR-15)</div>
+                        <div class="text-xs text-amber-800 mt-0.5">
+                            Tin đăng của bạn hiện đang ở trạng thái chờ duyệt. Quản trị viên (Admin) sẽ kiểm duyệt trước khi tin hiển thị công khai trên Chợ Đồ Cũ.
+                        </div>
+                    </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/admin/dashboard" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0">
+                    Trang Duyệt Tin (Admin)
+                </a>
+            </div>
+        </c:if>
 
         <!-- Two-Column Product Detail Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -125,7 +81,8 @@
                     <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden mt-8">
                         <img id="main-preview-img" 
                              class="w-full h-full object-contain p-4 transition-transform duration-300"
-                             src="${not empty listing.images ? listing.images[0].imageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx'}" 
+                             src="${not empty listing.images ? listing.images[0].imageUrl : listing.mainImageUrl}" 
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80';"
                              alt="Product View">
                     </div>
 
@@ -135,24 +92,32 @@
                     </div>
                 </div>
 
-                <!-- Interactive Thumbnails Grid -->
-                <div class="grid grid-cols-4 gap-3">
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx', this)" 
-                            class="thumb-btn active border-2 border-[#FF4A1C] bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhsfIBalXmMjhm1NLSQt6Qkz_OmWr2qcpKxJyrVsvza8nGYMeKenQaqdW_amrvTYf5pRjv8UBUSw4A0wDt_dUw7SWUxo34ZS_r0k0CZi43jMo1RTEUvkVGpIc1bVGAIMEgdhXDI33Vm-9hUhDYA6j_1l4U54e0k94ozBGr9ID-NWC-wAa72xeVo2ukKbWRZA0oPGhsaat6O_hva43CM99e-XhMkJ24anxVCuySREIaIgoX6VxWOSUx" class="w-full h-full object-cover">
-                    </button>
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuDhODs7XyBLSORa0vjBrDnTSGOgz8Itfi0qe9RFOUcklVa9bjz0kA_7DU3yhTNs-Ee-6MSYumRVJLeIXGDZ2XaGoDMrQ7JIgKHk5sFcpAyx7uyxu3fr-glBX_IXlrI0v-z8642VBFy7r4LzkZYv7BaWH4_q5MFpWFkgB8fMNzrJqfI93ggGVEPMJzmpUQKYX6xpXGvtSRotwdqMFu-LyW5TRy7hNn0wqzC4bICbCoYBb752oVC2YLQB', this)" 
-                            class="thumb-btn border border-surface-dim hover:border-primary bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhODs7XyBLSORa0vjBrDnTSGOgz8Itfi0qe9RFOUcklVa9bjz0kA_7DU3yhTNs-Ee-6MSYumRVJLeIXGDZ2XaGoDMrQ7JIgKHk5sFcpAyx7uyxu3fr-glBX_IXlrI0v-z8642VBFy7r4LzkZYv7BaWH4_q5MFpWFkgB8fMNzrJqfI93ggGVEPMJzmpUQKYX6xpXGvtSRotwdqMFu-LyW5TRy7hNn0wqzC4bICbCoYBb752oVC2YLQB" class="w-full h-full object-cover">
-                    </button>
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuA6iomvEWxZ9JcwC0wMKAmGiwmN8QMYVyGh4vWyEtYM4IAfaB8ld_BH4_Q-GkwO2IdMcZLkj52kEroIVm4zVtzr7hkHWFKKru-QjhjHaucCcwwiVXggEuR6LB7EkAcojKFnZ6LHKx5Auo7xaqjwgsuQ4i21I3NkYCGk_aLiJKd87InNEaeTlLFUzzaQBVG5Ivtw4HFQojJVQqTA0lOk7Qp9E2XPYpcGeZPbUHuw_d9YZ72ct2cvS10y', this)" 
-                            class="thumb-btn border border-surface-dim hover:border-primary bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6iomvEWxZ9JcwC0wMKAmGiwmN8QMYVyGh4vWyEtYM4IAfaB8ld_BH4_Q-GkwO2IdMcZLkj52kEroIVm4zVtzr7hkHWFKKru-QjhjHaucCcwwiVXggEuR6LB7EkAcojKFnZ6LHKx5Auo7xaqjwgsuQ4i21I3NkYCGk_aLiJKd87InNEaeTlLFUzzaQBVG5Ivtw4HFQojJVQqTA0lOk7Qp9E2XPYpcGeZPbUHuw_d9YZ72ct2cvS10y" class="w-full h-full object-cover">
-                    </button>
-                    <button type="button" onclick="selectThumbnail('https://lh3.googleusercontent.com/aida-public/AB6AXuDFCa4tIIFfr-BM4ZoVNvkDoZD8vYyzTaYbV53FfiL3pQSgJS6xxfy-YlKwSY_1IC4E3ErNK3aap5aWQd90yJbzAAnn9Ji02niPO6t2AF8G5bNawW2-uHpGO_2PMw9hIf2FGB2OwIxP8W6mxFsc0L6TpA6CWdRGRISvjtrC-gs5xyYbFYk1tsS56SSi5eT6lmdXl7plqwSGhKNu1hTAkx2OJLKaybW5kMLvBuRSjVRmXG_p1SacBCNe', this)" 
-                            class="thumb-btn border border-surface-dim hover:border-primary bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFCa4tIIFfr-BM4ZoVNvkDoZD8vYyzTaYbV53FfiL3pQSgJS6xxfy-YlKwSY_1IC4E3ErNK3aap5aWQd90yJbzAAnn9Ji02niPO6t2AF8G5bNawW2-uHpGO_2PMw9hIf2FGB2OwIxP8W6mxFsc0L6TpA6CWdRGRISvjtrC-gs5xyYbFYk1tsS56SSi5eT6lmdXl7plqwSGhKNu1hTAkx2OJLKaybW5kMLvBuRSjVRmXG_p1SacBCNe" class="w-full h-full object-cover">
-                    </button>
+                <!-- Interactive Thumbnails Grid (Render đúng danh sách ảnh thực tế của bài đăng) -->
+                <div class="grid grid-cols-4 sm:grid-cols-5 gap-3" id="listing-thumbnails-grid">
+                    <c:choose>
+                        <c:when test="${not empty listing.images && listing.images.size() > 0}">
+                            <c:forEach items="${listing.images}" var="img" varStatus="status">
+                                <button type="button" 
+                                        onclick="selectThumbnail('${img.imageUrl}', this)" 
+                                        class="thumb-btn ${status.first ? 'active border-2 border-[#FF4A1C]' : 'border border-surface-dim hover:border-primary'} bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-all relative group overflow-hidden">
+                                    <img src="${img.imageUrl}" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80';" 
+                                         class="w-full h-full object-cover">
+                                    <span class="absolute bottom-1 left-1 px-1 py-0.2 bg-black/80 text-white text-[9px] font-mono">${status.first ? 'Bìa' : '#' += status.count}</span>
+                                </button>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="button" 
+                                    onclick="selectThumbnail('${listing.mainImageUrl}', this)" 
+                                    class="thumb-btn active border-2 border-[#FF4A1C] bg-surface-container-lowest p-1 aspect-[4/3] flex items-center justify-center cursor-pointer transition-colors relative">
+                                <img src="${listing.mainImageUrl}" 
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80';" 
+                                     class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 left-1 px-1 py-0.2 bg-black/80 text-white text-[9px] font-mono">Bìa</span>
+                            </button>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <!-- Trust Signals Box -->
@@ -347,47 +312,6 @@
             </div>
         </div>
     </div>
-</main>
 
-<!-- Unified Architectural Footer (100% Đồng bộ home.jsp) -->
-<footer class="w-full bg-[#050505] text-on-primary border-t border-zinc-800 mt-20">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 border-b border-zinc-800 pb-8 mb-8">
-            <div class="flex flex-col gap-2">
-                <a class="text-[18px] text-white tracking-wider uppercase font-extrabold flex items-center gap-2" href="${pageContext.request.contextPath}/home">
-                    <span class="w-3 h-3 bg-[#FF4A1C]"></span>
-                    ELECTRONICSMARKETPLACE
-                </a>
-                <p class="text-[12px] text-zinc-400 mt-2">Sàn giao dịch laptop cũ & mới minh bạch 100% lịch sử phần cứng và tiêu chuẩn kiểm định 48 bước.</p>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">DANH MỤC</span>
-                <a href="${pageContext.request.contextPath}/product/list" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Laptop Mới</a>
-                <a href="${pageContext.request.contextPath}/listing/marketplace" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Chợ Laptop Cũ</a>
-                <a href="${pageContext.request.contextPath}/repair/request" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Dịch Vụ Sửa Chữa</a>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">DÀNH CHO NGƯỜI BÁN</span>
-                <a href="${pageContext.request.contextPath}/listing/form" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Đăng Tin Bán Máy</a>
-                <a href="${pageContext.request.contextPath}/listing/my" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Quản Lý Tin Của Tôi</a>
-                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Quy Chuẩn Kiểm Định</a>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">HỖ TRỢ & BẢO HÀNH</span>
-                <span class="text-[13px] text-zinc-300 uppercase font-medium">Hotline: 1900 8888</span>
-                <span class="text-[13px] text-zinc-300 uppercase font-medium">Email: support@electronics.vn</span>
-                <span class="text-[11px] text-zinc-500 mt-2">Bao test 7 ngày • Đổi trả minh bạch</span>
-            </div>
-        </div>
-        <div class="flex flex-col md:flex-row items-center justify-between font-mono text-[10px] text-zinc-600 uppercase tracking-widest">
-            <span>© 2026 ELECTRONICSMARKETPLACE. ALL RIGHTS RESERVED.</span>
-            <span>TASK CHỢ ĐỒ CŨ (THÀNH) • STITCH DESIGN ARCHITECTURE</span>
-        </div>
-    </div>
-</footer>
-
-<!-- Scripts -->
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/js/listing.js"></script>
-</body>
-</html>
+<%@ include file="/WEB-INF/layout/footer.jspf" %>

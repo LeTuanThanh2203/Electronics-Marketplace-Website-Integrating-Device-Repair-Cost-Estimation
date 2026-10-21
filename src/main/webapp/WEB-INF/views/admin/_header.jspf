@@ -1,0 +1,66 @@
+<%--
+    Header + nav con dùng chung cho 5 trang ADMIN của module sửa chữa.
+    Yêu cầu trước khi include:
+      <c:set var="rpAdminPage" value="requests|devices|problems|pricing|reports" scope="request"/>
+--%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<header class="rp-header">
+    <div class="rp-header__inner">
+        <a class="rp-brand" href="${pageContext.request.contextPath}/admin">
+            <span class="rp-brand__dot"></span>
+            SỬA HAY BÁN
+        </a>
+        <span style="font-family:var(--rp-font-mono); font-size:11px; font-weight:600;
+                     background:var(--rp-black); color:#fff; padding:2px 8px; letter-spacing:.06em;">
+            ADMIN
+        </span>
+        <div class="rp-header__divider"></div>
+        <nav class="rp-nav">
+            <a class="rp-nav__link ${empty rpAdminPage || rpAdminPage == 'dashboard' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin">Người dùng & Duyệt tin</a>
+            <a class="rp-nav__link ${rpAdminPage == 'requests' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin/repairs">Đơn sửa chữa</a>
+            <a class="rp-nav__link ${rpAdminPage == 'devices' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin/repair/devices">Dòng máy</a>
+            <a class="rp-nav__link ${rpAdminPage == 'problems' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin/repair/problems">Loại lỗi</a>
+            <a class="rp-nav__link ${rpAdminPage == 'pricing' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin/repair/pricing">Bảng giá</a>
+            <a class="rp-nav__link ${rpAdminPage == 'reports' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin/repair/reports">Thống kê</a>
+        </nav>
+        <div class="rp-header__account">
+            <c:choose>
+                <c:when test="${not empty sessionScope.currentUser}">
+                    <a class="rp-account" href="${pageContext.request.contextPath}/profile">
+                        <span class="rp-avatar"><c:out value="${sessionScope.currentUser.initial}" /></span>
+                        <span>
+                            <span class="rp-account__name"><c:out value="${sessionScope.currentUser.name}" /></span>
+                            <span class="rp-account__meta">Quản trị viên</span>
+                        </span>
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a class="rp-header__login" href="${pageContext.request.contextPath}/login">Đăng nhập</a>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</header>
+
+<%-- Thông báo dùng chung cho mọi trang admin --%>
+<c:if test="${not empty errorMessage}">
+    <div style="padding:16px 24px 0;">
+        <div class="rp-alert rp-alert--error" style="margin-bottom:0;">
+            <strong>Lỗi:</strong> <c:out value="${errorMessage}" />
+        </div>
+    </div>
+</c:if>
+<c:if test="${not empty param.message}">
+    <div style="padding:16px 24px 0;">
+        <div class="rp-alert rp-alert--success" style="margin-bottom:0;
+             background:#F0FDF4; border-color:#BBF7D0; color:#15803D;">
+            <c:out value="${param.message}" />
+        </div>
+    </div>
+</c:if>
