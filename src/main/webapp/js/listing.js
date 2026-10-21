@@ -215,8 +215,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             </span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold uppercase">ID: #${item.id}</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" 
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" 
                                  src="${item.imageUrl}" 
                                  alt="${escapeHtml(item.deviceName)}">
                         </div>
