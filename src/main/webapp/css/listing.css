@@ -41,3 +41,9 @@
     border-bottom: 1px solid #eeeeec;
     padding: 8px 0;
 }
+
+/* Ensure live search input has ample padding so icon never overlaps placeholder */
+#live-search-input {
+    padding-left: 44px !important;
+    padding-right: 40px !important;
+}

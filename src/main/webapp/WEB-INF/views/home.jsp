@@ -52,7 +52,7 @@
                 <div class="relative w-full max-w-[480px] aspect-[4/3] flex items-center justify-center">
                     <div class="absolute -bottom-6 w-4/5 h-12 bg-black/90 rounded-full blur-[24px] pointer-events-none transform scale-y-50"></div>
                     <div class="relative z-10 w-full h-full flex items-center justify-center p-2">
-                        <img class="w-full h-full object-contain filter contrast-125 brightness-95 drop-shadow-[0_25px_35px_rgba(0,0,0,0.9)] transition-transform duration-500 hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7bpZp2wnhJgHBu9uyrWzR1Xw2Y3lf9SBKve3Oi1UU6gu6ewIp3-a-OVEkSeR4SST6D57mhJzkvqoU9HHhiUZGmWlnzrfK-I2G9b-AfQkMw3enVfu95-_JJXurHmFrEJARMeExaJ_8zyMYtXTAMAUuDCVwMoDD69LkqB6TPp0zMvPDUT13WYpxVSNv7c3LgNn7dIseGF_RwJ03hx8HtBnxnepuT8dTQ9UqdO94RuQ" alt="Workstation Spec 1:1">
+                        <img class="w-full h-full object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.9)] transition-transform duration-500 hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7bpZp2wnhJgHBu9uyrWzR1Xw2Y3lf9SBKve3Oi1UU6gu6ewIp3-a-OVEkSeR4SST6D57mhJzkvqoU9HHhiUZGmWlnzrfK-I2G9b-AfQkMw3enVfu95-_JJXurHmFrEJARMeExaJ_8zyMYtXTAMAUuDCVwMoDD69LkqB6TPp0zMvPDUT13WYpxVSNv7c3LgNn7dIseGF_RwJ03hx8HtBnxnepuT8dTQ9UqdO94RuQ" alt="Workstation Spec 1:1">
                     </div>
                     <div class="absolute bottom-1 right-2 z-20 font-mono text-[10px] text-zinc-400 bg-[#0c0d10]/90 backdrop-blur-sm px-3 py-1 border border-zinc-800 tracking-widest uppercase flex items-center gap-2 shadow-2xl">
                         <span class="w-1.5 h-1.5 bg-zinc-400"></span> ARCHIVE // WORKSTATION SPEC 1:1
@@ -139,8 +139,8 @@
                                     <c:out value="${not empty prod.badge ? prod.badge : 'NEW SEAL'}"/>
                                 </span>
                             </div>
-                            <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                                <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="${prod.imageUrl}" alt="${prod.name}">
+                            <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                                <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="${prod.imageUrl}" alt="${prod.name}">
                             </div>
                             <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                                 <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight line-clamp-1"><c:out value="${prod.name}"/></h3>
@@ -162,8 +162,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-primary">01</span>
                             <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ThinkPad T14 Gen 2</h3>
@@ -181,8 +181,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-primary">02</span>
                             <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">Dell XPS 13 9310</h3>
@@ -200,8 +200,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-[#FF4A1C]">03</span>
                             <span class="text-[11px] bg-[#FF4A1C] text-[#000000] px-2.5 py-0.5 uppercase tracking-widest font-extrabold shadow-sm">ĐƯỢC QUAN TÂM</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary group-hover:text-[#FF4A1C] transition-colors leading-tight">MacBook Air M1 2020</h3>
@@ -219,8 +219,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-primary">04</span>
                             <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ASUS Vivobook 15</h3>
@@ -321,8 +321,8 @@
                                 </span>
                                 <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: #${l.id}</span>
                             </div>
-                            <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                                <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="${l.mainImageUrl}" alt="${not empty l.device ? l.device.name : 'Laptop Cũ'}">
+                            <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
+                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${l.mainImageUrl}" alt="${not empty l.device ? l.device.name : 'Laptop Cũ'}">
                             </div>
                             <div class="p-4 flex flex-col gap-2">
                                 <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight line-clamp-1">
@@ -349,8 +349,8 @@
                             <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 8841-TP</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">ThinkPad T14 Gen 2</h3>
@@ -371,8 +371,8 @@
                             <span class="text-[11px] bg-amber-500 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TẠM</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 9022-MB</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">MacBook Air M1 2020</h3>
@@ -393,8 +393,8 @@
                             <span class="text-[11px] bg-[#FF4A1C] text-black font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: HƯ HỎNG</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 1542-AC</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Acer Nitro 5</h3>
@@ -415,8 +415,8 @@
                             <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 4109-DX</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Dell XPS 13 9310</h3>

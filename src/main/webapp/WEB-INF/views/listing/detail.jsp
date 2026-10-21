@@ -78,7 +78,7 @@
                         <span>ẢNH THỰC TẾ 100%</span>
                     </div>
                     
-                    <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden mt-8">
+                    <div class="w-full aspect-[4/3] bg-white border border-surface-dim flex items-center justify-center overflow-hidden mt-8">
                         <img id="main-preview-img" 
                              class="w-full h-full object-contain p-4 transition-transform duration-300"
                              src="${not empty listing.images ? listing.images[0].imageUrl : listing.mainImageUrl}" 

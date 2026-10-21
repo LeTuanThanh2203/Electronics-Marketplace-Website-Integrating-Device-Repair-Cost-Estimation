@@ -452,13 +452,13 @@ a {
     color: var(--orange);
 }
 
-input[type='text'],
+:where(input[type='text'],
 input[type='tel'],
 input[type='email'],
 input[type='number'],
 input[type='search'],
 select,
-textarea {
+textarea) {
     width: 100%;
     height: 44px;
     padding: 0 12px;
@@ -477,14 +477,11 @@ textarea {
     line-height: 1.65;
 }
 
-input::placeholder,
-textarea::placeholder {
+:where(input, textarea)::placeholder {
     color: var(--gray);
 }
 
-input:focus,
-select:focus,
-textarea:focus {
+:where(input, select, textarea):focus {
     outline: none;
     border-color: var(--black);
 }
