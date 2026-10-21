@@ -132,9 +132,9 @@
                                     </c:choose>
                                     <span class="font-mono text-[11px] text-zinc-500 font-semibold uppercase">ID: #${item.id}</span>
                                 </div>
-                                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" 
-                                         src="${not empty item.images ? item.images[0].imageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw'}" 
+                                <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                                    <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" 
+                                         src="${not empty item.images ? item.images[0].imageUrl : (not empty item.mainImageUrl ? item.mainImageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw')}" 
                                          alt="Laptop Image">
                                 </div>
                                 <div class="p-4 flex flex-col gap-2">

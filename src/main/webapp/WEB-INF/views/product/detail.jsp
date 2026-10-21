@@ -1,3 +1,5 @@
+<<<<<<< Updated upstream
+=======
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -36,7 +38,7 @@
                     
                     <c:choose>
                         <c:when test="${not empty product.imageUrl}">
-                            <img class="max-h-full max-w-full object-contain mix-blend-multiply" src="${product.imageUrl}" alt="${product.name}">
+                            <img class="max-h-full max-w-full object-contain" src="${product.imageUrl}" alt="${product.name}">
                         </c:when>
                         <c:otherwise>
                             <span class="material-symbols-outlined text-8xl text-gray-300">laptop</span>
@@ -167,3 +169,4 @@
 
 <%@ include file="/WEB-INF/layout/footer.jspf" %>
 
+>>>>>>> Stashed changes

@@ -51,7 +51,7 @@
                                                 <div class="aspect-[4/3] bg-white border border-brand-border p-3 flex items-center justify-center mb-3">
                                                     <c:choose>
                                                         <c:when test="${not empty p.imageUrl}">
-                                                            <img src="${p.imageUrl}" alt="${p.name}" class="max-h-full max-w-full object-contain mix-blend-multiply">
+                                                            <img src="${p.imageUrl}" alt="${p.name}" class="max-h-full max-w-full object-contain">
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="material-symbols-outlined text-4xl text-gray-300">laptop</span>

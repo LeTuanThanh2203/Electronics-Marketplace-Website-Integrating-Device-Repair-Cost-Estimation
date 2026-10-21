@@ -1,10 +1,76 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<c:set var="pageTitle" value="ELECTRONICSMARKETPLACE — Nâng Cấp Laptop Hay Chọn Sửa Chữa?" scope="request"/>
-<c:set var="activeNav" value="home" scope="request"/>
-<%@ include file="/WEB-INF/layout/header.jspf" %>
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectronicsMarketplace - Nâng cấp Laptop hay Chọn sửa chữa?</title>
+    
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home.css">
+
+    <!-- Tailwind Configuration & CDN for Stitch Source of Truth -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#f9f9f7", "surface-dim": "#dadad8", "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f4f2", "surface-container": "#eeeeec", "surface-container-high": "#e8e8e6",
+            "on-surface": "#1a1c1b", "on-surface-variant": "#444748", "outline": "#747878",
+            "primary": "#000000", "on-primary": "#ffffff", "primary-container": "#1c1b1b",
+            "secondary-container": "#dc3200"
+          },
+          fontFamily: {
+            "label-sm": ["Be Vietnam Pro"], "body-md": ["Be Vietnam Pro"], "headline-lg-mobile": ["Be Vietnam Pro"],
+            "display-xl": ["Be Vietnam Pro"], "spec-numeral": ["Be Vietnam Pro"], "body-lg": ["Be Vietnam Pro"],
+            "label-md": ["Be Vietnam Pro"], "headline-sm": ["Be Vietnam Pro"], "headline-md": ["Be Vietnam Pro"],
+            "body-sm": ["Be Vietnam Pro"], "headline-lg": ["Be Vietnam Pro"]
+          }
+        }
+      }
+    };
+    </script>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased">
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-surface-dim">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 h-16 flex items-center justify-between">
+        <div class="flex items-center shrink-0">
+            <a class="font-headline-sm text-[18px] text-primary tracking-wider uppercase font-semibold" href="${pageContext.request.contextPath}/">ELECTRONICSMARKETPLACE</a>
+        </div>
+        <nav class="hidden md:flex items-center h-full gap-6">
+            <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 font-semibold border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/product/list">LAPTOP MỚI</a>
+            <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/listing/marketplace">LAPTOP CŨ</a>
+            <a class="font-label-md text-[13px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-2 border-b-2 border-transparent hover:border-primary" href="${pageContext.request.contextPath}/repair/request">SỬA CHỮA</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" type="button">
+                <span class="material-symbols-outlined text-[18px]">search</span>
+                <span class="hidden lg:inline">Tìm kiếm</span>
+            </button>
+            <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/cart">
+                <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+                <span class="hidden lg:inline">Giỏ hàng</span>
+            </a>
+            <a class="flex items-center gap-1 font-label-sm text-[11px] uppercase text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/auth/login">
+                <span class="material-symbols-outlined text-[18px]">person</span>
+                <span class="hidden lg:inline">Tài khoản</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]">
 <div class="flex flex-col w-full bg-surface-container-low text-on-surface antialiased">
 
 <!-- ==========================================
@@ -129,6 +195,83 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border-t border-l border-surface-dim">
+<<<<<<< Updated upstream
+            <!-- Product 1 -->
+            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                <div class="p-4 flex justify-between items-start">
+                    <span class="text-[15px] font-bold text-outline group-hover:text-primary">01</span>
+                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
+                </div>
+                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
+                </div>
+                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ThinkPad T14 Gen 2</h3>
+                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Core i5-1135G7</div>
+                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                        <span class="text-[22px] font-black tracking-tight text-primary">18.990.000 ₫</span>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 2 -->
+            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                <div class="p-4 flex justify-between items-start">
+                    <span class="text-[15px] font-bold text-outline group-hover:text-primary">02</span>
+                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
+                </div>
+                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
+                </div>
+                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">Dell XPS 13 9310</h3>
+                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · FHD+ 500 Nits</div>
+                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                        <span class="text-[22px] font-black tracking-tight text-primary">24.990.000 ₫</span>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 3 -->
+            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#FF4A1C] hover:shadow-xl">
+                <div class="p-4 flex justify-between items-start">
+                    <span class="text-[15px] font-bold text-outline group-hover:text-[#FF4A1C]">03</span>
+                    <span class="text-[11px] bg-[#FF4A1C] text-[#000000] px-2.5 py-0.5 uppercase tracking-widest font-extrabold shadow-sm">ĐƯỢC QUAN TÂM</span>
+                </div>
+                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
+                </div>
+                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary group-hover:text-[#FF4A1C] transition-colors leading-tight">MacBook Air M1 2020</h3>
+                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · Apple Silicon 8-Core</div>
+                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                        <span class="text-[22px] font-black tracking-tight text-[#FF4A1C]">19.490.000 ₫</span>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary group-hover:text-[#FF4A1C] flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 4 -->
+            <article class="group relative bg-surface-container-lowest border-r border-b border-surface-dim flex flex-col justify-between transition-all duration-200 hover:border-[#0B0B0B] hover:shadow-xl">
+                <div class="p-4 flex justify-between items-start">
+                    <span class="text-[15px] font-bold text-outline group-hover:text-primary">04</span>
+                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
+                </div>
+                <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
+                </div>
+                <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ASUS Vivobook 15</h3>
+                    <div class="text-[12px] text-outline">RAM 16GB · SSD 512GB · OLED Display</div>
+                    <div class="flex items-center justify-between pt-2 mt-2 border-t border-surface-container">
+                        <span class="text-[22px] font-black tracking-tight text-primary">14.500.000 ₫</span>
+                        <a class="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform" href="${pageContext.request.contextPath}/product/detail">XEM CHI TIẾT →</a>
+                    </div>
+                </div>
+            </article>
+=======
             <c:choose>
                 <c:when test="${not empty featuredProducts}">
                     <c:forEach items="${featuredProducts}" var="prod" varStatus="loop">
@@ -139,8 +282,8 @@
                                     <c:out value="${not empty prod.badge ? prod.badge : 'NEW SEAL'}"/>
                                 </span>
                             </div>
-                            <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                                <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="${prod.imageUrl}" alt="${prod.name}">
+                            <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                                <img class="w-full h-full object-contain transition-all duration-300 group-hover:scale-105" src="${prod.imageUrl}" alt="${prod.name}">
                             </div>
                             <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                                 <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight line-clamp-1"><c:out value="${prod.name}"/></h3>
@@ -162,8 +305,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-primary">01</span>
                             <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyQII0gQZnOvdoq1gfhrI9g_ysOrSAQRT0r7x_To-_rwnejMmSGVL_hcqvaGtMUkLSWXzt5WXLc_eoRG6MOZoYzCdm8t1-rlrsm8RHc9_Sy39CnpeKCfRV0hLfHbEzR-xlkH0yIrLXtYmpsz713-mQZeLsgxRcTK9o2VVhqU6KL-7O-LgM0zZeOvcLp4ox3HkizvmvdgCE2_fD_NQXMi9IhY8m9puUhHGaaHTymE" alt="ThinkPad T14 Gen 2">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ThinkPad T14 Gen 2</h3>
@@ -181,8 +324,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-primary">02</span>
                             <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMZcQxzevhWWxy1psajWcGeBNsZAY2DVhuJZ1-iSprdXzq3AkFT-PKF-j35GPLdRXluvd4mVuviiGjM6XbPZEkV8RMG2PVuY7_WsyL6zs7xWFlSBGC9i7ME5Af6skxdmXnRMgKtQtCnaa5YzMbhb2VuSMHA5uJUYK5OzH7Dg4Seipgb1Hh1B61p4WRSdB_1rPaXhMfeyozeyggxQStu83e7ktKjNqB6U3dz58Aoy8" alt="Dell XPS 13 9310">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">Dell XPS 13 9310</h3>
@@ -200,8 +343,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-[#FF4A1C]">03</span>
                             <span class="text-[11px] bg-[#FF4A1C] text-[#000000] px-2.5 py-0.5 uppercase tracking-widest font-extrabold shadow-sm">ĐƯỢC QUAN TÂM</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixfwMw10z8WXwzn76NSW63OhdsL4N66DFnp7ArmcICT9XM3KUzpKEZobcmkiqsMDY0vBRoQuAnqNVzwlYbn5pgaesKQlOv8UP9cA6rKiTsxrMUZjXQGox8aaNHcLoxlvsNXuRLgc2yABEZr_KUIwhVaUyfWShG14GwN7N52yMNCFq3wtZVNTEaJnPDI78vrDR1y-dmbvZPjIF2-K7-s5IJyZrXo6gTM5K5B0MXWU" alt="MacBook Air M1 2020">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary group-hover:text-[#FF4A1C] transition-colors leading-tight">MacBook Air M1 2020</h3>
@@ -219,8 +362,8 @@
                             <span class="text-[15px] font-bold text-outline group-hover:text-primary">04</span>
                             <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 uppercase tracking-wider">NEW SEAL</span>
                         </div>
-                        <div class="w-full aspect-[4/3] px-4 flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-contain grayscale group-hover:contrast-125 group-hover:grayscale-0 transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
+                        <div class="w-full aspect-[4/3] px-4 bg-white flex items-center justify-center overflow-hidden">
+                            <img class="w-full h-full object-contain transition-all duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZrOchXXYzGtQ01eVG6H9S3nf-BXbWjEg9McOKK_0gfllqU7GQlRNkKoODJM-ABVxYUeMBRh1wZEiys7j1lV6MzlnaZXrJJiA9JqxfjdL6Lqd-QRCU80G3aawpilK2o2my2KGLa41HVJ9W2Db4QpSxWE0K-dbEFc6j9jyFdKLBwM-TvIJSE6QEpLN8FsCPeiCwPH6SzoeIHmMbPv3Sc-nQn6R1BI_4pyrATA0X1Y" alt="ASUS Vivobook 15">
                         </div>
                         <div class="p-4 border-t border-surface-dim flex flex-col gap-2 bg-surface-container-lowest">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight">ASUS Vivobook 15</h3>
@@ -233,6 +376,7 @@
                     </article>
                 </c:otherwise>
             </c:choose>
+>>>>>>> Stashed changes
         </div>
     </div>
 </section>
@@ -307,6 +451,95 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<<<<<<< Updated upstream
+            <!-- Used Card 1 -->
+            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                    <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
+                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 8841-TP</span>
+                </div>
+                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
+                </div>
+                <div class="p-4 flex flex-col gap-2">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">ThinkPad T14 Gen 2</h3>
+                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                        <div class="text-outline">CHU KỲ SẠC</div>
+                        <div class="text-right font-bold text-primary">142 LẦN</div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 mt-1">
+                        <span class="text-[22px] font-black text-primary tracking-tight">12.800.000 ₫</span>
+                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=1">→</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Used Card 2 -->
+            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                    <span class="text-[11px] bg-amber-500 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TẠM</span>
+                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 9022-MB</span>
+                </div>
+                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
+                </div>
+                <div class="p-4 flex flex-col gap-2">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">MacBook Air M1 2020</h3>
+                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                        <div class="text-outline">CHU KỲ SẠC</div>
+                        <div class="text-right font-bold text-primary">310 LẦN</div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 mt-1">
+                        <span class="text-[22px] font-black text-primary tracking-tight">13.900.000 ₫</span>
+                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=2">→</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Used Card 3 -->
+            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-[#FF4A1C] transition-all hover:shadow-xl">
+                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                    <span class="text-[11px] bg-[#FF4A1C] text-black font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: HƯ HỎNG</span>
+                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 1542-AC</span>
+                </div>
+                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
+                </div>
+                <div class="p-4 flex flex-col gap-2">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Acer Nitro 5</h3>
+                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                        <div class="text-outline">CHU KỲ SẠC</div>
+                        <div class="text-right font-bold text-primary">215 LẦN</div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 mt-1">
+                        <span class="text-[22px] font-black text-[#FF4A1C] tracking-tight">9.900.000 ₫</span>
+                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=3">→</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Used Card 4 -->
+            <article class="bg-surface-container-lowest border border-surface-dim flex flex-col justify-between group hover:border-primary transition-all hover:shadow-xl">
+                <div class="p-4 border-b border-surface-dim flex items-center justify-between">
+                    <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
+                    <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 4109-DX</span>
+                </div>
+                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
+                </div>
+                <div class="p-4 flex flex-col gap-2">
+                    <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Dell XPS 13 9310</h3>
+                    <div class="grid grid-cols-2 gap-1 py-1 border-t border-b border-surface-container text-[11px] uppercase font-semibold">
+                        <div class="text-outline">CHU KỲ SẠC</div>
+                        <div class="text-right font-bold text-primary">88 LẦN</div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 mt-1">
+                        <span class="text-[22px] font-black text-primary tracking-tight">16.500.000 ₫</span>
+                        <a class="w-9 h-9 flex items-center justify-center bg-primary text-white font-bold hover:bg-[#FF4A1C] transition-colors" href="${pageContext.request.contextPath}/listing/detail?id=4">→</a>
+                    </div>
+                </div>
+            </article>
+=======
             <c:choose>
                 <c:when test="${not empty featuredListings}">
                     <c:forEach items="${featuredListings}" var="l" varStatus="loop">
@@ -321,8 +554,8 @@
                                 </span>
                                 <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: #${l.id}</span>
                             </div>
-                            <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                                <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="${l.mainImageUrl}" alt="${not empty l.device ? l.device.name : 'Laptop Cũ'}">
+                            <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                                <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="${l.mainImageUrl}" alt="${not empty l.device ? l.device.name : 'Laptop Cũ'}">
                             </div>
                             <div class="p-4 flex flex-col gap-2">
                                 <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors leading-tight line-clamp-1">
@@ -349,8 +582,8 @@
                             <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 8841-TP</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw" alt="ThinkPad T14">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">ThinkPad T14 Gen 2</h3>
@@ -371,8 +604,8 @@
                             <span class="text-[11px] bg-amber-500 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TẠM</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 9022-MB</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9khgwGVRWUr7pveEsWsrcrRTf1hc0XxMk3WqBU-iNkQ9vLl30BXCO8V3_eIq9V84sBWEa3GMJ-xWKkOjRgw2QsmmZY_4EgL3lwZ9vmdiM4v--QRzytRbb7wbkmOPA1ReAhPrYvATcEMIVJsCGWhLzMOMMItNI1l3ylHgHoaDY9SgTGoQNVrgcQUlq7PtuBWIPMJociJyfylwJ_6R_fvDDJWh33Yv3Y2t91jx9b0" alt="MacBook Air M1">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">MacBook Air M1 2020</h3>
@@ -393,8 +626,8 @@
                             <span class="text-[11px] bg-[#FF4A1C] text-black font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: HƯ HỎNG</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 1542-AC</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiUuFj9nirVJgi2UB2s0CpHLB99-isqHObkrQVP4tE1GH5-Dxrwyv-Ni21oPfk9Y-00bjxVqJTbDdpplGnae49oFLSUi207gyj8DbIRrMataGx5YbzEl_wKQkcBE9TRH42EVYW1fPTpyRY7MepF4YMpVt6u7yy8XOjVm6R1mlEhDFN-_Fk8evmVFBMcosnqg8_3ICZaqkfcLfJtXaXUrglKwf1EzJrPutJ_dvH58E" alt="Acer Nitro 5">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Acer Nitro 5</h3>
@@ -415,8 +648,8 @@
                             <span class="text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1 uppercase tracking-wider leading-none">TÌNH TRẠNG: TỐT</span>
                             <span class="font-mono text-[11px] text-zinc-500 font-semibold tracking-wider uppercase">ID: 4109-DX</span>
                         </div>
-                        <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                            <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
+                        <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+                            <img class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSDK_Y1Tn41n44-PHzjN4HBUkeJo0v_OSMIby1f3oGoKS1XIgWMT0OQ7x-70QP5_J2MFN6k8tKhSjLkWka7UUtU190qsoRx8njivi8sfEnxOxj0eqC61J_i-nvl-El0uUx2un5gtrIJ0X82JdlkRINC2sMFwV9_sGOrsFS2Xrq_UeQ-yYBeTdWKy0wfJSICusiILvie4qLItiyxiLfxq_uz5a50m5ER5NzpuL4wsU" alt="Dell XPS 13">
                         </div>
                         <div class="p-4 flex flex-col gap-2">
                             <h3 class="text-[20px] font-extrabold uppercase tracking-tight text-primary transition-colors">Dell XPS 13 9310</h3>
@@ -432,6 +665,7 @@
                     </article>
                 </c:otherwise>
             </c:choose>
+>>>>>>> Stashed changes
         </div>
     </div>
 </section>
@@ -524,6 +758,45 @@
 </section>
 
 </div>
+</main>
 
+<!-- ==========================================
+       8. FOOTER (Architectural Minimal)
+       ========================================== -->
+<footer class="w-full bg-[#050505] text-on-primary border-t border-zinc-800">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-24 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 border-b border-zinc-800 pb-8 mb-8">
+            <div class="flex flex-col gap-2">
+                <a class="text-[18px] text-white tracking-wider uppercase font-semibold" href="${pageContext.request.contextPath}/">ELECTRONICSMARKETPLACE</a>
+                <p class="text-[12px] text-zinc-400 mt-2">Giải pháp nâng cấp và bảo trì thiết bị tối ưu. Tiêu chuẩn minh bạch 100%.</p>
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">DANH MỤC</span>
+                <a href="${pageContext.request.contextPath}/product/list" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Máy Mới</a>
+                <a href="${pageContext.request.contextPath}/listing/marketplace" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Chợ Đồ Cũ</a>
+                <a href="${pageContext.request.contextPath}/repair/request" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Sửa Chữa</a>
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">HỖ TRỢ</span>
+                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Tra cứu đơn hàng</a>
+                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Chính sách bảo hành</a>
+                <a href="#" class="text-[13px] text-zinc-300 hover:text-[#FF4A1C] transition-colors uppercase font-medium">Liên hệ kỹ thuật</a>
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-[11px] uppercase tracking-widest text-zinc-500 mb-1 font-semibold">LIÊN HỆ</span>
+                <span class="text-[13px] text-zinc-300 uppercase font-medium">1900 8888</span>
+                <span class="text-[13px] text-zinc-300 uppercase font-medium">support@electronics.vn</span>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row items-center justify-between font-mono text-[10px] text-zinc-600 uppercase tracking-widest">
+            <span>© 2026 ELECTRONICSMARKETPLACE. ALL RIGHTS RESERVED.</span>
+            <span>DESIGNED VIA STITCH ARCHITECTURE</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/js/home.js"></script>
-<%@ include file="/WEB-INF/layout/footer.jspf" %>
+</body>
+</html>
