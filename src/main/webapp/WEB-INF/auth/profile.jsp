@@ -25,18 +25,14 @@
     <div class="profile-grid">
         <!-- Sidebar: User Overview -->
         <div class="profile-card profile-sidebar">
-            <div id="sidebarAvatarContainer">
-                <c:choose>
-                    <c:when test="${not empty u.avatar}">
-                        <img id="sidebarAvatarImg" class="profile-avatar" src="<c:url value='${u.avatar}'/>" alt="avatar">
-                        <div id="sidebarAvatarInitial" class="profile-avatar-initial" style="display: none;"><c:out value="${u.initial}"/></div>
-                    </c:when>
-                    <c:otherwise>
-                        <img id="sidebarAvatarImg" class="profile-avatar" src="" alt="avatar" style="display: none;">
-                        <div id="sidebarAvatarInitial" class="profile-avatar-initial"><c:out value="${u.initial}"/></div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
+            <c:choose>
+                <c:when test="${not empty u.avatar}">
+                    <img class="profile-avatar" src="<c:url value='${u.avatar}'/>" alt="avatar">
+                </c:when>
+                <c:otherwise>
+                    <div class="profile-avatar-initial"><c:out value="${u.initial}"/></div>
+                </c:otherwise>
+            </c:choose>
 
             <h2 class="profile-username"><c:out value="${u.name}"/></h2>
             
@@ -94,7 +90,7 @@
                     <span class="material-symbols-outlined text-[#FF4A1C]">badge</span>
                     <span>Cập nhật thông tin tài khoản</span>
                 </h3>
-                <form method="post" action="${pageContext.request.contextPath}/profile" enctype="multipart/form-data">
+                <form method="post" action="${pageContext.request.contextPath}/profile">
                     <input type="hidden" name="action" value="info">
                     
                     <div class="profile-field">
@@ -117,56 +113,10 @@
                         </div>
                     </div>
 
-                    <!-- Chọn ảnh đại diện từ máy tính & Xem trước (Live Preview) -->
                     <div class="profile-field">
-                        <label class="profile-label">Ảnh đại diện</label>
-                        
-                        <div class="profile-avatar-upload-box">
-                            <!-- Khung xem trước ảnh đại diện -->
-                            <div class="profile-avatar-preview-wrap">
-                                <c:choose>
-                                    <c:when test="${not empty u.avatar}">
-                                        <img id="avatarPreviewImg" class="profile-avatar-preview" src="<c:url value='${u.avatar}'/>" alt="Avatar preview">
-                                        <div id="avatarPreviewInitial" class="profile-avatar-preview-initial" style="display: none;"><c:out value="${u.initial}"/></div>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img id="avatarPreviewImg" class="profile-avatar-preview" src="" alt="Avatar preview" style="display: none;">
-                                        <div id="avatarPreviewInitial" class="profile-avatar-preview-initial"><c:out value="${u.initial}"/></div>
-                                    </c:otherwise>
-                                </c:choose>
-                                <span id="previewBadge" class="profile-preview-badge" style="display: none;">Xem trước</span>
-                            </div>
-
-                            <!-- Nút chọn ảnh và thao tác -->
-                            <div class="profile-avatar-upload-content">
-                                <div class="profile-avatar-btn-row">
-                                    <label for="avatarFileInput" class="profile-upload-btn">
-                                        <span class="material-symbols-outlined text-[18px]">photo_camera</span>
-                                        <span>CHỌN ẢNH TỪ MÁY</span>
-                                    </label>
-                                    <input type="file" id="avatarFileInput" name="avatarFile" 
-                                           accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" style="display: none;">
-
-                                    <c:if test="${not empty u.avatar}">
-                                        <button type="button" id="btnRemoveAvatar" class="profile-btn-remove-avatar" title="Gỡ bỏ ảnh đại diện">
-                                            <span class="material-symbols-outlined text-[16px]">delete</span>
-                                            <span>Xóa ảnh</span>
-                                        </button>
-                                    </c:if>
-                                    <button type="button" id="btnCancelPreview" class="profile-btn-remove-avatar" style="display: none;" title="Hủy ảnh vừa chọn">
-                                        <span class="material-symbols-outlined text-[16px]">close</span>
-                                        <span>Hủy chọn</span>
-                                    </button>
-                                </div>
-
-                                <input type="hidden" id="removeAvatarInput" name="removeAvatar" value="false">
-
-                                <div id="avatarFileName" class="profile-file-info" style="display: none;"></div>
-                                <div class="profile-upload-hint">
-                                    Hỗ trợ tệp định dạng JPG, PNG, WEBP, GIF (tối đa 5MB). Xem trước tức thì ngay khi chọn.
-                                </div>
-                            </div>
-                        </div>
+                        <label class="profile-label" for="profAvatar">Đường dẫn ảnh đại diện (URL)</label>
+                        <input type="url" id="profAvatar" name="avatar" value="<c:out value='${u.avatar}'/>" 
+                               class="profile-input" placeholder="https://example.com/avatar.jpg">
                     </div>
 
                     <button class="profile-btn profile-btn-primary" type="submit" style="margin-top: 0.5rem;">
@@ -214,134 +164,5 @@
         </div>
     </div>
 </div>
-
-<script>
-(function() {
-    var fileInput = document.getElementById('avatarFileInput');
-    var previewImg = document.getElementById('avatarPreviewImg');
-    var previewInitial = document.getElementById('avatarPreviewInitial');
-    var previewBadge = document.getElementById('previewBadge');
-    var fileNameDisplay = document.getElementById('avatarFileName');
-    var btnCancelPreview = document.getElementById('btnCancelPreview');
-    var btnRemoveAvatar = document.getElementById('btnRemoveAvatar');
-    var removeAvatarInput = document.getElementById('removeAvatarInput');
-    
-    var sidebarImg = document.getElementById('sidebarAvatarImg');
-    var sidebarInitial = document.getElementById('sidebarAvatarInitial');
-
-    var originalAvatarSrc = previewImg ? previewImg.getAttribute('src') : '';
-    var hasOriginalAvatar = originalAvatarSrc && originalAvatarSrc.trim() !== '';
-
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            var file = e.target.files && e.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Tệp ảnh quá lớn. Vui lòng chọn tệp nhỏ hơn 5MB.');
-                fileInput.value = '';
-                return;
-            }
-
-            var objectUrl = URL.createObjectURL(file);
-
-            if (previewImg) {
-                previewImg.src = objectUrl;
-                previewImg.style.display = 'block';
-            }
-            if (previewInitial) {
-                previewInitial.style.display = 'none';
-            }
-            if (previewBadge) {
-                previewBadge.textContent = 'Xem trước';
-                previewBadge.style.background = 'var(--auth-orange)';
-                previewBadge.style.color = '#000000';
-                previewBadge.style.display = 'inline-block';
-            }
-
-            if (sidebarImg) {
-                sidebarImg.src = objectUrl;
-                sidebarImg.style.display = 'block';
-            }
-            if (sidebarInitial) {
-                sidebarInitial.style.display = 'none';
-            }
-
-            var sizeKb = Math.round(file.size / 1024);
-            var sizeStr = sizeKb >= 1024 ? (sizeKb / 1024).toFixed(1) + ' MB' : sizeKb + ' KB';
-            if (fileNameDisplay) {
-                fileNameDisplay.textContent = 'Đã chọn: ' + file.name + ' (' + sizeStr + ')';
-                fileNameDisplay.style.display = 'block';
-            }
-            if (btnCancelPreview) {
-                btnCancelPreview.style.display = 'inline-flex';
-            }
-            if (btnRemoveAvatar) {
-                btnRemoveAvatar.style.display = 'none';
-            }
-            if (removeAvatarInput) {
-                removeAvatarInput.value = 'false';
-            }
-        });
-    }
-
-    if (btnCancelPreview) {
-        btnCancelPreview.addEventListener('click', function() {
-            if (fileInput) fileInput.value = '';
-            if (hasOriginalAvatar && (!removeAvatarInput || removeAvatarInput.value !== 'true')) {
-                if (previewImg) {
-                    previewImg.src = originalAvatarSrc;
-                    previewImg.style.display = 'block';
-                }
-                if (previewInitial) previewInitial.style.display = 'none';
-                if (sidebarImg) {
-                    sidebarImg.src = originalAvatarSrc;
-                    sidebarImg.style.display = 'block';
-                }
-                if (sidebarInitial) sidebarInitial.style.display = 'none';
-            } else {
-                if (previewImg) previewImg.style.display = 'none';
-                if (previewInitial) previewInitial.style.display = 'flex';
-                if (sidebarImg) sidebarImg.style.display = 'none';
-                if (sidebarInitial) sidebarInitial.style.display = 'flex';
-            }
-            if (previewBadge) previewBadge.style.display = 'none';
-            if (fileNameDisplay) fileNameDisplay.style.display = 'none';
-            btnCancelPreview.style.display = 'none';
-            if (btnRemoveAvatar && hasOriginalAvatar) {
-                btnRemoveAvatar.style.display = 'inline-flex';
-            }
-            if (removeAvatarInput) {
-                removeAvatarInput.value = 'false';
-            }
-        });
-    }
-
-    if (btnRemoveAvatar) {
-        btnRemoveAvatar.addEventListener('click', function() {
-            if (confirm('Bạn có chắc muốn xóa ảnh đại diện và quay về ký tự viết tắt mặc định?')) {
-                if (fileInput) fileInput.value = '';
-                if (removeAvatarInput) removeAvatarInput.value = 'true';
-                if (previewImg) previewImg.style.display = 'none';
-                if (previewInitial) previewInitial.style.display = 'flex';
-                if (sidebarImg) sidebarImg.style.display = 'none';
-                if (sidebarInitial) sidebarInitial.style.display = 'flex';
-                if (previewBadge) {
-                    previewBadge.textContent = 'Sẽ xóa ảnh';
-                    previewBadge.style.display = 'inline-block';
-                    previewBadge.style.background = '#DC2626';
-                    previewBadge.style.color = '#FFFFFF';
-                }
-                if (fileNameDisplay) {
-                    fileNameDisplay.textContent = 'Ảnh đại diện sẽ bị xóa sau khi bạn bấm Lưu.';
-                    fileNameDisplay.style.display = 'block';
-                }
-                btnRemoveAvatar.style.display = 'none';
-                if (btnCancelPreview) btnCancelPreview.style.display = 'inline-flex';
-            }
-        });
-    }
-})();
-</script>
 
 <%@ include file="/WEB-INF/layout/footer.jspf" %>
