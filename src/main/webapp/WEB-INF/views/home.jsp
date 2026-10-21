@@ -52,7 +52,7 @@
                 <div class="relative w-full max-w-[480px] aspect-[4/3] flex items-center justify-center">
                     <div class="absolute -bottom-6 w-4/5 h-12 bg-black/90 rounded-full blur-[24px] pointer-events-none transform scale-y-50"></div>
                     <div class="relative z-10 w-full h-full flex items-center justify-center p-2">
-                        <img class="w-full h-full object-contain filter contrast-125 brightness-95 drop-shadow-[0_25px_35px_rgba(0,0,0,0.9)] transition-transform duration-500 hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7bpZp2wnhJgHBu9uyrWzR1Xw2Y3lf9SBKve3Oi1UU6gu6ewIp3-a-OVEkSeR4SST6D57mhJzkvqoU9HHhiUZGmWlnzrfK-I2G9b-AfQkMw3enVfu95-_JJXurHmFrEJARMeExaJ_8zyMYtXTAMAUuDCVwMoDD69LkqB6TPp0zMvPDUT13WYpxVSNv7c3LgNn7dIseGF_RwJ03hx8HtBnxnepuT8dTQ9UqdO94RuQ" alt="Workstation Spec 1:1">
+                        <img class="w-full h-full object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.9)] transition-transform duration-500 hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7bpZp2wnhJgHBu9uyrWzR1Xw2Y3lf9SBKve3Oi1UU6gu6ewIp3-a-OVEkSeR4SST6D57mhJzkvqoU9HHhiUZGmWlnzrfK-I2G9b-AfQkMw3enVfu95-_JJXurHmFrEJARMeExaJ_8zyMYtXTAMAUuDCVwMoDD69LkqB6TPp0zMvPDUT13WYpxVSNv7c3LgNn7dIseGF_RwJ03hx8HtBnxnepuT8dTQ9UqdO94RuQ" alt="Workstation Spec 1:1">
                     </div>
                     <div class="absolute bottom-1 right-2 z-20 font-mono text-[10px] text-zinc-400 bg-[#0c0d10]/90 backdrop-blur-sm px-3 py-1 border border-zinc-800 tracking-widest uppercase flex items-center gap-2 shadow-2xl">
                         <span class="w-1.5 h-1.5 bg-zinc-400"></span> ARCHIVE // WORKSTATION SPEC 1:1

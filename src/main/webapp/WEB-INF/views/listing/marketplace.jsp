@@ -40,8 +40,8 @@
         <section class="mt-6 bg-surface-container-lowest border border-surface-dim p-4">
             <form id="marketplace-filter-form" method="GET" action="${pageContext.request.contextPath}/listing/marketplace" class="flex flex-col xl:flex-row items-stretch xl:items-center gap-3">
                 <div class="relative flex-1 min-w-[260px]">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
-                    <input id="live-search-input" name="keyword" value="${param.keyword}" class="w-full h-11 pl-10 pr-10 bg-surface-container-low border border-surface-dim text-sm text-primary placeholder:text-outline focus:border-primary focus:outline-none transition-colors" placeholder="Tìm theo tên máy, cấu hình hoặc người bán..." type="text" autocomplete="off">
+                    <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none select-none flex items-center justify-center">search</span>
+                    <input id="live-search-input" name="keyword" value="${param.keyword}" class="w-full h-11 pl-11 pr-10 bg-surface-container-low border border-surface-dim text-sm text-primary placeholder:text-outline focus:border-primary focus:outline-none transition-colors" style="padding-left: 44px !important; padding-right: 40px !important;" placeholder="Tìm theo tên máy, cấu hình hoặc người bán..." type="text" autocomplete="off">
                     <span id="search-spinner" class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#FF4A1C] text-[18px] animate-spin hidden pointer-events-none">progress_activity</span>
                     <button type="button" id="search-clear-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary ${empty param.keyword ? 'hidden' : ''}" title="Xóa tìm kiếm">
                         <span class="material-symbols-outlined text-[18px]">close</span>
@@ -132,8 +132,8 @@
                                     </c:choose>
                                     <span class="font-mono text-[11px] text-zinc-500 font-semibold uppercase">ID: #${item.id}</span>
                                 </div>
-                                <div class="w-full aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
-                                    <img class="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 transition-transform duration-300" 
+                                <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
+                                    <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                                          src="${not empty item.images ? item.images[0].imageUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfW4DtavcquK1SUWDVWq4B-j-lm9TuqguAQN4Xa6MQg4U4aiGZnrk7v3ldHxLGKSeCe8M5zgisMD067mW34tC5KAdqFcN_v98c15IBo7SF0WlHF0EA-qXE2BsIcR-_VzT0LHni0Dr-Tlk-bNzyvpNTtHWVtuTOIxw8cQTE2qfcWCPYRDdie9vqz-Is7Wax6QMcB-0Odv_pp0ewcZPHPH8VU788RLkdImm_NIV1pXw'}" 
                                          alt="Laptop Image">
                                 </div>
