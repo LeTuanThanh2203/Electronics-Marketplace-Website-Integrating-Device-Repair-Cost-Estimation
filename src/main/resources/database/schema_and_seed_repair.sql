@@ -511,14 +511,14 @@ ON CONFLICT (device_id, problem_id, version) DO NOTHING;
 
 
 -- Người dùng mẫu. Mật khẩu là "123456" (hash bcrypt hợp lệ, 60 ký tự).
-INSERT INTO users (name, email, phone, password_hash, role, status)
+INSERT INTO users (name, email, phone, password_hash, role, status, completed_sales_count, created_at)
 VALUES ('Nguyễn Văn Quốc', 'quoc@example.com', '0987654321',
-        '$2a$10$mHo/klVRHYv3lKOZ1AWnhunhq68Tqv4Op7ZF.lTzp3XDGgflG4KU2', 'USER', 'ACTIVE')
+        '$2a$10$mHo/klVRHYv3lKOZ1AWnhunhq68Tqv4Op7ZF.lTzp3XDGgflG4KU2', 'USER', 'ACTIVE', 0, CURRENT_TIMESTAMP)
 ON CONFLICT (email) DO NOTHING;
 
 -- Yêu cầu sửa chữa mẫu phong phú (12 đơn mẫu để kiểm thử báo cáo thống kê GROUP BY và phân loại)
-INSERT INTO repair_requests (user_id, device_id, problem_id, customer_name, customer_phone, customer_email, description, status)
-SELECT u.user_id, d.id, p.problem_id, v.customer_name, v.phone, v.email, v.description, v.status
+INSERT INTO repair_requests (user_id, device_id, problem_id, customer_name, customer_phone, customer_email, description, status, created_at)
+SELECT u.id, d.id, p.problem_id, v.customer_name, v.phone, v.email, v.description, v.status, CURRENT_TIMESTAMP
 FROM (VALUES
     ('Apple',   'iPhone',     'iPhone 16 Pro Max',         'Vỡ màn hình / Chảy mực',       'Trần Minh Đức',   '0901234567', 'duc@example.com',    'Rơi từ bàn làm việc vỡ màn hình nứt góc',       'ESTIMATED'),
     ('Dell',    'XPS',        'Dell XPS 15 9530',          'Vỡ màn hình / Chảy mực',       'Lê Hoàng Nam',    '0902345678', 'nam@example.com',    'Màn hình bị va đập góc cấn sọc ngang',          'IN_PROGRESS'),
