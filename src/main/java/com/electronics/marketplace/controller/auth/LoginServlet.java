@@ -36,8 +36,13 @@ public class LoginServlet extends HttpServlet {
             } else if (u.getStatus() == UserStatus.SUSPENDED) {
                 error = "Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên.";
             } else {
-                req.changeSessionId();                       // chống session fixation
-                req.getSession().setAttribute(AuthenticationFilter.SESSION_KEY, u);
+                HttpSession session = req.getSession(false);
+                if (session != null) {
+                    req.changeSessionId();
+                } else {
+                    session = req.getSession(true);
+                }
+                session.setAttribute(AuthenticationFilter.SESSION_KEY, u);
                 String redirect = req.getParameter("redirect");
                 if (redirect != null && !redirect.trim().isEmpty() && !redirect.contains("://")) {
                     resp.sendRedirect(redirect);

@@ -49,9 +49,6 @@
                         </div>
                     </div>
                 </div>
-                <a href="${pageContext.request.contextPath}/admin/dashboard" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0">
-                    Trang Duyệt Tin (Admin)
-                </a>
             </div>
         </c:if>
 

@@ -18,6 +18,8 @@
         <nav class="rp-nav">
             <a class="rp-nav__link ${empty rpAdminPage || rpAdminPage == 'dashboard' ? 'is-active' : ''}"
                href="${pageContext.request.contextPath}/admin">Người dùng & Duyệt tin</a>
+            <a class="rp-nav__link ${rpAdminPage == 'products' ? 'is-active' : ''}"
+               href="${pageContext.request.contextPath}/admin/products">Sản phẩm B2C</a>
             <a class="rp-nav__link ${rpAdminPage == 'requests' ? 'is-active' : ''}"
                href="${pageContext.request.contextPath}/admin/repairs">Đơn sửa chữa</a>
             <a class="rp-nav__link ${rpAdminPage == 'devices' ? 'is-active' : ''}"

@@ -20,6 +20,10 @@
             <span class="material-symbols-outlined text-[16px]">group</span>
             <span>Người dùng & Duyệt tin</span>
         </a>
+        <a class="admin-tab" href="${pageContext.request.contextPath}/admin/products">
+            <span class="material-symbols-outlined text-[16px]">laptop_mac</span>
+            <span>Sản phẩm B2C</span>
+        </a>
         <a class="admin-tab" href="${pageContext.request.contextPath}/admin/repairs">
             <span class="material-symbols-outlined text-[16px]">build</span>
             <span>Đơn sửa chữa</span>

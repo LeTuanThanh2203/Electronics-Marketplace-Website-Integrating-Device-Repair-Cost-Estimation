@@ -36,6 +36,14 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    public void deleteProduct(Long id) {
+        productRepository.delete(id);
+    }
+
     public List<Product> filterProducts(List<String> brands, BigDecimal minPrice, BigDecimal maxPrice,
                                        Integer minRam, String targetNeed, String sortBy) {
         return productRepository.filter(brands, minPrice, maxPrice, minRam, targetNeed, sortBy);

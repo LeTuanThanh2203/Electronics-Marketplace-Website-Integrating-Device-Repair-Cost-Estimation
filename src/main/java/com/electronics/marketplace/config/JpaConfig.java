@@ -53,7 +53,7 @@ public final class JpaConfig {
         Map<String, Object> overrides = new HashMap<>();
         overrides.put("jakarta.persistence.jdbc.url", getEnvOrDefault(ENV_URL, "jdbc:postgresql://localhost:5432/electronics_marketplace"));
         overrides.put("jakarta.persistence.jdbc.user", getEnvOrDefault(ENV_USER, "postgres"));
-        overrides.put("jakarta.persistence.jdbc.password", getEnvOrDefault(ENV_PASSWORD, "postgres"));
+        overrides.put("jakarta.persistence.jdbc.password", getEnvOrDefault(ENV_PASSWORD, "02052010"));
         return overrides;
     }
 
