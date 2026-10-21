@@ -158,4 +158,16 @@ public class User implements Serializable {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(role);
+    }
+
+    public boolean isActive() {
+        return "ACTIVE".equalsIgnoreCase(status) || status == null;
+    }
+
+    public String getInitial() {
+        return (name == null || name.trim().isEmpty()) ? "?" : name.trim().substring(0, 1).toUpperCase();
+    }
 }
